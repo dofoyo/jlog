@@ -1,0 +1,39 @@
+[
+    {
+    "id":"001",
+    "name":"zhaoyi",
+    "department":"集团总部.信息化管理中心.实施推广部",
+    "bosses":"qianer",
+    "tobeBosses":"",
+    "followers":"",
+    "isMyBoss":false,
+    "isMyFollower":false,
+    "tobeMyBoss":false,
+    "isMyself":false
+    },
+    {
+    "id":"002",
+    "name":"qianer",
+    "department":"集团总部.信息化管理中心.实施推广部",
+    "bosses":"sunsan",
+    "tobeBosses":"",
+    "followers":"zhaoyi",
+    "isMyBoss":false,
+    "isMyFollower":false,
+    "tobeMyBoss":false,
+    "isMyself":false
+    },
+    {
+    "id":"003",
+    "name":"sunsan",
+    "department":"集团总部.信息化管理中心.实施推广部",
+    "bosses":"",
+    "tobeBosses":"",
+    "followers":"qianer",
+    "isMyBoss":false,
+    "isMyFollower":false,
+    "tobeMyBoss":false,
+    "isMyself":false
+    }
+]
+

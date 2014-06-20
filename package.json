@@ -1,0 +1,16 @@
+{
+  "name": "jlog",
+  "version": "0.0.1",
+  "description": "a log system for organizaiton",
+  "repository": "https://github.com/dofoyo/jlog",
+  "dependencies": {
+    "express":      "~3.4.7",
+    "express-jwt":  "~0.2.1",
+    "jsonwebtoken": "~0.4.0"
+  },
+  "scripts": {
+	"start":	"node app.js",
+	"test":		"karma start test/karma.conf.js"
+  }
+
+}

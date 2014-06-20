@@ -1,0 +1,27 @@
+<TEXTAREA NAME="" ROWS="4" COLS="28" ng-model="message"></TEXTAREA>
+<button ng-click="submitMesasage();" style="width: 45px; height: 75px;">提交</button>
+<hr>
+<div>
+<ul class="partial1_logview">
+    <li ng-repeat="log in logs">
+        <font color="blue">{{log.creator.name}}</font><font size="1" color="grey">({{log.creator.department}})</font><br>
+        {{log.message}}<font size="1" color="grey">({{log.datetime}})</font>
+        <ul>
+            <li ng-repeat="comment in log.comments">
+                <font color="blue">{{comment.creator.name}}</font><font size="1" color="grey">({{comment.creator.department}})</font><br>
+                {{comment.message}}<font size="1" color="grey">({{comment.datetime}})</font>
+            </li>
+        </ul>
+        <button ng-click='toggleCommentState($index);'>点评</button>
+        <div  ng-class="{showComment: $index!=selectedIndex}">
+            <input ng-model="log.comment"><button ng-click="submitComment($index);">提交</button>
+        </div>
+    </li>
+</ul>
+</div>
+
+<style type="text/css">
+    .showComment {
+        display:none;
+    }
+</style>

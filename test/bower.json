@@ -1,0 +1,9 @@
+{
+  "name": "jlog test",
+  "description": "test of jlog ",
+  "version": "0.0.1",
+  "dependencies": {
+    "angular-mocks": "1.2.18",
+    "angular-scenario": "1.2.18"
+  }
+}
