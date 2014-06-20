@@ -11,8 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="bower_components/html5-boilerplate/css/normalize.css">
   <link rel="stylesheet" href="bower_components/html5-boilerplate/css/main.css">
-  <link rel="stylesheet" href="css/app.css"/>
-  <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
+  <link rel="stylesheet" href="common/css/app.css"/>
 </head>
 
 <body>
@@ -22,7 +21,6 @@
     <li><a href="#/user">关注</a></li>
     <li><a href="#/search">搜索</a></li>
     <li><a href="#/login">登录</a></li>
-    <li><a href="#/todo">待改进</a></li>
   </ul>
 
   <!--[if lt IE 7]>
@@ -31,16 +29,40 @@
 
   <div ng-view></div>
 
+
+
+  <div style="position:absolute; top:850px;left:50px;">
+      <hr>
+      <h3>TODO</h3>
+  <ul>
+      <li>日志和人员的数据库保存。</li>
+      <li>日志和关注的分页。</li>
+      <li>日志搜索。</li>
+      <li>日志展示级别。</li>
+      <li>人员头像。</li>
+      <li>附件上传。</li>
+      <li>在同意关注时，有传递和非传递二种属性。</li>
+  </ul>
+</div>
+
   <!-- In production use:
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
   -->
+  <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
   <script src="bower_components/angular/angular.min.js"></script>
   <script src="bower_components/angular-route/angular-route.min.js"></script>
   <script src="bower_components/angular-resource/angular-resource.min.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/services.js"></script>
-  <script src="js/controllers.js"></script>
-  <script src="js/filters.js"></script>
-  <script src="js/directives.js"></script>
+  <script src="common/js/app.js"></script>
+  <script src="common/js/services.js"></script>
+  <script src="common/js/controllers.js"></script>
+  <script src="common/js/filters.js"></script>
+  <script src="common/js/directives.js"></script>
+  <script src="log/js/logServices.js"></script>
+  <script src="log/js/logControllers.js"></script>
+  <script src="user/js/userServices.js"></script>
+  <script src="user/js/userControllers.js"></script>
+  <script src="login/js/loginControllers.js"></script>
+  <script src="login/js/loginServices.js"></script>
+
 </body>
 </html>

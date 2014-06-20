@@ -30,13 +30,13 @@ describe('tlog controllers', function() {
         });
     });
 
-    beforeEach(module('logServices'));
+    beforeEach(module('myApp.logServices'));
 
     describe('LogCtrl', function(){
         var scope, ctrl, $httpBackend;
         beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
             $httpBackend = _$httpBackend_;
-            $httpBackend.expectGET('log/logs.json').respond([{id: '0001'}, {id: '0002'}]);
+            $httpBackend.expectGET('log/log_resource/logs.json').respond([{id: '0001'}, {id: '0002'}]);
             scope = $rootScope.$new();
             ctrl = $controller(LogCtrl, {$scope: scope});
         }));

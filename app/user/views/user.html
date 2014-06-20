@@ -1,12 +1,12 @@
-<div ng-controller="FilterCtrl">
-&nbsp;&nbsp;关键字：<input type="text" id="searchTextBox" ng-model="filterService.searchText">
-    <input type="checkbox" ng-model="filterService.activeFilters.isMyFollower" ng-false-value="">我关注的&nbsp;&nbsp;
-    <input type="checkbox" ng-model="filterService.activeFilters.isMyBoss" ng-false-value="">关注我的&nbsp;&nbsp;
-    <input type="checkbox" ng-model="filterService.activeFilters.tobeMyBoss" ng-false-value="">待处理的
+<div ng-controller="UserFilterCtrl">
+&nbsp;&nbsp;关键字：<input type="text" id="searchTextBox" ng-model="userFilterService.searchText">
+    <input type="checkbox" ng-model="userFilterService.activeFilters.isMyFollower" ng-false-value="">我关注的&nbsp;&nbsp;
+    <input type="checkbox" ng-model="userFilterService.activeFilters.isMyBoss" ng-false-value="">关注我的&nbsp;&nbsp;
+    <input type="checkbox" ng-model="userFilterService.activeFilters.tobeMyBoss" ng-false-value="">待处理的
 </div>
 <div ng-controller="UserCtrl">
     <INPUT TYPE="button" VALUE="刷新" ng-click="refresh()">
-    <div ng-repeat="user in users | filter:{'name':filterService.searchText} | filter:filterService.activeFilters"  class="partial2_div2_none">
+    <div ng-repeat="user in users | filter:{'name':userFilterService.searchText} | filter:userFilterService.activeFilters"  class="partial2_div2_none">
         <div ng-show="!user.isMyself">
             <font color="blue">{{user.name}}</font><br>
             {{user.department}}<br>
@@ -16,4 +16,3 @@
         </div>
     </div>
 </div>
-
