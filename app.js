@@ -1,8 +1,11 @@
 var express = require('express');
 var jwt = require('jsonwebtoken');  //https://npmjs.org/package/node-jsonwebtoken
 var expressJwt = require('express-jwt'); //https://npmjs.org/package/express-jwt
-
 var secret = 'this is the secret secret secret 12356';
+
+var databaseUrl = "jlog"; // "username:password@example.com/mydb"
+var collections = ["users"]
+var db = require("mongojs").connect(databaseUrl, collections);
 
 var app = express();
 
@@ -25,25 +28,23 @@ app.use(function(err, req, res, next){
 });
 
 app.post('/authenticate', function (req, res) {
-  //TODO validate req.body.username and req.body.password
-  //if is invalid, return 401
-  /*
-    if (!(req.body.username === 'john.doe' && req.body.password === 'foobar')) {
-    res.send(401, 'Wrong user or password');
-    return;
-  }
-  */
-
-  var profile = {
-    id: 123,
-    username: req.body.username,
-    email: req.body.username+'@gifore.com'
-  };
-
-  // We are sending the profile inside the token
-  var token = jwt.sign(profile, secret, { expiresInMinutes: 60*5 });
-
-  res.json({ token: token });
+   db.users.find({username:req.body.username,password:req.body.password}, function(err, users) {
+        if( err || !users || users.length==0){
+            res.send(401, 'Wrong user or password');
+            console.log("authenticate: wrong user or password!");
+        }else {
+            var user = users[0];
+            var profile = {
+                id:user._id,
+                username:user.username,
+                password:user.password,
+                department:user.department
+            };
+            console.log("authenticate: succeeded!");
+            var token = jwt.sign(profile, secret, { expiresInMinutes: 60*5 });
+            res.json({token: token });
+        }
+   });
 });
 
 app.get('/api/restricted', function (req, res) {
@@ -56,3 +57,5 @@ app.get('/api/restricted', function (req, res) {
 app.listen(8080, function () {
   console.log('server started,  http://localhost:8080');
 });
+
+
