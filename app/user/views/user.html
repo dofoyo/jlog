@@ -1,18 +1,38 @@
-<div ng-controller="UserFilterCtrl">
-&nbsp;&nbsp;关键字：<input type="text" id="searchTextBox" ng-model="userFilterService.searchText">
-    <input type="checkbox" ng-model="userFilterService.activeFilters.isMyFollower" ng-false-value="">我关注的&nbsp;&nbsp;
-    <input type="checkbox" ng-model="userFilterService.activeFilters.isMyBoss" ng-false-value="">关注我的&nbsp;&nbsp;
-    <input type="checkbox" ng-model="userFilterService.activeFilters.tobeMyBoss" ng-false-value="">待处理的
+<div class="container-fluid">
+<div class="row-fluid">
+	  <div class="span2">
+		<!--Sidebar content-->
+		Search: <input ng-model="user">
+		<div class="span10">
+			<!--Body content-->
+			<ul class="users">
+			  <li ng-repeat="user in users | filter:user ">
+				{{user.name}},{{user.password}},{{user.department}}
+			  </li>
+			</ul>
+		  </div>
+	  </div>
 </div>
-<div ng-controller="UserCtrl">
-    <INPUT TYPE="button" VALUE="刷新" ng-click="refresh()">
-    <div ng-repeat="user in users | filter:{'name':userFilterService.searchText} | filter:userFilterService.activeFilters"  class="partial2_div2_none">
-        <div ng-show="!user.isMyself">
-            <font color="blue">{{user.name}}</font><br>
-            {{user.department}}<br>
-            <span ng-show="user.isMyFollower">我已关注的人</span><button ng-show="user.isMyFollower" ng-click="deleteFollower($index)">取消关注</button><button ng-show="!user.isMyFollower" ng-click="addFollower($index)">关注TA</button><br>
-            <span ng-show="user.isMyBoss">已关注我的人</span><button ng-show="user.isMyBoss" ng-click="deleteBoss($index)">取消关注</button><button ng-show="!user.isMyBoss" ng-click="addBoss($index)">请TA关注我</button><br>
-            <button ng-show="user.tobeMyBoss" ng-click="agreeMyBoss($index)">同意TA关注我</button><button ng-show="user.tobeMyBoss" ng-click="disagreeMyBoss($index)">不同意TA关注我</button><br>
-        </div>
-    </div>
+</div>
+
+<hr>
+
+<div class="container-fluid" >
+<div class="row-fluid">
+	  <div class="span10">
+		<form name="myform" id="myform1" ng-submit="save()">
+			<fieldset>
+				<legend>New User</legend>
+				<div class="control-group">
+					<center><input type="text" placeholder="User…" ng-model="username" size=50 required/></center>
+					<center><input type="text" placeholder="Password…" ng-model="password" size=50 required/></center>
+					<center><input type="text" placeholder="Department" ng-model="department" size=50 required/></center>
+				</div>
+			</fieldset>
+			<p>
+				<div><center><button type="submit" >Save now...</button></center></div>
+			</p>
+		</form>
+	</div>
+</div>
 </div>

@@ -2,7 +2,7 @@
 
 function UserFilterCtrl($scope, userFilterService) {
     $scope.userFilterService = userFilterService;
-};
+}
 
 function UserCtrl($scope, User, $window, userFilterService) {
     //alert('it is UserCtrl');
@@ -57,3 +57,62 @@ function UserCtrl($scope, User, $window, userFilterService) {
 
     }
 }
+
+function UserListCtrl($scope, $http, $templateCache) {
+
+    var method = 'POST';
+    var inserturl = '/user';
+    $scope.codeStatus = "";
+    $scope.save = function() {
+        var formData = {
+            'username' : this.username,
+            'password' : this.password,
+            'department' : this.department
+        };
+        this.username = '';
+        this.password = '';
+        this.department = '';
+
+
+        var jdata = 'mydata='+JSON.stringify(formData);
+
+        $http({
+            method: method,
+            url: inserturl,
+            data:  jdata ,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            cache: $templateCache
+        }).
+            success(function(response) {
+                alert("save user successed!");
+                $scope.codeStatus = response.data;
+                console.log($scope.codeStatus);
+
+            }).
+            error(function(response) {
+                alert("save user error!");
+                $scope.codeStatus = response || "Request failed";
+                console.log($scope.codeStatus);
+            });
+        $scope.list();
+        return false;
+    };
+
+
+    $scope.list = function() {
+        var url = '/users';
+        //alert(url);
+        $http.get(url).
+            //$http({url: '127.0.0.1:1212/users', method: 'GET'})
+            success(function(data,status,headers,config) {
+                //alert("get users success!");
+                $scope.users = data;
+            }).
+            error(function(data,status,headers,config){
+                alert("get users error!");
+            });
+    };
+
+    $scope.list();
+}
+
