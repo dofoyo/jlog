@@ -6,13 +6,11 @@
         "creator":{"id":"001","name":"赵一","department":"集团总部.信息化管理中心.实施推广部"},
         "comments":[
             {
-                "id": "0002",
                 "message":"讨论并确定日志功能：加关注、允许关注、取消关注、写日志、点评日志、搜索日志。",
                 "datetime":"2014-6-2 18:23:23",
                 "creator":{"id":"002","name":"钱二","department":"集团总部.信息化管理中心.实施推广部"}
             },
             {
-                "id": "0003",
                 "message":"讨论并确定搜索日志功能：可以按被关注人、起止日期、关键字进行搜索。",
                 "datetime":"2014-6-3 17:35:12",
                 "creator":{"id":"003","name":"孙三","department":"集团总部.信息化管理中心.实施推广部"}
@@ -25,6 +23,7 @@
         "datetime":"2014-6-1 18:00:32",
         "creator":{"id":"002","name":"钱二","department":"集团总部.信息化管理中心.实施推广部"},
         "comments":[]
-    }
+    },
+    {"id":"6832772865AA537856230013","message":"11111111111111111111","datetime":"Wed Jun 25 2014 20:04:34 GMT+0800 (中国标准时间)","creator":{"id":"53a7d94c5a9341f0108df3c6","name":"rhb","department":"jifeng.information.application"},"comments":[{"message":"SDFEWQFDASF SDF","datetime":"2014-06-25T12:04:34.096Z","creator":{"id":"53a7d94c5a9341f0108df3c6","name":"rhb","department":"jifeng.information.application"}},{"message":"ddddd","datetime":"2014-06-25T11:53:57.608Z","creator":{"id":"53a7d94c5a9341f0108df3c6","name":"rhb","department":"jifeng.information.application"}}]}
 ]
 

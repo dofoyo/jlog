@@ -63,7 +63,7 @@ app.get('/api/restricted', function (req, res) {
 app.get('/logs', function (req, res) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    logdb.logs.find({parentid:''}).sort({datetime:-1}, function(err, logs) {
+    logdb.logs.find().sort({datetime:-1}, function(err, logs) {
         if( err || !logs){
             console.log("error or No logs found!");
         } else {
@@ -71,7 +71,6 @@ app.get('/logs', function (req, res) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             var str='[';
             logs.forEach( function(log) {
-                var id = log._id;
                 str += '{';
                 str += '"id":"' + log._id + '",';
                 str += '"message":"' + log.message + '",';
@@ -82,26 +81,21 @@ app.get('/logs', function (req, res) {
                     str += '"department":"' + log.creator.department + '"';
                     str += '},';
                 str += '"comments":[';
-                logdb.logs.find({parentid:id}).sort({datetime:-1},function(err, comments){
-                     if(err || !comments){
-                        console.log("error or No Comments Found!");
-                     }else{
-                        console.log("there are "+ comments.length +" comments Found! id is " + id);
-                        comments.forEach(function(comment){
-                            str += '{';
-                            str += '"id":"' + comment._id + '",';
-                            str += '"message":"' + comment.message + '",';
-                            str += '"datetime":"' + comment.datetime + '",';
-                            str += '"creator":{';
-                                str += '"id":"' + comment.creator.id + '",';
-                                str += '"name":"' + comment.creator.name + '",';
-                                str += '"department":"' + comment.creator.department + '"';
-                                str += '},';
-                            str += '},';
-                            str += '\n';
-                        });
-                     }
-                });
+                    for(var i=0; i<log.comments.length; i++){
+                        var comment = log.comments[i];
+                        str += '{';
+                        str += '"message":"' + comment.message + '",';
+                        str += '"datetime":"' + comment.datetime + '",';
+                        str += '"creator":{';
+                            str += '"id":"' + comment.creator.id + '",';
+                            str += '"name":"' + comment.creator.name + '",';
+                            str += '"department":"' + comment.creator.department + '"';
+                        str += '}},';
+                    }
+                    if(log.comments.length>0){
+                        str = str.trim();
+                        str = str.substring(0,str.length-1);
+                    }
                 str += ']';
                 str += '},';
                 str += '\n';
@@ -109,7 +103,7 @@ app.get('/logs', function (req, res) {
             str = str.trim();
             str = str.substring(0,str.length-1);
             str = str + ']';
-            console.log("get logs successed, with comments!")
+            console.log("get logs successed, with comments as apart!")
             res.end(str);
         }
     });
@@ -121,19 +115,26 @@ app.post('/log', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     //console.log('req.body = '+req.body);
-    console.log('req.body.mydata = ' + req.body.mydata);
+    //console.log('req.body.mydata = ' + req.body.mydata);
     var jsonData = JSON.parse(req.body.mydata);
-    console.log('jsonData.parentid = ' + jsonData.parentid);
-    console.log('jsonData.message = ' + jsonData.message);
-    console.log('jsonData.creator = ' + jsonData.creator);
-    //var msg = jsonData.message.replaceAll("\n","").replaceAll("\r","");
-    logdb.logs.save({parentid:jsonData.parentid,message:jsonData.message, creator: jsonData.creator,datetime:new Date()}, function(err, saved) {
+    //console.log('jsonData.id = ' + jsonData.id);
+    //console.log('jsonData.message = ' + jsonData.message);
+    //console.log('jsonData.creator = ' + jsonData.creator);
+    //console.log('jsonData.comments = ' + jsonData.comments);
+    for(var i=0; i<jsonData.comments.length; i++){
+        var comment = jsonData.comments[i];
+        if(comment.message == jsonData.comment){
+            comment.datetime = new Date();  //以服务端的日期为准
+        }
+    }
+
+    logdb.logs.save({_id:jsonData.id,message:jsonData.message, creator: jsonData.creator,datetime:new Date(),comments:jsonData.comments}, function(err, saved) {
         if( err || !saved ){
             var msg ="log not saved";
             console.log(msg);
             res.end(msg);
         }else{
-            var msg = "log saved.";
+            var msg = "log with comments saved.";
             console.log(msg);
             res.end(msg);
         }
