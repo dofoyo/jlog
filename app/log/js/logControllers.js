@@ -1,13 +1,15 @@
 'use strict';
 
-function LogCtrl($scope, Log, $window, $http, $templateCache) {
-    //alert('hello, i am here.');
-    var str = "#工作总结#             \n\n#工作计划#\n";
+function LogCtrl($scope, $http, $templateCache, $window) {
+    var str = "工作总结：\n\n工作计划：\n";
     $scope.message = str;
 
     $scope.loginUser = parseProfile($window.sessionStorage.token);
 
-    $scope.logs = Log.query();
+    //$scope.logs = Log.query();  get logs from logServices
+    //$scope.list = getLog($scope,$http,'');
+    $scope.list = getLog($scope,$http,'');
+    //$scope.list();
 
     $scope.toggleCommentState = function(index){
         $scope.selectedIndex = index;
@@ -15,9 +17,13 @@ function LogCtrl($scope, Log, $window, $http, $templateCache) {
 
     $scope.submitComment = function(index){
         var log = $scope.logs[index];
+
+        var msg = log.comment;
+        var msg = msg.replace(/[\n\r]/g,'').replace(/[\\]/g,'').replace("工作计划","    工作计划");
+
         var comment = {
-            id:"",
-            message:log.comment,
+            parentid:log.id,
+            message:msg,
             datetime:new Date(),
             creator:{
                 "id":$scope.loginUser.id,
@@ -25,14 +31,23 @@ function LogCtrl($scope, Log, $window, $http, $templateCache) {
                 "department":$scope.loginUser.department
             }
         };
+
         log.comments.splice(0,0,comment);
+
+        var jdata = 'mydata='+JSON.stringify(comment);
+
+        saveLog($http,$templateCache,jdata);
+
         log.comment = "";
     };
 
-    $scope.submitMesasage = function(){
-        var message = {
-            id:"",
-            message:$scope.message,
+    $scope.submitLog = function(){
+        var msg = $scope.message;
+        var msg = msg.replace(/[\n\r]/g,'').replace(/[\\]/g,'').replace("工作计划","    工作计划");
+
+        var log = {
+            parentid:"",
+            message:msg,
             datetime:new Date(),
             creator:{
                 "id":$scope.loginUser.id,
@@ -42,36 +57,46 @@ function LogCtrl($scope, Log, $window, $http, $templateCache) {
             comments:[]
         };
 
-        var jdata = 'mydata='+JSON.stringify(message);
+        var jdata = 'mydata='+JSON.stringify(log);
+        saveLog($http,$templateCache,jdata);
 
-        var method = 'POST';
-        var url = '/log';
-        alert('begin save log ......');
-        $http({
-            method: method,
-            url: url,
-            data:  jdata ,
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            cache: $templateCache
-        }).
-            success(function(response) {
-                alert("save log successed!");
-                $scope.codeStatus = response.data;
-                console.log($scope.codeStatus);
-
-            }).
-            error(function(response) {
-                alert("save log error!");
-                $scope.codeStatus = response || "Request failed";
-                console.log($scope.codeStatus);
-            });
-
-        alert('end save!');
-
-        $scope.logs.splice(0,0,message);
+        $scope.logs.splice(0,0,log);
         $scope.message = str;
     };
+}
 
+function getLog($scope, $http, parentid){
+    var url = '/logs';
+    $http.get(url).
+        success(function(data,status,headers,config) {
+            //alert('get logs successed!');
+            $scope.logs = data;
+        }).
+        error(function(data,status,headers,config){
+            alert("get logs error!");
+        });
+}
+
+function saveLog($http,$templateCache,jdata ){
+    var method = 'POST';
+    var url = '/log';
+    $http({
+        method: method,
+        url: url,
+        data:  jdata ,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        cache: $templateCache
+    }).
+        success(function(response) {
+            alert("save log successed!");
+            $scope.codeStatus = response.data;
+            console.log($scope.codeStatus);
+        }).
+        error(function(response) {
+            alert("save log error!");
+            $scope.codeStatus = response || "Request failed";
+            console.log($scope.codeStatus);
+        });
 }
 
 function parseProfile(token){
@@ -81,33 +106,4 @@ function parseProfile(token){
         profile = JSON.parse(url_base64_decode(encodedProfile));
     }
     return profile;
-}
-
-function uuid(len, radix) {
-    var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
-    var uuid = [], i;
-    radix = radix || chars.length;
-
-    if (len) {
-        // Compact form
-        for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random()*radix];
-    } else {
-        // rfc4122, version 4 form
-        var r;
-
-        // rfc4122 requires these characters
-        uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
-        uuid[14] = '4';
-
-        // Fill in random data.  At i==19 set the high bits of clock sequence as
-        // per rfc4122, sec. 4.1.5
-        for (i = 0; i < 36; i++) {
-            if (!uuid[i]) {
-                r = 0 | Math.random()*16;
-                uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
-            }
-        }
-    }
-
-    return uuid.join('');
 }

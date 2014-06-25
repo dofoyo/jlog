@@ -5,7 +5,6 @@ function UserFilterCtrl($scope, userFilterService) {
 }
 
 function UserCtrl($scope, User, $window, userFilterService) {
-    //alert('it is UserCtrl');
     $scope.userFilterService = userFilterService;
     $scope.loginUser = parseProfile($window.sessionStorage.token);
     $scope.users = User.query();
@@ -97,7 +96,6 @@ function UserListCtrl($scope, $http, $templateCache) {
         $scope.list();
         return false;
     };
-
 
     $scope.list = function() {
         var url = '/users';

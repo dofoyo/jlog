@@ -5,7 +5,7 @@ function LoginCtrl($scope, $http, $window) {
         $scope.loginUser = parseProfile($window.sessionStorage.token);
     //});
     $scope.isAuthenticated = $window.sessionStorage.token ? true : false;
-    $scope.welcome = $scope.isAuthenticated ? "Hi, " + $scope.loginUser.username + "(id:" + $scope.loginUser.id  + ",department:" + $scope.loginUser.department + ",email:" + $scope.loginUser.email  + ")! you has already logined." : "";
+    $scope.welcome = $scope.isAuthenticated ? "Hi, " + $scope.loginUser.username + "(id:" + $scope.loginUser.id  + ",department:" + $scope.loginUser.department + ",password:" + $scope.loginUser.password  + ")! you has already logined." : "";
     $scope.message = '';
 
     $scope.submit = function () {

@@ -61,57 +61,81 @@ app.get('/api/restricted', function (req, res) {
 
 //create REST api to get all logs from log collection.
 app.get('/logs', function (req, res) {
-    console.log("get logs!");
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    logdb.logs.find('', function(err, logs) {
-        if( err || !logs) console.log("No logs found");
-        else
-        {
+    logdb.logs.find({parentid:''}).sort({datetime:-1}, function(err, logs) {
+        if( err || !logs){
+            console.log("error or No logs found!");
+        } else {
+            console.log("there are "+ logs.length +" logs Found!");
             res.writeHead(200, {'Content-Type': 'application/json'});
-            str='[';
+            var str='[';
             logs.forEach( function(log) {
-                str = str + '{"message":"' + log.message + '","creator":"' + log.creator + '"},' +'\n';
-                //console.log(str);
+                var id = log._id;
+                str += '{';
+                str += '"id":"' + log._id + '",';
+                str += '"message":"' + log.message + '",';
+                str += '"datetime":"' + log.datetime + '",';
+                str += '"creator":{';
+                    str += '"id":"' + log.creator.id + '",';
+                    str += '"name":"' + log.creator.name + '",';
+                    str += '"department":"' + log.creator.department + '"';
+                    str += '},';
+                str += '"comments":[';
+                logdb.logs.find({parentid:id}).sort({datetime:-1},function(err, comments){
+                     if(err || !comments){
+                        console.log("error or No Comments Found!");
+                     }else{
+                        console.log("there are "+ comments.length +" comments Found! id is " + id);
+                        comments.forEach(function(comment){
+                            str += '{';
+                            str += '"id":"' + comment._id + '",';
+                            str += '"message":"' + comment.message + '",';
+                            str += '"datetime":"' + comment.datetime + '",';
+                            str += '"creator":{';
+                                str += '"id":"' + comment.creator.id + '",';
+                                str += '"name":"' + comment.creator.name + '",';
+                                str += '"department":"' + comment.creator.department + '"';
+                                str += '},';
+                            str += '},';
+                            str += '\n';
+                        });
+                     }
+                });
+                str += ']';
+                str += '},';
+                str += '\n';
             });
             str = str.trim();
             str = str.substring(0,str.length-1);
             str = str + ']';
+            console.log("get logs successed, with comments!")
             res.end(str);
         }
     });
 });
 
-
-/*
-"id": "0004",
-"message":"完成资金流程的合计金额的计算错误的修改。",
-"datetime":"2014-6-1 18:00:32",
-"creator":{"id":"002","name":"钱二","department":"集团总部.信息化管理中心.实施推广部"},
-"comments":[]
- */
-
-
-//Here we have made a POST request to create an user via REST calling.
+//create a log record.
 app.post('/log', function (req, res){
-    console.log("POST log!");
+    //console.log("POST log!");
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    console.log('req.body = '+req.body);
+    //console.log('req.body = '+req.body);
     console.log('req.body.mydata = ' + req.body.mydata);
     var jsonData = JSON.parse(req.body.mydata);
+    console.log('jsonData.parentid = ' + jsonData.parentid);
     console.log('jsonData.message = ' + jsonData.message);
     console.log('jsonData.creator = ' + jsonData.creator);
-
-    logdb.logs.save({message: jsonData.message, creator: jsonData.creator}, function(err, saved) {
+    //var msg = jsonData.message.replaceAll("\n","").replaceAll("\r","");
+    logdb.logs.save({parentid:jsonData.parentid,message:jsonData.message, creator: jsonData.creator,datetime:new Date()}, function(err, saved) {
         if( err || !saved ){
             var msg ="log not saved";
-            res.end(msg);
             console.log(msg);
+            res.end(msg);
         }else{
             var msg = "log saved.";
-            res.end(msg);
             console.log(msg);
+            res.end(msg);
         }
     });
 });
@@ -124,7 +148,7 @@ app.get('/users', function (req, res) {
         else
         {
             res.writeHead(200, {'Content-Type': 'application/json'});
-            str='[';
+            var str='[';
             users.forEach( function(user) {
                 str = str + '{"name":"' + user.username + '","password":"' + user.password + '","department":"' + user.department + '"},' +'\n';
                 //console.log(str);
@@ -132,6 +156,7 @@ app.get('/users', function (req, res) {
             str = str.trim();
             str = str.substring(0,str.length-1);
             str = str + ']';
+            console.log("get users successed!")
             res.end( str);
         }
     });
@@ -139,25 +164,24 @@ app.get('/users', function (req, res) {
 
 
 app.post('/user', function (req, res){
-    console.log("POST: ");
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    console.log('req.body = '+req.body);
+    //console.log('req.body = '+req.body);
     console.log('req.body.mydata = ' + req.body.mydata);
     var jsonData = JSON.parse(req.body.mydata);
     console.log('jsonData.username = ' + jsonData.username);
     console.log('jsonData.password = ' + jsonData.password);
     console.log('jsonData.department = ' + jsonData.department);
 
-    userdb.users.save({department: jsonData.department, password: jsonData.password, username: jsonData.username}, function(err, saved) {
+    userdb.users.save({username: jsonData.username, password: jsonData.password,department: jsonData.department}, function(err, saved) {
         if( err || !saved ){
             var msg ="User not saved";
             res.end(msg);
             console.log(msg);
         }else{
             var msg = "User saved.";
-            res.end(msg);
             console.log(msg);
+            res.end(msg);
         }
     });
 });
@@ -165,5 +189,6 @@ app.post('/user', function (req, res){
 app.listen(8080, function () {
   console.log('server started,  http://localhost:8080');
 });
+
 
 
