@@ -61,6 +61,8 @@ function UserListCtrl($scope, $http, $templateCache) {
 
     var method = 'POST';
     var inserturl = '/user';
+    $scope.search = {};
+    $scope.search.username = '';
     $scope.codeStatus = "";
     $scope.save = function() {
         var formData = {
@@ -98,9 +100,11 @@ function UserListCtrl($scope, $http, $templateCache) {
     };
 
     $scope.list = function() {
+        //alert('search.username:' + $scope.search.username);
         var url = '/users';
         //alert(url);
-        $http.get(url).
+        $http.get(url,{params:{username:$scope.search.username}}).
+        //$http.get(url).
             //$http({url: '127.0.0.1:1212/users', method: 'GET'})
             success(function(data,status,headers,config) {
                 //alert("get users success!");
@@ -110,7 +114,6 @@ function UserListCtrl($scope, $http, $templateCache) {
                 alert("get users error!");
             });
     };
-
     $scope.list();
 }
 

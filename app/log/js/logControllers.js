@@ -101,15 +101,6 @@ function saveLog($http,$templateCache,jdata ){
         });
 }
 
-function parseProfile(token){
-    var profile = {};
-    if (token) {
-        var encodedProfile = token.split('.')[1];
-        profile = JSON.parse(url_base64_decode(encodedProfile));
-    }
-    return profile;
-}
-
 function uuid(len, radix) {
     var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
     var uuid = [], i;

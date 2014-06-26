@@ -1,6 +1,6 @@
 <div>
     <span ng-show="isAuthenticated">{{welcome}}</span>
-    <form ng-show="!isAuthenticated" ng-submit="submit()">
+    <form ng-show="!isAuthenticated" ng-submit="login()">
         <input ng-model="loginUser.username" type="text" name="user" placeholder="Username" />
         <input ng-model="loginUser.password" type="password" name="pass" placeholder="Password" />
         <input type="submit" value="Login" />

@@ -46,6 +46,7 @@ app.post('/authenticate', function (req, res) {
             };
             console.log("authenticate: succeeded!");
             var token = jwt.sign(profile, secret, { expiresInMinutes: 60*5 });
+            //console.log("token: " + token);
             res.json({token: token });
         }
    });
@@ -54,10 +55,9 @@ app.post('/authenticate', function (req, res) {
 app.get('/api/restricted', function (req, res) {
   console.log('user ' + req.user.username + ' is calling /api/restricted');
   res.json({
-    name: req.user.email
+    name: req.user.department
   });
 });
-
 
 //create REST api to get all logs from log collection.
 app.get('/logs', function (req, res) {
@@ -144,14 +144,17 @@ app.post('/log', function (req, res){
 app.get('/users', function (req, res) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    userdb.users.find('', function(err, users) {
-        if( err || !users) console.log("No users found");
-        else
-        {
+    console.log("find user by username:" + req.param('username'));
+    userdb.users.find({'username':req.param('username')}, function(err, users) {
+    //userdb.users.find('', function(err, users) {
+        if( err || !users){
+            console.log("No users found");
+        }else{
+            console.log('find ' + users.length + ' users.');
             res.writeHead(200, {'Content-Type': 'application/json'});
             var str='[';
             users.forEach( function(user) {
-                str = str + '{"name":"' + user.username + '","password":"' + user.password + '","department":"' + user.department + '"},' +'\n';
+                str = str + '{"id":"'+ user._id  +'","name":"' + user.username + '","password":"' + user.password + '","department":"' + user.department + '"},' +'\n';
                 //console.log(str);
             });
             str = str.trim();
@@ -163,6 +166,28 @@ app.get('/users', function (req, res) {
     });
 });
 
+
+app.get('/user', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    userdb.users.find({_id:req.userid}, function(err, users) {
+        if( err || !users) console.log("No users found");
+        else
+        {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            var str='[';
+            users.forEach( function(user) {
+                str = str + '{"id":"'+ user._id  +'","name":"' + user.username + '","password":"' + user.password + '","department":"' + user.department + '"},' +'\n';
+                //console.log(str);
+            });
+            str = str.trim();
+            str = str.substring(0,str.length-1);
+            str = str + ']';
+            console.log("get users successed!")
+            res.end( str);
+        }
+    });
+});
 
 app.post('/user', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");

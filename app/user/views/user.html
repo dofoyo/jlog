@@ -2,12 +2,12 @@
 <div class="row-fluid">
 	  <div class="span2">
 		<!--Sidebar content-->
-		Search: <input ng-model="user">
+		Search: <input ng-model="search.username"><button ng-click="list()" >Go</button>
 		<div class="span10">
 			<!--Body content-->
 			<ul class="users">
-			  <li ng-repeat="user in users | filter:user ">
-				{{user.name}},{{user.password}},{{user.department}}
+			  <li ng-repeat="user in users | filter:{name:search.username}">
+				{{user.id}},{{user.name}},{{user.password}},{{user.department}}
 			  </li>
 			</ul>
 		  </div>
@@ -36,3 +36,4 @@
 	</div>
 </div>
 </div>
+

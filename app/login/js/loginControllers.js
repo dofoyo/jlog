@@ -8,16 +8,18 @@ function LoginCtrl($scope, $http, $window) {
     $scope.welcome = $scope.isAuthenticated ? "Hi, " + $scope.loginUser.username + "(id:" + $scope.loginUser.id  + ",department:" + $scope.loginUser.department + ",password:" + $scope.loginUser.password  + ")! you has already logined." : "";
     $scope.message = '';
 
-    $scope.submit = function () {
+    $scope.login = function () {
         $http
             .post('/authenticate', $scope.loginUser)
             .success(function (data, status, headers, config) {
+                alert('authenticate successed!');
                 $window.sessionStorage.token = data.token;
                 $scope.isAuthenticated = true;
                 var profile = parseProfile(data.token);
                 $scope.welcome = 'Welcome ' + profile.username + '!';
             })
             .error(function (data, status, headers, config) {
+                alert('authenticate ERROR!');
                 // Erase the token if the user fails to log in
                 //delete $window.sessionStorage.token;
                 //$scope.isAuthenticated = false;
@@ -54,6 +56,7 @@ function parseProfile(token){
     var profile = {};
     if (token) {
         var encodedProfile = token.split('.')[1];
+        //alert(encodedProfile);
         profile = JSON.parse(url_base64_decode(encodedProfile));
     }
     return profile;
@@ -74,6 +77,7 @@ function url_base64_decode(str) {
         default:
             throw 'Illegal base64url string!';
     }
-    return window.atob(output); //polifyll https://github.com/davidchambers/Base64.js
+    //return window.atob(output); //polifyll https://github.com/davidchambers/Base64.js
+    return unescape(decodeURIComponent(window.atob(output)));
 }
 
