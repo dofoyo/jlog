@@ -67,7 +67,7 @@ function LogCtrl($scope, $http, $templateCache, $window) {
     };
 }
 
-function getLog($scope, $http, parentid){
+function getLog($scope, $http, params){
     var url = '/logs';
     $http.get(url).
         success(function(data,status,headers,config) {

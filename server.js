@@ -32,30 +32,31 @@ app.use(function(err, req, res, next){
 });
 
 app.post('/authenticate', function (req, res) {
-   userdb.users.find({username:req.body.username,password:req.body.password}, function(err, users) {
+    userdb.users.find({username:req.body.username,password:req.body.password}, function(err, users) {
         if( err || !users || users.length==0){
             res.send(401, 'Wrong user or password');
             console.log("authenticate: wrong user or password!");
         }else {
             var user = users[0];
             var profile = {
-                id:user._id,
-                username:user.username,
-                password:user.password,
-                department:user.department
+                userid:user._id
+            };
+            var loginUser = {
+                userid: user._id,
+                username: user.username,
+                department: user.department
             };
             console.log("authenticate: succeeded!");
             var token = jwt.sign(profile, secret, { expiresInMinutes: 60*5 });
-            //console.log("token: " + token);
-            res.json({token: token });
+            res.json({token: token,loginUser:loginUser });
         }
    });
 });
 
 app.get('/api/restricted', function (req, res) {
-  console.log('user ' + req.user.username + ' is calling /api/restricted');
+  console.log('user ' + req.user.userid + ' is calling /api/restricted');
   res.json({
-    name: req.user.department
+    name: req.user.userid
   });
 });
 
@@ -145,7 +146,9 @@ app.get('/users', function (req, res) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     console.log("find user by username:" + req.param('username'));
-    userdb.users.find({'username':req.param('username')}, function(err, users) {
+    var regexp = "{$regex:'" + req.param("username") + "'}";
+    console.log(regexp);
+    userdb.users.find({username:{$regex:req.param("username")}}, function(err, users) {
     //userdb.users.find('', function(err, users) {
         if( err || !users){
             console.log("No users found");
@@ -166,24 +169,25 @@ app.get('/users', function (req, res) {
     });
 });
 
-
 app.get('/user', function (req, res) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    userdb.users.find({_id:req.userid}, function(err, users) {
+    console.log("userid: " + req.param("userid"))
+    userdb.users.find({_id:req.param("userid")}, function(err, users) {
         if( err || !users) console.log("No users found");
         else
         {
+            console.log("found " + users.length + " users.");
             res.writeHead(200, {'Content-Type': 'application/json'});
-            var str='[';
+            var str='';
             users.forEach( function(user) {
-                str = str + '{"id":"'+ user._id  +'","name":"' + user.username + '","password":"' + user.password + '","department":"' + user.department + '"},' +'\n';
+                str = str + '{"userid":"'+ user._id  +'","username":"' + user.username + '","password":"' + user.password + '","department":"' + user.department + '"},' +'\n';
                 //console.log(str);
             });
             str = str.trim();
             str = str.substring(0,str.length-1);
-            str = str + ']';
-            console.log("get users successed!")
+            console.log("get user successed!")
+            console.log(str);
             res.end( str);
         }
     });
@@ -193,13 +197,14 @@ app.post('/user', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     //console.log('req.body = '+req.body);
-    console.log('req.body.mydata = ' + req.body.mydata);
+    //console.log('req.body.mydata = ' + req.body.mydata);
     var jsonData = JSON.parse(req.body.mydata);
+    console.log('jsonData.userid = ' + jsonData.userid);
     console.log('jsonData.username = ' + jsonData.username);
     console.log('jsonData.password = ' + jsonData.password);
     console.log('jsonData.department = ' + jsonData.department);
 
-    userdb.users.save({username: jsonData.username, password: jsonData.password,department: jsonData.department}, function(err, saved) {
+    userdb.users.save({_id:jsonData.userid,username: jsonData.username, password: jsonData.password,department: jsonData.department}, function(err, saved) {
         if( err || !saved ){
             var msg ="User not saved";
             res.end(msg);
@@ -215,6 +220,7 @@ app.post('/user', function (req, res){
 app.listen(8080, function () {
   console.log('server started,  http://localhost:8080');
 });
+
 
 
 

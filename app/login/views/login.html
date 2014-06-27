@@ -12,4 +12,13 @@
         <div>{{message}}</div>
         <a ng-click="logout()" href="">Logout</a>
     </div>
+
+    <br>
+    <br>
+    <br>
+    <div>
+        <button ng-click="getLoginUser()">show logined user's information</button><br>
+        {{loginUser.userid}},{{loginUser.username}},{{loginUser.department}}
+    </div>
+
 </div>
