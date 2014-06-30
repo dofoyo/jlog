@@ -6,8 +6,8 @@
 		<div class="span10">
 			<!--Body content-->
 			<ul class="users">
-			  <li ng-repeat="user in users | filter:{name:search.username}">
-				{{user.id}},{{user.name}},{{user.password}},{{user.department}}
+			  <li ng-repeat="user in users">
+				{{user.userid}},{{user.username}},{{user.password}},{{user.department}},{{user.bosses}}.{{user.followers}}
 			  </li>
 			</ul>
 		  </div>

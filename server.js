@@ -157,7 +157,7 @@ app.get('/users', function (req, res) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             var str='[';
             users.forEach( function(user) {
-                str = str + '{"id":"'+ user._id  +'","name":"' + user.username + '","password":"' + user.password + '","department":"' + user.department + '"},' +'\n';
+                str = str + '{"userid":"'+ user._id  +'","username":"' + user.username + '","password":"' + user.password + '","department":"' + user.department + '","bosses":"' + user.bosses + '","followers":"' + user.followers + '"},' +'\n';
                 //console.log(str);
             });
             str = str.trim();
@@ -181,7 +181,7 @@ app.get('/user', function (req, res) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             var str='';
             users.forEach( function(user) {
-                str = str + '{"userid":"'+ user._id  +'","username":"' + user.username + '","password":"' + user.password + '","department":"' + user.department + '"},' +'\n';
+                str = str + '{"userid":"'+ user._id  +'","username":"' + user.username + '","password":"' + user.password + '","department":"' + user.department + '","bosses":"' + user.bosses + '","followers":"' + user.followers + '"},' +'\n';
                 //console.log(str);
             });
             str = str.trim();
@@ -203,8 +203,10 @@ app.post('/user', function (req, res){
     console.log('jsonData.username = ' + jsonData.username);
     console.log('jsonData.password = ' + jsonData.password);
     console.log('jsonData.department = ' + jsonData.department);
+    console.log('jsonData.bosses = ' + jsonData.bosses);
+    console.log('jsonData.followers = ' + jsonData.followers);
 
-    userdb.users.save({_id:jsonData.userid,username: jsonData.username, password: jsonData.password,department: jsonData.department}, function(err, saved) {
+    userdb.users.save({_id:jsonData.userid,username: jsonData.username, password: jsonData.password,department: jsonData.department,bosses:jsonData.bosses,followers:jsonData.followers}, function(err, saved) {
         if( err || !saved ){
             var msg ="User not saved";
             res.end(msg);

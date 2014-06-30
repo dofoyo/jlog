@@ -69,12 +69,16 @@ function UserListCtrl($scope, $http, $templateCache) {
             'userid':uuid(24,11),
             'username' : this.username,
             'password' : this.password,
-            'department' : this.department
+            'department' : this.department,
+            'bosses':'',
+            'followers':''
         };
         this.userid = '';
         this.username = '';
         this.password = '';
         this.department = '';
+        this.bosses = '';
+        this.followers = '';
 
 
         var jdata = 'mydata='+JSON.stringify(formData);
