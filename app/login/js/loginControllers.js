@@ -20,7 +20,17 @@ function LoginCtrl($scope, $http, $window) {
                 $window.sessionStorage.loginUserId = data.loginUser.userid;
                 $window.sessionStorage.loginUserName = data.loginUser.username;
                 $window.sessionStorage.loginUserDepartment = data.loginUser.department;
-                $scope.loginUser = {userid:$window.sessionStorage.loginUserId,username:$window.sessionStorage.loginUserName,department:$window.sessionStorage.loginUserDepartment};
+                $window.sessionStorage.loginUserBosses = data.loginUser.bosses;
+                $window.sessionStorage.loginUserFollowers = data.loginUser.followers;
+                $window.sessionStorage.loginUsertobebosses = data.loginUser.tobebosses;
+                $scope.loginUser = {
+                     userid:$window.sessionStorage.loginUserId,
+                     username:$window.sessionStorage.loginUserName,
+                     department:$window.sessionStorage.loginUserDepartment,
+                     bosses:$window.sessionStorage.loginUserBosses,
+                     followers:$window.sessionStorage.loginUserFollowers,
+                     tobebosses:$window.sessionStorage.loginUsertobebosses
+                };
                 //$scope.loginUser = data.loginUser;
                 $scope.isAuthenticated = true;
                 //var profile = parseProfile(data.token);
@@ -48,6 +58,10 @@ function LoginCtrl($scope, $http, $window) {
         delete $window.sessionStorage.loginUserId;
         delete $window.sessionStorage.loginUserName;
         delete $window.sessionStorage.loginUserDepartment;
+        delete $window.sessionStorage.loginUserBosses;
+        delete $window.sessionStorage.loginUserFollowers;
+        delete $window.sessionStorage.loginUsertobebosses;
+
     };
 
     $scope.callRestricted = function () {
