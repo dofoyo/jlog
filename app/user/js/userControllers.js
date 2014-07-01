@@ -2,11 +2,28 @@
 
 function UserCtrl($scope,$http,$templateCache,$window, userFilterService) {
     $scope.userFilterService = userFilterService;
-    $scope.loginUser = parseProfile($window.sessionStorage.token);
+    $scope.loginUser = $window.sessionStorage.token ?
+    {
+        userid:$window.sessionStorage.loginUserId,
+        username:$window.sessionStorage.loginUserName,
+        department:$window.sessionStorage.loginUserDepartment,
+        bosses:$window.sessionStorage.loginUserBosses,
+        followers:$window.sessionStorage.loginUserFollowers,
+        tobebosses:$window.sessionStorage.loginUsertobebosses
+    }:
+    {
+        userid:'',
+        username:'',
+        department:'',
+        bosses:'',
+        followers:'',
+        tobebosses:''
+    };
+
 
     $scope.getList = function() {
         //alert('get user list...');
-        $http.get('/users',{params:{username:userFilterService.searchText,loginUserId:$window.sessionStorage.loginUserId}}).
+        $http.get('/users',{params:{username:userFilterService.searchText,loginUserId:$scope.loginUser.userid}}).
             success(function(data,status,headers,config) {
                 //alert("get users success!");
                 $scope.users = data;
@@ -20,13 +37,14 @@ function UserCtrl($scope,$http,$templateCache,$window, userFilterService) {
 
     $scope.addFollower = function(index){
         var user = $scope.users[index];
-        user.bosses = user.bosses + "," + $window.sessionStorage.loginUserId;
+        user.bosses = user.bosses + "," + $scope.loginUser.userid;
         user.isMyFollower = true;
         $scope.saveBosses(user.userid,user.bosses);
 
         var myid = $window.sessionStorage.loginUserId;
-        var myFollowers = $window.sessionStorage.loginUserFollowers + ',' + user.userid;
+        var myFollowers = $scope.loginUser.followers + ',' + user.userid;
         $window.sessionStorage.loginUserFollowers = myFollowers;
+        $scope.loginUser.followers = myFollowers;
         $scope.saveFollowers(myid,myFollowers);
     }
 
@@ -41,26 +59,28 @@ function UserCtrl($scope,$http,$templateCache,$window, userFilterService) {
         $scope.saveBosses(user.userid,bosses);
 
         var myid = $window.sessionStorage.loginUserId;
-        var myFollowers = $window.sessionStorage.loginUserFollowers;
+        var myFollowers = $scope.loginUser.followers;
         myFollowers = cutString(myFollowers,user.userid);
         $window.sessionStorage.loginUserFollowers = myFollowers;
+        $scope.loginUser.followers = myFollowers;
         $scope.saveFollowers(myid,myFollowers);
     }
 
     $scope.addBoss = function(index){
         var user = $scope.users[index];
-        user.followers = user.followers + "," + $window.sessionStorage.loginUserId;
+        user.followers = user.followers + "," + $scope.loginUser.userid;
         user.isMyBoss = true;
         $scope.saveFollowers(user.userid,user.followers);
 
-        var myid = $window.sessionStorage.loginUserId;
-        var myBosses = $window.sessionStorage.loginUserBosses + ',' + user.userid;
+        var myid = $scope.loginUser.userid;
+        var myBosses = $scope.loginUser.bosses + ',' + user.userid;
         $window.sessionStorage.loginUserBosses = myBosses;
+        $scope.loginUser.bosses = myBosses;
         $scope.saveBosses(myid,myBosses);
     }
 
     $scope.deleteBoss = function(index){
-        var myid = $window.sessionStorage.loginUserId;
+        var myid = $scope.loginUser.userid;
 
         var user = $scope.users[index];
         var followers = user.followers;
@@ -69,10 +89,11 @@ function UserCtrl($scope,$http,$templateCache,$window, userFilterService) {
         user.isMyBoss = false;
         $scope.saveFollowers(user.userid,followers);
 
-        var myid = $window.sessionStorage.loginUserId;
-        var myBosses = $window.sessionStorage.loginUserBosses;
+        var myid = $scope.loginUser.userid;
+        var myBosses = $scope.loginUser.bosses;
         myBosses = cutString(myBosses,user.userid);
         $window.sessionStorage.loginUserBosses = myBosses;
+        $scope.loginUser.bosses = myBosses;
         $scope.saveBosses(myid,myBosses);
 
     }
@@ -93,7 +114,7 @@ function UserCtrl($scope,$http,$templateCache,$window, userFilterService) {
         var jdata = 'mydata='+JSON.stringify(formData);
 
         var method = 'POST';
-        var inserturl = '/user/savebosses';
+        var inserturl = '/user/bosses';
         $http({
             method: method,
             url: inserturl,
@@ -122,7 +143,7 @@ function UserCtrl($scope,$http,$templateCache,$window, userFilterService) {
         var jdata = 'mydata='+JSON.stringify(formData);
 
         var method = 'POST';
-        var inserturl = '/user/savefollowers';
+        var inserturl = '/user/followers';
         $http({
             method: method,
             url: inserturl,
@@ -201,7 +222,7 @@ function UserListCtrl($scope, $http, $templateCache,$window) {
     };
 
     $scope.list = function() {
-        $http.get('/users',{params:{username:$scope.search.username,loginUserId:$window.sessionStorage.loginUserId}}).
+        $http.get('/users',{params:{username:$scope.search.username,loginUserId:$scope.loginUser.userid}}).
             success(function(data,status,headers,config) {
                 //alert("get users success!");
                 $scope.users = data;

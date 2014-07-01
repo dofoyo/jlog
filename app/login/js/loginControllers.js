@@ -3,8 +3,22 @@
 function LoginCtrl($scope, $http, $window) {
 
     $scope.loginUser = $window.sessionStorage.token ?
-                        {userid:$window.sessionStorage.loginUserId,username:$window.sessionStorage.loginUserName,department:$window.sessionStorage.loginUserDepartment} :
-                        {userid:'0874A3A42416394A65111025',username:'',department:''};
+    {
+        userid:$window.sessionStorage.loginUserId,
+        username:$window.sessionStorage.loginUserName,
+        department:$window.sessionStorage.loginUserDepartment,
+        bosses:$window.sessionStorage.loginUserBosses,
+        followers:$window.sessionStorage.loginUserFollowers,
+        tobebosses:$window.sessionStorage.loginUsertobebosses
+    }:
+    {
+        userid:'',
+        username:'',
+        department:'',
+        bosses:'',
+        followers:'',
+        tobebosses:''
+    };
 
     //allPrpos($scope.loginUser);
     $scope.isAuthenticated = $window.sessionStorage.token ? true : false;

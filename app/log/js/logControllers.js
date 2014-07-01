@@ -4,12 +4,29 @@ function LogCtrl($scope, $http, $templateCache, $window) {
     var str = "工作总结：\n\n工作计划：\n";
     $scope.message = str;
 
-    $scope.loginUser = parseProfile($window.sessionStorage.token);
+    $scope.loginUser = $window.sessionStorage.token ?
+    {
+        userid:$window.sessionStorage.loginUserId,
+        username:$window.sessionStorage.loginUserName,
+        department:$window.sessionStorage.loginUserDepartment,
+        bosses:$window.sessionStorage.loginUserBosses,
+        followers:$window.sessionStorage.loginUserFollowers,
+        tobebosses:$window.sessionStorage.loginUsertobebosses
+    }:
+    {
+        userid:'',
+        username:'',
+        department:'',
+        bosses:'',
+        followers:'',
+        tobebosses:''
+    };
 
-    //$scope.logs = Log.query();  get logs from logServices
-    //$scope.list = getLog($scope,$http,'');
-    $scope.list = getLog($scope,$http,'');
-    //$scope.list();
+    var params = {
+        creatorid:$window.sessionStorage.loginUserId
+    };
+
+    $scope.list = getLog($scope,$http,params);
 
     $scope.toggleCommentState = function(index){
         $scope.selectedIndex = index;
@@ -25,7 +42,7 @@ function LogCtrl($scope, $http, $templateCache, $window) {
             message:msg,
             datetime:new Date(),
             creator:{
-                "id":$scope.loginUser.id,
+                "id":$scope.loginUser.userid,
                 "name":$scope.loginUser.username,
                 "department":$scope.loginUser.department
             }
@@ -44,15 +61,12 @@ function LogCtrl($scope, $http, $templateCache, $window) {
         var msg = $scope.message;
         var msg = msg.replace(/[\n\r]/g,'').replace(/[\\]/g,'').replace("工作计划","    工作计划");
 
-        var id = uuid(24,11); //通过自生成的id，方便控制
-        //alert(id);
-
         var log = {
-            id:id,
+            id:uuid(24,11),
             message:msg,
             datetime:new Date(),
             creator:{
-                "id":$scope.loginUser.id,
+                "id":$scope.loginUser.userid,
                 "name":$scope.loginUser.username,
                 "department":$scope.loginUser.department
             },
@@ -69,7 +83,7 @@ function LogCtrl($scope, $http, $templateCache, $window) {
 
 function getLog($scope, $http, params){
     var url = '/logs';
-    $http.get(url).
+    $http.get(url,{params:params}).
         success(function(data,status,headers,config) {
             //alert('get logs successed!');
             $scope.logs = data;
@@ -80,6 +94,7 @@ function getLog($scope, $http, params){
 }
 
 function saveLog($http,$templateCache,jdata ){
+    //alert(jdata);
     var method = 'POST';
     var url = '/log';
     $http({
@@ -90,14 +105,10 @@ function saveLog($http,$templateCache,jdata ){
         cache: $templateCache
     }).
         success(function(response) {
-            alert("save log successed!");
-            $scope.codeStatus = response.data;
-            console.log($scope.codeStatus);
+            //alert("save log successed!");
         }).
         error(function(response) {
             alert("save log error!");
-            $scope.codeStatus = response || "Request failed";
-            console.log($scope.codeStatus);
         });
 }
 

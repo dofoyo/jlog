@@ -65,47 +65,50 @@ app.get('/api/restricted', function (req, res) {
 
 //create REST api to get all logs from log collection.
 app.get('/logs', function (req, res) {
+    console.log('find log by ' + req.param('creatorid'))
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    logdb.logs.find().sort({datetime:-1}, function(err, logs) {
+    logdb.logs.find({'creator.id':req.param('creatorid')}).sort({datetime:-1}, function(err, logs) {
         if( err || !logs){
             console.log("error or No logs found!");
         } else {
             console.log("there are "+ logs.length +" logs Found!");
             res.writeHead(200, {'Content-Type': 'application/json'});
             var str='[';
-            logs.forEach( function(log) {
-                str += '{';
-                str += '"id":"' + log._id + '",';
-                str += '"message":"' + log.message + '",';
-                str += '"datetime":"' + log.datetime + '",';
-                str += '"creator":{';
+            if(logs.length>0){
+                logs.forEach( function(log) {
+                    str += '{';
+                    str += '"id":"' + log._id + '",';
+                    str += '"message":"' + log.message + '",';
+                    str += '"datetime":"' + log.datetime + '",';
+                    str += '"creator":{';
                     str += '"id":"' + log.creator.id + '",';
                     str += '"name":"' + log.creator.name + '",';
                     str += '"department":"' + log.creator.department + '"';
                     str += '},';
-                str += '"comments":[';
+                    str += '"comments":[';
                     for(var i=0; i<log.comments.length; i++){
                         var comment = log.comments[i];
                         str += '{';
                         str += '"message":"' + comment.message + '",';
                         str += '"datetime":"' + comment.datetime + '",';
                         str += '"creator":{';
-                            str += '"id":"' + comment.creator.id + '",';
-                            str += '"name":"' + comment.creator.name + '",';
-                            str += '"department":"' + comment.creator.department + '"';
+                        str += '"id":"' + comment.creator.id + '",';
+                        str += '"name":"' + comment.creator.name + '",';
+                        str += '"department":"' + comment.creator.department + '"';
                         str += '}},';
                     }
                     if(log.comments.length>0){
                         str = str.trim();
                         str = str.substring(0,str.length-1);
                     }
-                str += ']';
-                str += '},';
-                str += '\n';
-            });
-            str = str.trim();
-            str = str.substring(0,str.length-1);
+                    str += ']';
+                    str += '},';
+                    str += '\n';
+                });
+                str = str.trim();
+                str = str.substring(0,str.length-1);
+            }
             str = str + ']';
             console.log("get logs successed, with comments as apart!")
             res.end(str);
@@ -125,6 +128,7 @@ app.post('/log', function (req, res){
     //console.log('jsonData.message = ' + jsonData.message);
     //console.log('jsonData.creator = ' + jsonData.creator);
     //console.log('jsonData.comments = ' + jsonData.comments);
+
     for(var i=0; i<jsonData.comments.length; i++){
         var comment = jsonData.comments[i];
         if(comment.message == jsonData.comment){
@@ -244,7 +248,7 @@ app.post('/user', function (req, res){
     });
 });
 
-app.post('/user/savebosses', function (req, res){
+app.post('/user/bosses', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     //console.log('req.body = '+req.body);
@@ -271,7 +275,7 @@ app.post('/user/savebosses', function (req, res){
     });
 });
 
-app.post('/user/savefollowers', function (req, res){
+app.post('/user/followers', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     //console.log('req.body = '+req.body);
