@@ -4,25 +4,27 @@ function LoginCtrl($scope, $http, $window) {
 
     $scope.loginUser = $window.sessionStorage.token ?
     {
-        userid:$window.sessionStorage.loginUserId,
-        username:$window.sessionStorage.loginUserName,
+        userId:$window.sessionStorage.loginUserId,
+        userName:$window.sessionStorage.loginUserName,
         department:$window.sessionStorage.loginUserDepartment,
         bosses:$window.sessionStorage.loginUserBosses,
         followers:$window.sessionStorage.loginUserFollowers,
-        tobebosses:$window.sessionStorage.loginUsertobebosses
+        tobeBosses:$window.sessionStorage.loginUserTobeBosses,
+        tobeFollowers:$window.sessionStorage.loginUserTobeFollowers
     }:
     {
-        userid:'',
-        username:'',
+        userId:'',
+        userName:'',
         department:'',
         bosses:'',
         followers:'',
-        tobebosses:''
+        tobeBosses:'',
+        tobeFollowers:''
     };
 
     //allPrpos($scope.loginUser);
     $scope.isAuthenticated = $window.sessionStorage.token ? true : false;
-    $scope.welcome = $scope.isAuthenticated  ? "Hi, " + $scope.loginUser.username + "! you has already logined." : "";
+    $scope.welcome = $scope.isAuthenticated  ? "Hi, " + $scope.loginUser.userName + "! you has already logined." : "";
     $scope.message = '';
 
     $scope.login = function () {
@@ -31,25 +33,27 @@ function LoginCtrl($scope, $http, $window) {
             .success(function (data, status, headers, config) {
                 alert('authenticate successed!');
                 $window.sessionStorage.token = data.token;
-                $window.sessionStorage.loginUserId = data.loginUser.userid;
-                $window.sessionStorage.loginUserName = data.loginUser.username;
+                $window.sessionStorage.loginUserId = data.loginUser.userId;
+                $window.sessionStorage.loginUserName = data.loginUser.userName;
                 $window.sessionStorage.loginUserDepartment = data.loginUser.department;
                 $window.sessionStorage.loginUserBosses = data.loginUser.bosses;
                 $window.sessionStorage.loginUserFollowers = data.loginUser.followers;
-                $window.sessionStorage.loginUsertobebosses = data.loginUser.tobebosses;
+                $window.sessionStorage.loginUserTobeBosses = data.loginUser.tobeBosses;
+                $window.sessionStorage.loginUserTobeFollowers = data.loginUser.tobeFollowers;
                 $scope.loginUser = {
-                     userid:$window.sessionStorage.loginUserId,
-                     username:$window.sessionStorage.loginUserName,
+                     userId:$window.sessionStorage.loginUserId,
+                     userName:$window.sessionStorage.loginUserName,
                      department:$window.sessionStorage.loginUserDepartment,
                      bosses:$window.sessionStorage.loginUserBosses,
                      followers:$window.sessionStorage.loginUserFollowers,
-                     tobebosses:$window.sessionStorage.loginUsertobebosses
+                    tobeBosses:$window.sessionStorage.loginUserTobeBosses,
+                    tobeFollowers:$window.sessionStorage.loginUserTobeFollowers
                 };
                 //$scope.loginUser = data.loginUser;
                 $scope.isAuthenticated = true;
                 //var profile = parseProfile(data.token);
                 //$scope.welcome = 'Welcome ' + profile.userid + '!';
-                $scope.welcome = 'Welcome ' + data.loginUser.username + '!';
+                $scope.welcome = 'Welcome ' + data.loginUser.userName + '!';
             })
             .error(function (data, status, headers, config) {
                 alert('authenticate ERROR!');
@@ -67,14 +71,15 @@ function LoginCtrl($scope, $http, $window) {
         $scope.welcome = '';
         $scope.message = '';
         $scope.isAuthenticated = false;
-        $scope.loginUser = {userid:'',username:'',department:''};
+        $scope.loginUser = {userId:'',userName:'',department:''};
         delete $window.sessionStorage.token;
         delete $window.sessionStorage.loginUserId;
         delete $window.sessionStorage.loginUserName;
         delete $window.sessionStorage.loginUserDepartment;
         delete $window.sessionStorage.loginUserBosses;
         delete $window.sessionStorage.loginUserFollowers;
-        delete $window.sessionStorage.loginUsertobebosses;
+        delete $window.sessionStorage.loginUserTobeBosses;
+        delete $window.sessionStorage.loginUserTobeFollowers;
 
     };
 
@@ -91,7 +96,7 @@ function LoginCtrl($scope, $http, $window) {
     $scope.getLoginUser = function() {
         var url = '/user';
         //alert($scope.loginUser.userid);
-        $http.get(url,{params:{userid:$scope.loginUser.userid}}).
+        $http.get(url,{params:{userId:$scope.loginUser.userId}}).
             success(function(data,status,headers,config) {
                 allPrpos(data);
                 $scope.loginUser = data;

@@ -4,8 +4,8 @@ var expressJwt = require('express-jwt'); //https://npmjs.org/package/express-jwt
 var secret = 'this is the secret secret secret 12356';
 
 var databaseUrl = "jlog"; // "username:password@example.com/mydb"
-var userCollections = ["users"]
-var logCollections = ["logs"]
+var userCollections = ["users"];
+var logCollections = ["logs"];
 var userdb = require("mongojs").connect(databaseUrl, userCollections);
 var logdb = require("mongojs").connect(databaseUrl, logCollections);
 
@@ -32,22 +32,23 @@ app.use(function(err, req, res, next){
 });
 
 app.post('/authenticate', function (req, res) {
-    userdb.users.find({username:req.body.username,password:req.body.password}, function(err, users) {
+    userdb.users.find({userName:req.body.userName,password:req.body.password}, function(err, users) {
         if( err || !users || users.length==0){
             res.send(401, 'Wrong user or password');
             console.log("authenticate: wrong user or password!");
         }else {
             var user = users[0];
             var profile = {
-                userid:user._id
+                userId:user._id
             };
             var loginUser = {
-                userid: user._id,
-                username: user.username,
+                userId: user._id,
+                userName: user.userName,
                 department: user.department,
                 bosses:user.bosses,
                 followers:user.followers,
-                tobebosses:user.tobebosses
+                tobeBosses:user.tobeBosses,
+                tobeFollowers:user.tobeFollowers
             };
             console.log("authenticate: succeeded!");
             var token = jwt.sign(profile, secret, { expiresInMinutes: 60*5 });
@@ -57,9 +58,9 @@ app.post('/authenticate', function (req, res) {
 });
 
 app.get('/api/restricted', function (req, res) {
-  console.log('user ' + req.user.userid + ' is calling /api/restricted');
+  console.log('user ' + req.user.userId + ' is calling /api/restricted');
   res.json({
-    name: req.user.userid
+    name: req.user.userId
   });
 });
 
@@ -166,11 +167,11 @@ app.post('/log', function (req, res){
 app.get('/users', function (req, res) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    console.log("find user by username:" + req.param('username'));
+    console.log("find user by userName:" + req.param('userName'));
     //var regexp = "{$regex:'" + req.param("username") + "'}";
     //console.log(regexp);
     console.log('loginUserId = ' + req.param('loginUserId'));
-    userdb.users.find({username:{$regex:req.param("username")}}, function(err, users) {
+    userdb.users.find({userName:{$regex:req.param("userName")}}, function(err, users) {
         if( err || !users){
             console.log("No users found");
         }else{
@@ -179,16 +180,18 @@ app.get('/users', function (req, res) {
             var str='[';
             users.forEach( function(user) {
                 str += '{';
-                str += '"userid":"'         + user._id                                                                    + '"'       + ',';
-                str += '"username":"'       + user.username                                                              + '"'       + ',';
+                str += '"userId":"'         + user._id                                                                    + '"'       + ',';
+                str += '"userName":"'       + user.userName                                                              + '"'       + ',';
                 str += '"password":"'       + user.password                                                               + '"'       + ',';
                 str += '"department":"'     + user.department                                                           + '"'       +  ',';
                 str += '"bosses":"'          + user.bosses                                                               + '"'      + ',';
                 str += '"followers":"'      + user.followers                                                            + '"'      + ',';
-                str += '"tobebosses":"'     + user.tobebosses                                                           + '"'      + ',';
+                str += '"tobeBosses":"'     + user.tobeBosses                                                           + '"'      + ',';
+                str += '"tobeFollowers":"'  + user.tobeFollowers                                                       + '"'      + ',';
                 str += '"isMyBoss":'       + (user.followers.indexOf(req.param('loginUserId'))==-1 ? false : true)      + ''      + ',';
-                str += '"isMyFollower":'   + (user.bosses.indexOf(req.param('loginUserId'))==-1 ? false : true)  + ''      + ',';
-                str += '"tobeMyBoss":'     + (user.tobebosses.indexOf(req.param('loginUserId'))==-1 ? false : true)   + ''      + ',';
+                str += '"isMyFollower":'   + (user.bosses.indexOf(req.param('loginUserId'))==-1 ? false : true)         + ''      + ',';
+                str += '"tobeMyBoss":'     + (user.tobeBosses.indexOf(req.param('loginUserId'))==-1 ? false : true)   + ''      + ',';
+                str += '"tobeMyFollower":'     + (user.tobeFollowers.indexOf(req.param('loginUserId'))==-1 ? false : true)   + ''      + ',';
                 str += '"isMyself":'       + (user._id==req.param('loginUserId') ?  true : false)                      + ''      + '';
                 str += '},' +'\n';
             });
@@ -205,8 +208,8 @@ app.get('/users', function (req, res) {
 app.get('/user', function (req, res) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    console.log("userid: " + req.param("userid"))
-    userdb.users.find({_id:req.param("userid")}, function(err, users) {
+    console.log("userId: " + req.param("userId"))
+    userdb.users.find({_id:req.param("userId")}, function(err, users) {
         if( err || !users) console.log("No users found");
         else
         {
@@ -214,16 +217,15 @@ app.get('/user', function (req, res) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             var str='';
             users.forEach( function(user) {
-                //str = str + '{"userid":"'+ user._id  +'","username":"' + user.username + '","password":"' + user.password + '","department":"' + user.department + '","bosses":"' + user.bosses + '","followers":"' + user.followers + '","tobebosses":"' + user.tobebosses + '"},' +'\n';
-                //console.log(str);
                 str += '{';
-                str += '"userid":"'         + user._id              + '"'              + ',';
-                str += '"username":"'       + user.username         + '"'        + ',';
+                str += '"userId":"'         + user._id              + '"'              + ',';
+                str += '"userName":"'       + user.userName         + '"'        + ',';
                 str += '"password":"'       + user.password         + '"'          + ',';
                 str += '"department":"'     + user.department     + '"'          +  ',';
                 str += '"bosses":"'         + user.bosses           + '"'           + ',';
                 str += '"followers":"'      + user.followers        + '"'       + ',';
-                str += '"tobebosses":"'     + user.tobebosses       + '"'      + '';
+                str += '"tobeBosses":"'     + user.tobeBosses       + '"'      + '';
+                str += '"tobeFollowers":"'     + user.tobeFollowers       + '"'      + '';
                 str += '},' +'\n';
             });
             str = str.trim();
@@ -241,25 +243,36 @@ app.post('/user', function (req, res){
     //console.log('req.body = '+req.body);
     //console.log('req.body.mydata = ' + req.body.mydata);
     var jsonData = JSON.parse(req.body.mydata);
-    console.log('jsonData.userid = ' + jsonData.userid);
-    console.log('jsonData.username = ' + jsonData.username);
+    console.log('jsonData.userId = ' + jsonData.userId);
+    console.log('jsonData.userName = ' + jsonData.userName);
     console.log('jsonData.password = ' + jsonData.password);
     console.log('jsonData.department = ' + jsonData.department);
     console.log('jsonData.bosses = ' + jsonData.bosses);
     console.log('jsonData.followers = ' + jsonData.followers);
-    console.log('jsonData.tobebosses = ' + jsonData.tobebosses);
+    console.log('jsonData.tobeBosses = ' + jsonData.tobeBosses);
+    console.log('jsonData.tobeFollowers = ' + jsonData.tobeFollowers);
 
-    userdb.users.save({_id:jsonData.userid,username: jsonData.username, password: jsonData.password,department: jsonData.department,bosses:jsonData.bosses,followers:jsonData.followers,tobebosses:jsonData.tobebosses}, function(err, saved) {
-        if( err || !saved ){
-            var msg ="User not saved";
-            res.end(msg);
-            console.log(msg);
-        }else{
-            var msg = "User saved.";
-            console.log(msg);
-            res.end(msg);
-        }
-    });
+    userdb.users.save(
+            {
+                _id:jsonData.userId,
+                userName: jsonData.userName,
+                password: jsonData.password,
+                department: jsonData.department,
+                bosses:"",
+                followers:"",
+                tobeBosses:"",
+                tobeFollowers:""
+            }, function(err, saved) {
+                if( err || !saved ){
+                    var msg ="User not saved";
+                    res.end(msg);
+                    console.log(msg);
+                }else{
+                    var msg = "User saved.";
+                    console.log(msg);
+                    res.end(msg);
+                }
+        });
 });
 
 app.post('/user/bosses', function (req, res){
@@ -269,11 +282,11 @@ app.post('/user/bosses', function (req, res){
     //console.log('req.body.mydata = ' + req.body.mydata);
     var jsonData = JSON.parse(req.body.mydata);
     console.log("save user's bosses......");
-    console.log('jsonData.userid = ' + jsonData.userid);
+    console.log('jsonData.userId = ' + jsonData.userId);
     console.log('jsonData.bosses = ' + jsonData.bosses);
 
     userdb.users.findAndModify({
-        query: { _id: jsonData.userid },
+        query: { _id: jsonData.userId },
         update: { $set: { bosses:jsonData.bosses } },
         new: true
     }, function(err, doc, lastErrorObject) {
@@ -289,18 +302,45 @@ app.post('/user/bosses', function (req, res){
     });
 });
 
+app.post('/user/tobebosses', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    //console.log('req.body = '+req.body);
+    //console.log('req.body.mydata = ' + req.body.mydata);
+    var jsonData = JSON.parse(req.body.mydata);
+    console.log("save user's tobeBosses......");
+    console.log('jsonData.userId = ' + jsonData.userId);
+    console.log('jsonData.tobeBosses = ' + jsonData.tobeBosses);
+
+    userdb.users.findAndModify({
+        query: { _id: jsonData.userId },
+        update: { $set: { tobeBosses:jsonData.tobeBosses } },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="User' tobeBosses not saved";
+            res.end(msg);
+            console.log(msg);
+        }else{
+            var msg = "User's tobeBosses saved.";
+            console.log(msg);
+            res.end(msg);
+        }
+    });
+});
+
 app.post('/user/followers', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     //console.log('req.body = '+req.body);
     //console.log('req.body.mydata = ' + req.body.mydata);
     var jsonData = JSON.parse(req.body.mydata);
-    console.log("save user's bosses......");
-    console.log('jsonData.userid = ' + jsonData.userid);
+    console.log("save user's followers......");
+    console.log('jsonData.userId = ' + jsonData.userId);
     console.log('jsonData.followers = ' + jsonData.followers);
 
     userdb.users.findAndModify({
-        query: { _id: jsonData.userid },
+        query: { _id: jsonData.userId },
         update: { $set: { followers:jsonData.followers } },
         new: true
     }, function(err, doc, lastErrorObject) {
@@ -310,6 +350,33 @@ app.post('/user/followers', function (req, res){
             console.log(msg);
         }else{
             var msg = "User's followers saved.";
+            console.log(msg);
+            res.end(msg);
+        }
+    });
+});
+
+app.post('/user/tobefollowers', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    //console.log('req.body = '+req.body);
+    //console.log('req.body.mydata = ' + req.body.mydata);
+    var jsonData = JSON.parse(req.body.mydata);
+    console.log("save user's tobeFollowers......");
+    console.log('jsonData.userId = ' + jsonData.userId);
+    console.log('jsonData.tobeFollowers = ' + jsonData.tobeFollowers);
+
+    userdb.users.findAndModify({
+        query: { _id: jsonData.userId },
+        update: { $set: { tobeFollowers:jsonData.tobeFollowers } },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="User' tobeFollowers not saved";
+            res.end(msg);
+            console.log(msg);
+        }else{
+            var msg = "User's tobeFollowers saved.";
             console.log(msg);
             res.end(msg);
         }

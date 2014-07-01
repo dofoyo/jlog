@@ -5,9 +5,9 @@
     <input type="checkbox" ng-model="userFilterService.activeFilters.isMyBoss" ng-false-value="">关注我的&nbsp;&nbsp;
     <input type="checkbox" ng-model="userFilterService.activeFilters.tobeMyBoss" ng-false-value="">待处理的
     </div>
-    <div ng-repeat="user in users | filter:{'username':userFilterService.searchText} | filter:userFilterService.activeFilters"  class="partial2_div2_none">
+    <div ng-repeat="user in users | filter:{'userName':userFilterService.searchText} | filter:userFilterService.activeFilters"  class="partial2_div2_none">
         <div ng-show="!user.isMyself">
-            <font color="blue">{{user.username}}</font><br>
+            <font color="blue">{{user.userName}}</font><br>
             department: {{user.department}}<br>
             bosses: {{user.bosses}}<br>
             followers: {{user.followers}}<br>

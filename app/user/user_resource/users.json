@@ -1,2 +1,2 @@
-[{"userid":"0659484AA45704795A809A77","username":"rhb","password":"iamrhb","department":"吉峰.信息化","bosses":"","followers":"","tobebosses":"","isMyBoss":false,"isMyFollower":false,"tobeMyBoss":false,"isMyself":false},
-    {"userid":"A35103A259823444A6479331","username":"cj","password":"cj","department":"吉峰.信息化.实施推广部","bosses":"","followers":"","tobebosses":"","isMyBoss":false,"isMyFollower":false,"tobeMyBoss":false,"isMyself":false}]
+[{"userId":"0659484AA45704795A809A77","userName":"rhb","password":"iamrhb","department":"吉峰.信息化","bosses":"","followers":"","tobeBosses":"","isMyBoss":false,"isMyFollower":false,"tobeMyBoss":false,"isMyself":false},
+    {"userId":"A35103A259823444A6479331","userName":"cj","password":"cj","department":"吉峰.信息化.实施推广部","bosses":"","followers":"","tobeBosses":"","isMyBoss":false,"isMyFollower":false,"tobeMyBoss":false,"isMyself":false}]

@@ -6,24 +6,26 @@ function LogCtrl($scope, $http, $templateCache, $window) {
 
     $scope.loginUser = $window.sessionStorage.token ?
     {
-        userid:$window.sessionStorage.loginUserId,
-        username:$window.sessionStorage.loginUserName,
+        userId:$window.sessionStorage.loginUserId,
+        userName:$window.sessionStorage.loginUserName,
         department:$window.sessionStorage.loginUserDepartment,
         bosses:$window.sessionStorage.loginUserBosses,
         followers:$window.sessionStorage.loginUserFollowers,
-        tobebosses:$window.sessionStorage.loginUsertobebosses
+        tobeBosses:$window.sessionStorage.loginUserTobeBosses,
+        tobeFollowers:$window.sessionStorage.loginUserTobeFollowers
     }:
     {
-        userid:'',
-        username:'',
+        userId:'',
+        userName:'',
         department:'',
         bosses:'',
         followers:'',
-        tobebosses:''
+        tobeBosses:'',
+        tobeFollowers:''
     };
 
     var params = {
-        creatorid:$scope.loginUser.userid
+        creatorid:$scope.loginUser.userId
     };
 
     $scope.list = getLog($scope,$http,params);
@@ -42,8 +44,8 @@ function LogCtrl($scope, $http, $templateCache, $window) {
             message:msg,
             datetime:new Date(),
             creator:{
-                "id":$scope.loginUser.userid,
-                "name":$scope.loginUser.username,
+                "id":$scope.loginUser.userId,
+                "name":$scope.loginUser.userName,
                 "department":$scope.loginUser.department
             }
         };
@@ -66,8 +68,8 @@ function LogCtrl($scope, $http, $templateCache, $window) {
             message:msg,
             datetime:new Date(),
             creator:{
-                "id":$scope.loginUser.userid,
-                "name":$scope.loginUser.username,
+                "id":$scope.loginUser.userId,
+                "name":$scope.loginUser.userName,
                 "department":$scope.loginUser.department
             },
             comments:[]

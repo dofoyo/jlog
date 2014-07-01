@@ -1,7 +1,7 @@
 <div>
     <span ng-show="isAuthenticated">{{welcome}}</span>
     <form ng-show="!isAuthenticated" ng-submit="login()">
-        <input ng-model="loginUser.username" type="text" name="user" placeholder="Username" />
+        <input ng-model="loginUser.userName" type="text" name="user" placeholder="Username" />
         <input ng-model="loginUser.password" type="password" name="pass" placeholder="Password" />
         <input type="submit" value="Login" />
     </form>
@@ -15,12 +15,13 @@
 
     <div>
         <h3>logined user's information:</h3>
-        userid: {{loginUser.userid}}<br>
-        username: {{loginUser.username}}<br>
+        userId: {{loginUser.userId}}<br>
+        userName: {{loginUser.userName}}<br>
         department: {{loginUser.department}}<br>
         bosses: {{loginUser.bosses}}<br>
         followers: {{loginUser.followers}}<br>
-        tobebosses: {{loginUser.tobebosses}}
+        tobeBosses: {{loginUser.tobeBosses}}<br>
+        tobeFollowers: {{loginUser.tobeFollowers}}
     </div>
 
 </div>

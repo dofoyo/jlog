@@ -6,7 +6,7 @@
                 <fieldset>
                     <legend>Add New User</legend>
                     <div class="control-group">
-                        <input type="text" placeholder="Username…" ng-model="username" size=30 required/><br>
+                        <input type="text" placeholder="Username…" ng-model="userName" size=30 required/><br>
                         <input type="text" placeholder="Password…" ng-model="password" size=30 required/><br>
                         <input type="text" placeholder="Department" ng-model="department" size=30 required/>
                     </div>
@@ -25,11 +25,11 @@
 <div class="row-fluid">
 	  <div class="span2">
 		<!--Sidebar content-->
-		Search: <input ng-model="search.username"><button ng-click="list()" >Go</button>
+		Search: <input ng-model="search.userName"><button ng-click="list()" >Go</button>
 		<div class="span10">
 			<ul class="users">
-			  <li ng-repeat="user in users | filter:{'username':search.username}">
-				{{user.userid}},{{user.username}},{{user.password}},{{user.department}},{{user.bosses}}.{{user.followers}}
+			  <li ng-repeat="user in users | filter:{'userName':search.userName}">
+				{{user.userId}},{{user.userName}},{{user.password}},{{user.department}},{{user.bosses}}.{{user.followers}}
 			  </li>
 			</ul>
 		  </div>
