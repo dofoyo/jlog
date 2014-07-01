@@ -23,7 +23,7 @@ function LogCtrl($scope, $http, $templateCache, $window) {
     };
 
     var params = {
-        creatorid:$window.sessionStorage.loginUserId
+        creatorid:$scope.loginUser.userid
     };
 
     $scope.list = getLog($scope,$http,params);

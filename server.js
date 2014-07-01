@@ -63,60 +63,73 @@ app.get('/api/restricted', function (req, res) {
   });
 });
 
-//create REST api to get all logs from log collection.
 app.get('/logs', function (req, res) {
-    console.log('find log by ' + req.param('creatorid'))
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    logdb.logs.find({'creator.id':req.param('creatorid')}).sort({datetime:-1}, function(err, logs) {
-        if( err || !logs){
-            console.log("error or No logs found!");
-        } else {
-            console.log("there are "+ logs.length +" logs Found!");
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            var str='[';
-            if(logs.length>0){
-                logs.forEach( function(log) {
-                    str += '{';
-                    str += '"id":"' + log._id + '",';
-                    str += '"message":"' + log.message + '",';
-                    str += '"datetime":"' + log.datetime + '",';
-                    str += '"creator":{';
-                    str += '"id":"' + log.creator.id + '",';
-                    str += '"name":"' + log.creator.name + '",';
-                    str += '"department":"' + log.creator.department + '"';
-                    str += '},';
-                    str += '"comments":[';
-                    for(var i=0; i<log.comments.length; i++){
-                        var comment = log.comments[i];
-                        str += '{';
-                        str += '"message":"' + comment.message + '",';
-                        str += '"datetime":"' + comment.datetime + '",';
-                        str += '"creator":{';
-                        str += '"id":"' + comment.creator.id + '",';
-                        str += '"name":"' + comment.creator.name + '",';
-                        str += '"department":"' + comment.creator.department + '"';
-                        str += '}},';
+
+    userdb.users.findOne({'_id':req.param('creatorid')},function(err,user){
+            if(err || !user){
+                console.log('get logs error! could NOT find followers!');
+                res.end("[]");
+            }else{
+                var ids = user.followers.split(',');
+                ids.splice(0,0,req.param('creatorid'));
+
+                logdb.logs.find({'creator.id':{$in:ids}}).sort({datetime:-1}, function(err, logs) {
+                    console.log(ids);
+
+                    if( err || !logs){
+                        console.log("get logs error! could NOT find logs!");
+                        console.log(err);
+                        res.end("[]");
+                    } else {
+                        console.log("there are "+ logs.length +" logs Found!");
+                        res.writeHead(200, {'Content-Type': 'application/json'});
+                        var str='[';
+                        if(logs.length>0){
+                            logs.forEach( function(log) {
+                                str += '{';
+                                str += '"id":"' + log._id + '",';
+                                str += '"message":"' + log.message + '",';
+                                str += '"datetime":"' + log.datetime + '",';
+                                str += '"creator":{';
+                                str += '"id":"' + log.creator.id + '",';
+                                str += '"name":"' + log.creator.name + '",';
+                                str += '"department":"' + log.creator.department + '"';
+                                str += '},';
+                                str += '"comments":[';
+                                for(var i=0; i<log.comments.length; i++){
+                                    var comment = log.comments[i];
+                                    str += '{';
+                                    str += '"message":"' + comment.message + '",';
+                                    str += '"datetime":"' + comment.datetime + '",';
+                                    str += '"creator":{';
+                                    str += '"id":"' + comment.creator.id + '",';
+                                    str += '"name":"' + comment.creator.name + '",';
+                                    str += '"department":"' + comment.creator.department + '"';
+                                    str += '}},';
+                                }
+                                if(log.comments.length>0){
+                                    str = str.trim();
+                                    str = str.substring(0,str.length-1);
+                                }
+                                str += ']';
+                                str += '},';
+                                str += '\n';
+                            });
+                            str = str.trim();
+                            str = str.substring(0,str.length-1);
+                        }
+                        str = str + ']';
+                        console.log("get logs successed!")
+                        res.end(str);
                     }
-                    if(log.comments.length>0){
-                        str = str.trim();
-                        str = str.substring(0,str.length-1);
-                    }
-                    str += ']';
-                    str += '},';
-                    str += '\n';
                 });
-                str = str.trim();
-                str = str.substring(0,str.length-1);
+
             }
-            str = str + ']';
-            console.log("get logs successed, with comments as apart!")
-            res.end(str);
-        }
     });
 });
 
-//create a log record.
 app.post('/log', function (req, res){
     //console.log("POST log!");
     res.header("Access-Control-Allow-Origin", "http://localhost");
@@ -128,15 +141,16 @@ app.post('/log', function (req, res){
     //console.log('jsonData.message = ' + jsonData.message);
     //console.log('jsonData.creator = ' + jsonData.creator);
     //console.log('jsonData.comments = ' + jsonData.comments);
+    var d = new Date();
 
     for(var i=0; i<jsonData.comments.length; i++){
         var comment = jsonData.comments[i];
         if(comment.message == jsonData.comment){
-            comment.datetime = new Date();  //以服务端的日期为准
+            comment.datetime = d.getTime();  //以服务端的日期为准
         }
     }
 
-    logdb.logs.save({_id:jsonData.id,message:jsonData.message, creator: jsonData.creator,datetime:new Date(),comments:jsonData.comments}, function(err, saved) {
+    logdb.logs.save({_id:jsonData.id,message:jsonData.message, creator: jsonData.creator,datetime:d.getTime(),comments:jsonData.comments}, function(err, saved) {
         if( err || !saved ){
             var msg ="log not saved";
             console.log(msg);

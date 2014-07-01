@@ -22,15 +22,20 @@ function UserCtrl($scope,$http,$templateCache,$window, userFilterService) {
 
 
     $scope.getList = function() {
-        //alert('get user list...');
-        $http.get('/users',{params:{username:userFilterService.searchText,loginUserId:$scope.loginUser.userid}}).
-            success(function(data,status,headers,config) {
-                //alert("get users success!");
-                $scope.users = data;
-            }).
-            error(function(data,status,headers,config){
-                alert("get users error!");
-            });
+        if($scope.loginUser.userid.length>0){
+            var params = {
+                username:userFilterService.searchText,
+                loginUserId:$scope.loginUser.userid
+            };
+            $http.get('/users',{params:params}).
+                success(function(data,status,headers,config) {
+                    //alert("get users success!");
+                    $scope.users = data;
+                }).
+                error(function(data,status,headers,config){
+                    alert("get users error!");
+                });
+        }
     };
     $scope.getList();
     //$scope.users = User.query();
@@ -222,7 +227,10 @@ function UserListCtrl($scope, $http, $templateCache,$window) {
     };
 
     $scope.list = function() {
-        $http.get('/users',{params:{username:$scope.search.username,loginUserId:$scope.loginUser.userid}}).
+        var params = {
+            username:$scope.search.username
+        };
+        $http.get('/users',{params:params}).
             success(function(data,status,headers,config) {
                 //alert("get users success!");
                 $scope.users = data;

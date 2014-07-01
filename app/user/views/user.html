@@ -1,39 +1,39 @@
+
+<div class="container-fluid" >
+    <div class="row-fluid">
+        <div class="span10">
+            <form name="myform" id="myform1" ng-submit="save()">
+                <fieldset>
+                    <legend>Add New User</legend>
+                    <div class="control-group">
+                        <input type="text" placeholder="Username…" ng-model="username" size=30 required/><br>
+                        <input type="text" placeholder="Password…" ng-model="password" size=30 required/><br>
+                        <input type="text" placeholder="Department" ng-model="department" size=30 required/>
+                    </div>
+                </fieldset>
+                <p>
+                <div><button type="submit" >Save now...</button></div>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+
+<hr>
+
 <div class="container-fluid">
 <div class="row-fluid">
 	  <div class="span2">
 		<!--Sidebar content-->
 		Search: <input ng-model="search.username"><button ng-click="list()" >Go</button>
 		<div class="span10">
-			<!--Body content-->
 			<ul class="users">
-			  <li ng-repeat="user in users">
+			  <li ng-repeat="user in users | filter:{'username':search.username}">
 				{{user.userid}},{{user.username}},{{user.password}},{{user.department}},{{user.bosses}}.{{user.followers}}
 			  </li>
 			</ul>
 		  </div>
 	  </div>
-</div>
-</div>
-
-<hr>
-
-<div class="container-fluid" >
-<div class="row-fluid">
-	  <div class="span10">
-		<form name="myform" id="myform1" ng-submit="save()">
-			<fieldset>
-				<legend>New User</legend>
-				<div class="control-group">
-					<center><input type="text" placeholder="Username…" ng-model="username" size=50 required/></center>
-					<center><input type="text" placeholder="Password…" ng-model="password" size=50 required/></center>
-					<center><input type="text" placeholder="Department" ng-model="department" size=50 required/></center>
-				</div>
-			</fieldset>
-			<p>
-				<div><center><button type="submit" >Save now...</button></center></div>
-			</p>
-		</form>
-	</div>
 </div>
 </div>
 
