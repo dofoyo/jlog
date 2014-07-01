@@ -7,13 +7,24 @@
     </div>
     <div ng-repeat="user in users | filter:{'userName':userFilterService.searchText} | filter:userFilterService.activeFilters"  class="partial2_div2_none">
         <div ng-show="!user.isMyself">
-            <font color="blue">{{user.userName}}</font><br>
-            department: {{user.department}}<br>
-            bosses: {{user.bosses}}<br>
-            followers: {{user.followers}}<br>
-            <span ng-show="user.isMyFollower">我已关注的人</span><button ng-show="user.isMyFollower" ng-click="deleteFollower($index)">取消关注</button><button ng-show="!user.isMyFollower" ng-click="addFollower($index)">关注TA</button><br>
-            <span ng-show="user.isMyBoss">已关注我的人</span><button ng-show="user.isMyBoss" ng-click="deleteBoss($index)">取消关注</button><button ng-show="!user.isMyBoss" ng-click="addBoss($index)">请TA关注我</button><br>
-            <button ng-show="user.tobeMyBoss" ng-click="agreeMyBoss($index)">同意TA关注我</button><button ng-show="user.tobeMyBoss" ng-click="disagreeMyBoss($index)">不同意TA关注我</button><br>
+            姓名：<font color="blue">{{user.userName}}</font><br>
+            部门：{{user.department}}<br>
+            <span ng-show="user.isMyFollower">我已关注{{user.userName}}</span>
+                <button ng-show="user.isMyFollower" ng-click="deleteFollower($index)">取消关注</button>
+                <button ng-show="!user.isMyFollower && !user.tobeMyFollower" ng-click="addTobeMyFollower($index)">关注{{user.userName}}</button><br>
+
+            <span ng-show="user.isMyBoss">{{user.userName}}已关注我</span>
+                <button ng-show="user.isMyBoss" ng-click="deleteBoss($index)">取消关注</button>
+                <button ng-show="!user.isMyBoss && !user.tobeMyBoss" ng-click="addBoss($index)">请{{user.userName}}关注我</button><br>
+
+            <span ng-show="user.tobeMyBoss">{{user.userName}}提请关注我</span>
+                <button ng-show="user.tobeMyBoss" ng-click="agreeTobeMyBoss($index)">同意{{user.userName}}关注我</button>
+                <button ng-show="user.tobeMyBoss" ng-click="disagreeTobeMyBoss($index)">不同意{{user.userName}}关注我</button><br>
+
+            <span ng-show="user.tobeMyFollower">我已提请关注{{user.userName}}</span>
+                <button ng-show="user.tobeMyFollower" ng-click="deleteTobeMyFollower($index)">取消关注</button>
+
+
         </div>
     </div>
 </div>

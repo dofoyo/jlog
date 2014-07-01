@@ -190,8 +190,8 @@ app.get('/users', function (req, res) {
                 str += '"tobeFollowers":"'  + user.tobeFollowers                                                       + '"'      + ',';
                 str += '"isMyBoss":'       + (user.followers.indexOf(req.param('loginUserId'))==-1 ? false : true)      + ''      + ',';
                 str += '"isMyFollower":'   + (user.bosses.indexOf(req.param('loginUserId'))==-1 ? false : true)         + ''      + ',';
-                str += '"tobeMyBoss":'     + (user.tobeBosses.indexOf(req.param('loginUserId'))==-1 ? false : true)   + ''      + ',';
-                str += '"tobeMyFollower":'     + (user.tobeFollowers.indexOf(req.param('loginUserId'))==-1 ? false : true)   + ''      + ',';
+                str += '"tobeMyBoss":'     + (user.tobeFollowers.indexOf(req.param('loginUserId'))==-1 ? false : true)   + ''      + ',';
+                str += '"tobeMyFollower":'     + (user.tobeBosses.indexOf(req.param('loginUserId'))==-1 ? false : true)   + ''      + ',';
                 str += '"isMyself":'       + (user._id==req.param('loginUserId') ?  true : false)                      + ''      + '';
                 str += '},' +'\n';
             });
