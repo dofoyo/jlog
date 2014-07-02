@@ -132,18 +132,10 @@ app.get('/logs', function (req, res) {
 });
 
 app.post('/log', function (req, res){
-    //console.log("POST log!");
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    //console.log('req.body = '+req.body);
-    //console.log('req.body.mydata = ' + req.body.mydata);
     var jsonData = JSON.parse(req.body.mydata);
-    //console.log('jsonData.id = ' + jsonData.id);
-    //console.log('jsonData.message = ' + jsonData.message);
-    //console.log('jsonData.creator = ' + jsonData.creator);
-    //console.log('jsonData.comments = ' + jsonData.comments);
     var d = new Date();
-
     for(var i=0; i<jsonData.comments.length; i++){
         var comment = jsonData.comments[i];
         if(comment.message == jsonData.comment){
@@ -167,39 +159,28 @@ app.post('/log', function (req, res){
 app.get('/users', function (req, res) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    console.log("find user by userName:" + req.param('userName'));
-    //var regexp = "{$regex:'" + req.param("username") + "'}";
-    //console.log(regexp);
-    console.log('loginUserId = ' + req.param('loginUserId'));
+    res.writeHead(200, {'Content-Type': 'application/json'});
     userdb.users.find({userName:{$regex:req.param("userName")}}, function(err, users) {
         if( err || !users){
             console.log("No users found");
+            res.end( "[]");
         }else{
-            //console.log('find ' + users.length + ' users.');
-            res.writeHead(200, {'Content-Type': 'application/json'});
             var str='[';
-            users.forEach( function(user) {
-                str += '{';
-                str += '"userId":"'         + user._id                                                                    + '"'       + ',';
-                str += '"userName":"'       + user.userName                                                              + '"'       + ',';
-                str += '"password":"'       + user.password                                                               + '"'       + ',';
-                str += '"department":"'     + user.department                                                           + '"'       +  ',';
-                str += '"bosses":"'          + user.bosses                                                               + '"'      + ',';
-                str += '"followers":"'      + user.followers                                                            + '"'      + ',';
-                str += '"tobeBosses":"'     + user.tobeBosses                                                           + '"'      + ',';
-                str += '"tobeFollowers":"'  + user.tobeFollowers                                                       + '"'      + ',';
-                str += '"isMyBoss":'       + (user.followers.indexOf(req.param('loginUserId'))==-1 ? false : true)      + ''      + ',';
-                str += '"isMyFollower":'   + (user.bosses.indexOf(req.param('loginUserId'))==-1 ? false : true)         + ''      + ',';
-                str += '"tobeMyBoss":'     + (user.tobeFollowers.indexOf(req.param('loginUserId'))==-1 ? false : true)   + ''      + ',';
-                str += '"tobeMyFollower":'     + (user.tobeBosses.indexOf(req.param('loginUserId'))==-1 ? false : true)   + ''      + ',';
-                str += '"isMyself":'       + (user._id==req.param('loginUserId') ?  true : false)                      + ''      + '';
-                str += '},' +'\n';
-            });
-            str = str.trim();
-            str = str.substring(0,str.length-1);
+            if(users.length>0){
+                users.forEach( function(user) {
+                    str += '{';
+                    str += '"userId":"'         + user._id                                                                    + '"'       + ',';
+                    str += '"userName":"'       + user.userName                                                              + '"'       + ',';
+                    str += '"password":"'       + user.password                                                               + '"'       + ',';
+                    str += '"department":"'     + user.department                                                           + '"'       +  ',';
+                    str += '"followers":"'      + user.followers                                                            + '"'      + ',';
+                    str += '"tobeFollowers":"'  + user.tobeFollowers                                                       + '"'      + '';
+                    str += '},' +'\n';
+                });
+                str = str.trim();
+                str = str.substring(0,str.length-1);
+            }
             str = str + ']';
-            //console.log(str);
-            //console.log("get users successed!")
             res.end( str);
         }
     });
@@ -240,28 +221,15 @@ app.get('/user', function (req, res) {
 app.post('/user', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    //console.log('req.body = '+req.body);
-    //console.log('req.body.mydata = ' + req.body.mydata);
     var jsonData = JSON.parse(req.body.mydata);
-    console.log('jsonData.userId = ' + jsonData.userId);
-    console.log('jsonData.userName = ' + jsonData.userName);
-    console.log('jsonData.password = ' + jsonData.password);
-    console.log('jsonData.department = ' + jsonData.department);
-    console.log('jsonData.bosses = ' + jsonData.bosses);
-    console.log('jsonData.followers = ' + jsonData.followers);
-    console.log('jsonData.tobeBosses = ' + jsonData.tobeBosses);
-    console.log('jsonData.tobeFollowers = ' + jsonData.tobeFollowers);
-
     userdb.users.save(
             {
                 _id:jsonData.userId,
                 userName: jsonData.userName,
                 password: jsonData.password,
                 department: jsonData.department,
-                bosses:"",
-                followers:"",
-                tobeBosses:"",
-                tobeFollowers:""
+                followers:[],
+                tobeFollowers:[]
             }, function(err, saved) {
                 if( err || !saved ){
                     var msg ="User not saved";
@@ -273,6 +241,72 @@ app.post('/user', function (req, res){
                     res.end(msg);
                 }
         });
+});
+
+app.post('/user/befollower', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jsonData = JSON.parse(req.body.mydata);
+    userdb.users.findAndModify({
+        query: { _id: jsonData.userId },
+        update: {
+                    $addToSet: { followers:jsonData.followerId },
+                    $pull: { tobeFollowers:jsonData.followerId }
+                },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="follower not added";
+            res.end(msg);
+            console.log(msg);
+        }else{
+            var msg = "follower added.";
+            console.log(msg);
+            res.end(msg);
+        }
+    });
+});
+
+app.post('/user/notfollower', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jsonData = JSON.parse(req.body.mydata);
+    userdb.users.findAndModify({
+        query: { _id: jsonData.userId },
+        update: { $pull: { followers:jsonData.followerId },$pull: { tobeFollowers:jsonData.followerId } },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="follower not deleted";
+            res.end(msg);
+            console.log(msg);
+        }else{
+            var msg = "follower deleted.";
+            console.log(msg);
+            res.end(msg);
+        }
+    });
+});
+
+app.post('/user/tobefollower', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jsonData = JSON.parse(req.body.mydata);
+    userdb.users.findAndModify({
+        query: { _id: jsonData.userId },
+        update: { $addToSet: { tobeFollowers:jsonData.followerId } },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="tobefollower not added";
+            res.end(msg);
+            console.log(msg);
+        }else{
+            var msg = "tobefollower added.";
+            console.log(msg);
+            res.end(msg);
+        }
+    });
 });
 
 app.post('/user/bosses', function (req, res){

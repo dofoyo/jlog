@@ -280,6 +280,89 @@ function UserCtrl($scope,$http,$templateCache,$window, userFilterService) {
             });
 
     }
+
+    $scope.saveTobeBossAndFollower = function(bossId,followerId){
+
+    }
+
+
+    $scope.saveTobeFollower = function(userId,followerId){
+        var formData = {
+            'userId':userId,
+            'followerId':followerId
+        };
+        var jdata = 'mydata='+JSON.stringify(formData);
+
+        var method = 'POST';
+        var inserturl = '/user/tobefollower';
+        $http({
+            method: method,
+            url: inserturl,
+            data:  jdata ,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            cache: $templateCache
+        }).
+            success(function(response) {
+                alert("save tobefollower successed!");
+
+            }).
+            error(function(response) {
+                alert("save tobefollower error!");
+            });
+    }
+
+    $scope.saveBeFollower = function(userId,followerId){
+        var formData = {
+            'userId':userId,
+            'followerId':followerId
+        };
+        var jdata = 'mydata='+JSON.stringify(formData);
+
+        var method = 'POST';
+        var inserturl = '/user/befollower';
+        $http({
+            method: method,
+            url: inserturl,
+            data:  jdata ,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            cache: $templateCache
+        }).
+            success(function(response) {
+                alert("save follower successed!");
+
+            }).
+            error(function(response) {
+                alert("save follower error!");
+            });
+    }
+
+    $scope.saveNotFollower = function(userId,followerId){
+        var formData = {
+            'userId':userId,
+            'followerId':followerId
+        };
+        var jdata = 'mydata='+JSON.stringify(formData);
+
+        var method = 'POST';
+        var inserturl = '/user/notfollower';
+        $http({
+            method: method,
+            url: inserturl,
+            data:  jdata ,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            cache: $templateCache
+        }).
+            success(function(response) {
+                alert("not follower successed!");
+
+            }).
+            error(function(response) {
+                alert("not follower error!");
+            });
+    }
+    //$scope.saveTobeFollower('00285249A93A148667611007','4379825838124A4751862357');
+    //$scope.saveBeFollower('00285249A93A148667611007','4379825838124A4751862357');
+    $scope.saveNotFollower('00285249A93A148667611007','4379825838124A4751862357');
 }
 
 function UserListCtrl($scope, $http, $templateCache,$window) {
