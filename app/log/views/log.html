@@ -1,5 +1,26 @@
+<button ng-click="setWriteShow(true)">写日志</button><button ng-click="setWriteShow(false)">搜索日志</button>
+<div ng-show="pageState.writeShow">
 <TEXTAREA NAME="" ROWS="4" COLS="28" ng-model="message"></TEXTAREA>
 <button ng-click="submitLog();" style="width: 45px; height: 75px;">提交</button>
+</div>
+<div ng-show="!pageState.writeShow">
+    <table class="partial4_table1">
+        <tr>
+            <td>级&nbsp;&nbsp;&nbsp;&nbsp;别：</td><td><INPUT TYPE="text" NAME="" size="12"></td>
+        </tr>
+        <tr>
+            <td>日&nbsp;志&nbsp;人：</td><td><INPUT TYPE="text" NAME="" size="12"><INPUT TYPE="button" VALUE=".." ONCLICK=""></td>
+        </tr>
+        <tr>
+            <td>关&nbsp;键&nbsp;字：</td><td><INPUT TYPE="text" NAME="" size="12"></td>
+        </tr>
+        <tr>
+            <td valign="top">起止日期：</td><td><INPUT TYPE="text" NAME="" size="12"><br><INPUT TYPE="text" NAME="" size="12"></td>
+        </tr>
+    </table>
+</div>
+
+
 <hr>
 <div>
 <ul class="partial1_logview">

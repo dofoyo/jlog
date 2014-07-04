@@ -2,30 +2,27 @@
 
 function LogCtrl($scope, $http, $templateCache, $window) {
     var str = "工作总结：\n\n工作计划：\n";
+
     $scope.message = str;
+
+    $scope.pageState={};
+
+    $scope.pageState.writeShow = true;
 
     $scope.loginUser = $window.sessionStorage.token ?
     {
         userId:$window.sessionStorage.loginUserId,
         userName:$window.sessionStorage.loginUserName,
-        department:$window.sessionStorage.loginUserDepartment,
-        bosses:$window.sessionStorage.loginUserBosses,
-        followers:$window.sessionStorage.loginUserFollowers,
-        tobeBosses:$window.sessionStorage.loginUserTobeBosses,
-        tobeFollowers:$window.sessionStorage.loginUserTobeFollowers
+        department:$window.sessionStorage.loginUserDepartment
     }:
     {
         userId:'',
         userName:'',
-        department:'',
-        bosses:'',
-        followers:'',
-        tobeBosses:'',
-        tobeFollowers:''
+        department:''
     };
 
     var params = {
-        creatorid:$scope.loginUser.userId
+        creatorId:$scope.loginUser.userId
     };
 
     $scope.list = getLog($scope,$http,params);
@@ -38,7 +35,7 @@ function LogCtrl($scope, $http, $templateCache, $window) {
         var log = $scope.logs[index];
 
         var msg = log.comment;
-        var msg = msg.replace(/[\n\r]/g,'').replace(/[\\]/g,'').replace("工作计划","    工作计划");
+        var msg = msg.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
 
         var comment = {
             message:msg,
@@ -50,12 +47,12 @@ function LogCtrl($scope, $http, $templateCache, $window) {
             }
         };
 
+        var jdata = 'mydata='+JSON.stringify(comment);
+        jdata =+ ',logId='+log.id;
+
+        saveComment($http,$templateCache,jdata);
+
         log.comments.splice(0,0,comment);
-
-        var jdata = 'mydata='+JSON.stringify(log);
-
-        saveLog($http,$templateCache,jdata);
-
         log.comment = "";
     };
 
@@ -81,10 +78,14 @@ function LogCtrl($scope, $http, $templateCache, $window) {
         $scope.logs.splice(0,0,log);
         $scope.message = str;
     };
+
+    $scope.setWriteShow = function(flag){
+        $scope.pageState.writeShow = flag;
+    };
 }
 
 function getLog($scope, $http, params){
-    var url = '/logs';
+    var url = '/logs/own';
     $http.get(url,{params:params}).
         success(function(data,status,headers,config) {
             //alert('get logs successed!');
@@ -92,6 +93,26 @@ function getLog($scope, $http, params){
         }).
         error(function(data,status,headers,config){
             alert("get logs error!");
+            alert(data);
+        });
+}
+
+function saveComment($http,$templateCache,jdata ){
+    //alert(jdata);
+    var method = 'POST';
+    var url = '/comment';
+    $http({
+        method: method,
+        url: url,
+        data:  jdata ,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        cache: $templateCache
+    }).
+        success(function(response) {
+            //alert("save log successed!");
+        }).
+        error(function(response) {
+            alert("save comment error!");
         });
 }
 

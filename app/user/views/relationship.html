@@ -1,12 +1,14 @@
 <div ng-controller="UserCtrl">
     <div>
-    &nbsp;&nbsp;关键字：<input type="text" id="searchTextBox" ng-model="userFilterService.searchText"><INPUT TYPE="button" VALUE="Go" ng-click="getList()">
-    <input type="checkbox" ng-model="userFilterService.activeFilters.isMyFollower" ng-false-value="">我关注的&nbsp;&nbsp;
-    <input type="checkbox" ng-model="userFilterService.activeFilters.isMyBoss" ng-false-value="">关注我的&nbsp;&nbsp;
-    <input type="checkbox" ng-model="userFilterService.activeFilters.tobeMyBoss" ng-false-value="">待处理的
+    关键字：<input type="text" id="searchTextBox" ng-model="userFilterService.searchText"><br>
+        <input type="radio" name="radio1" ng-click="getMyFollowers()">我关注的&nbsp;&nbsp;
+        <input type="radio" name="radio1" ng-click="getTobeMyFollowers()">我关注的(待确认)<br>
+        <input type="radio" name="radio1" ng-click="getMyBosses()">关注我的&nbsp;&nbsp;
+        <input type="radio" name="radio1" ng-click="getTobeMyBosses()">关注我的(待确认)<br>
+        <input type="radio" name="radio1" ng-click="getUnrelated()">无关系&nbsp;&nbsp;
     </div>
-    <div ng-repeat="user in users | filter:{'userName':userFilterService.searchText} | filter:userFilterService.activeFilters"  class="partial2_div2_none">
-        <div ng-show="!user.isMyself">
+    <div ng-repeat="user in users | filter:{'userName':userFilterService.searchText}"  class="partial2_div2_none">
+        <div>
             姓名：<font color="blue">{{user.userName}}</font><br>
             部门：{{user.department}}<br>
             <span ng-show="user.isMyFollower">我已关注{{user.userName}}</span>
