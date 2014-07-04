@@ -6,20 +6,12 @@ function LoginCtrl($scope, $http, $window) {
     {
         userId:$window.sessionStorage.loginUserId,
         userName:$window.sessionStorage.loginUserName,
-        department:$window.sessionStorage.loginUserDepartment,
-        bosses:$window.sessionStorage.loginUserBosses,
-        followers:$window.sessionStorage.loginUserFollowers,
-        tobeBosses:$window.sessionStorage.loginUserTobeBosses,
-        tobeFollowers:$window.sessionStorage.loginUserTobeFollowers
+        department:$window.sessionStorage.loginUserDepartment
     }:
     {
         userId:'',
         userName:'',
-        department:'',
-        bosses:'',
-        followers:'',
-        tobeBosses:'',
-        tobeFollowers:''
+        department:''
     };
 
     //allPrpos($scope.loginUser);
@@ -36,18 +28,10 @@ function LoginCtrl($scope, $http, $window) {
                 $window.sessionStorage.loginUserId = data.loginUser.userId;
                 $window.sessionStorage.loginUserName = data.loginUser.userName;
                 $window.sessionStorage.loginUserDepartment = data.loginUser.department;
-                $window.sessionStorage.loginUserBosses = data.loginUser.bosses;
-                $window.sessionStorage.loginUserFollowers = data.loginUser.followers;
-                $window.sessionStorage.loginUserTobeBosses = data.loginUser.tobeBosses;
-                $window.sessionStorage.loginUserTobeFollowers = data.loginUser.tobeFollowers;
                 $scope.loginUser = {
                      userId:$window.sessionStorage.loginUserId,
                      userName:$window.sessionStorage.loginUserName,
-                     department:$window.sessionStorage.loginUserDepartment,
-                     bosses:$window.sessionStorage.loginUserBosses,
-                     followers:$window.sessionStorage.loginUserFollowers,
-                    tobeBosses:$window.sessionStorage.loginUserTobeBosses,
-                    tobeFollowers:$window.sessionStorage.loginUserTobeFollowers
+                     department:$window.sessionStorage.loginUserDepartment
                 };
                 //$scope.loginUser = data.loginUser;
                 $scope.isAuthenticated = true;
@@ -76,10 +60,6 @@ function LoginCtrl($scope, $http, $window) {
         delete $window.sessionStorage.loginUserId;
         delete $window.sessionStorage.loginUserName;
         delete $window.sessionStorage.loginUserDepartment;
-        delete $window.sessionStorage.loginUserBosses;
-        delete $window.sessionStorage.loginUserFollowers;
-        delete $window.sessionStorage.loginUserTobeBosses;
-        delete $window.sessionStorage.loginUserTobeFollowers;
 
     };
 

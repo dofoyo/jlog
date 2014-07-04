@@ -6,280 +6,113 @@ function UserCtrl($scope,$http,$templateCache,$window, userFilterService) {
     {
         userId:$window.sessionStorage.loginUserId,
         userName:$window.sessionStorage.loginUserName,
-        department:$window.sessionStorage.loginUserDepartment,
-        bosses:$window.sessionStorage.loginUserBosses,
-        followers:$window.sessionStorage.loginUserFollowers,
-        tobeBosses:$window.sessionStorage.loginUserTobeBosses,
-        tobeFollowers:$window.sessionStorage.loginUserTobeFollowers
+        department:$window.sessionStorage.loginUserDepartment
     }:
     {
         userId:'',
         userName:'',
-        department:'',
-        bosses:'',
-        followers:'',
-        tobeBosses:'',
-        tobeFollowers:''
+        department:''
     };
 
 
-    $scope.getList = function() {
-        if($scope.loginUser.userId.length>0){
-            var params = {
-                userName:userFilterService.searchText,
-                loginUserId:$scope.loginUser.userId
-            };
-            $http.get('/users',{params:params}).
-                success(function(data,status,headers,config) {
-                    //alert("get users success!");
-                    $scope.users = data;
-                }).
-                error(function(data,status,headers,config){
-                    alert("get users error!");
-                });
-        }
+    $scope.getUnrelated = function() {
+        getUsers($scope.loginUser.userId,userFilterService.searchText,$scope,$http,'/users/unrelated');
     };
-    $scope.getList();
-    //$scope.users = User.query();
 
-    $scope.addTobeMyFollower = function(index){
-        var user = $scope.users[index];
-        user.tobeBosses = user.tobeBosses + "," + $scope.loginUser.userId;
-        user.tobeMyFollower = true;
-        $scope.saveTobeBosses(user.userId,user.tobeBosses);
+    $scope.getTobeMyBosses = function() {
+        getUsers($scope.loginUser.userId,userFilterService.searchText,$scope,$http,'/users/tobeboss');
+    };
 
-        var myid = $window.sessionStorage.loginUserId;
-        var tobeFollowers = $scope.loginUser.tobeFollowers + ',' + user.userId;
-        $window.sessionStorage.loginUserTobeFollowers = tobeFollowers;
-        $scope.loginUser.tobeFollowers = tobeFollowers;
-        $scope.saveTobeFollowers(myid,tobeFollowers);
-    }
+    $scope.getMyBosses = function() {
+        getUsers($scope.loginUser.userId,userFilterService.searchText,$scope,$http,'/users/boss');
+    };
 
-    $scope.deleteTobeMyFollower = function(index){
-        var myid = $window.sessionStorage.loginUserId; //dyr
+    $scope.getTobeMyFollowers = function() {
+        getUsers($scope.loginUser.userId,userFilterService.searchText,$scope,$http,'/users/tobefollower');
+    };
 
-        var user = $scope.users[index];  //rhb
-        var tobeBosses = user.tobeBosses;
-        tobeBosses = cutString(tobeBosses,myid);
-        user.tobeBosses = tobeBosses;
-        user.tobeMyFollower = false;
-        $scope.saveTobeBosses(user.userId,tobeBosses);
-
-        var tobeFollowers = $scope.loginUser.tobeFollowers;
-        tobeFollowers = cutString(tobeFollowers,user.userId);
-        $window.sessionStorage.loginUserTobeFollowers = tobeFollowers;
-        $scope.loginUser.tobeFollowers = tobeFollowers;
-        $scope.saveTobeFollowers(myid,tobeFollowers);
-    }
-
-    $scope.deleteTobeMyBoss = function(index){
-        var myid = $window.sessionStorage.loginUserId; //dyr
-
-        var user = $scope.users[index];  //rhb
-        var tobeFollowers = user.tobeFollowers;
-        tobeFollowers = cutString(tobeFollowers,myid);
-        user.tobeFollowers = tobeFollowers;
-        user.tobeMyBoss = false;
-        $scope.saveTobeFollowers(user.userId,tobeFollowers);
-
-        var tobeBosses = $scope.loginUser.tobeBosses;
-        tobeBosses = cutString(tobeBosses,user.userId);
-        $window.sessionStorage.loginUserTobeBosses = tobeBosses;
-        $scope.loginUser.tobeBosses = tobeBosses;
-        $scope.saveTobeBosses(myid,tobeBosses);
-    }
-
-    $scope.addFollower = function(index){
-        var user = $scope.users[index];
-        user.bosses = user.bosses + "," + $scope.loginUser.userId;
-        user.isMyFollower = true;
-        $scope.saveBosses(user.userId,user.bosses);
-
-        var myid = $window.sessionStorage.loginUserId;
-        var myFollowers = $scope.loginUser.followers + ',' + user.userId;
-        $window.sessionStorage.loginUserFollowers = myFollowers;
-        $scope.loginUser.followers = myFollowers;
-        $scope.saveFollowers(myid,myFollowers);
-    }
+    $scope.getMyFollowers = function() {
+        getUsers($scope.loginUser.userId,userFilterService.searchText,$scope,$http,'/users/follower');
+    };
 
     $scope.deleteFollower = function(index){
-        var myid = $window.sessionStorage.loginUserId;
-
+        var url = '/user/notfollower';
+        var myId = $window.sessionStorage.loginUserId;
         var user = $scope.users[index];
-        var bosses = user.bosses;
-        bosses = cutString(bosses,myid);
-        user.bosses = bosses;
+        var followerId = user.userId;
+        saveRelation(myId,followerId,$http,$templateCache,url);
         user.isMyFollower = false;
-        $scope.saveBosses(user.userId,bosses);
-
-        var myid = $window.sessionStorage.loginUserId;
-        var myFollowers = $scope.loginUser.followers;
-        myFollowers = cutString(myFollowers,user.userId);
-        $window.sessionStorage.loginUserFollowers = myFollowers;
-        $scope.loginUser.followers = myFollowers;
-        $scope.saveFollowers(myid,myFollowers);
+        user.tobeMyFollower = false;
+        user.isMyBoss = false;
+        user.tobeMyBoss = false;
     }
 
-    $scope.addBoss = function(index){
+    $scope.addTobeMyFollower = function(index){
+        var url = '/user/tobefollower';
+        var myId = $window.sessionStorage.loginUserId;
         var user = $scope.users[index];
-        user.followers = user.followers + "," + $scope.loginUser.userId;
-        user.isMyBoss = true;
-        $scope.saveFollowers(user.userId,user.followers);
+        var followerId = user.userId;
+        saveRelation(myId,followerId,$http,$templateCache,url);
+        user.isMyFollower = false;
+        user.tobeMyFollower = true;
+        user.isMyBoss = false;
+        user.tobeMyBoss = false;
 
-        var myid = $scope.loginUser.userId;
-        var myBosses = $scope.loginUser.bosses + ',' + user.userId;
-        $window.sessionStorage.loginUserBosses = myBosses;
-        $scope.loginUser.bosses = myBosses;
-        $scope.saveBosses(myid,myBosses);
     }
 
     $scope.deleteBoss = function(index){
-        var myid = $scope.loginUser.userId;
-
+        var url = '/user/notfollower';
+        var followerId = $window.sessionStorage.loginUserId; // i was the follower
         var user = $scope.users[index];
-        var followers = user.followers;
-        followers = cutString(followers,myid);
-        user.followers = followers;
+        var bossId = user.userId;
+        saveRelation(bossId,followerId,$http,$templateCache,url);
+        user.isMyFollower = false;
+        user.tobeMyFollower = false;
         user.isMyBoss = false;
-        $scope.saveFollowers(user.userId,followers);
+        user.tobeMyBoss = false;
 
-        var myid = $scope.loginUser.userId;
-        var myBosses = $scope.loginUser.bosses;
-        myBosses = cutString(myBosses,user.userId);
-        $window.sessionStorage.loginUserBosses = myBosses;
-        $scope.loginUser.bosses = myBosses;
-        $scope.saveBosses(myid,myBosses);
+    }
+
+    $scope.addBoss = function(index){
+        var url = '/user/befollower';
+        var followerId = $window.sessionStorage.loginUserId; // i will be the follower
+        var user = $scope.users[index];
+        var bossId = user.userId;
+        saveRelation(bossId,followerId,$http,$templateCache,url);
+
+        user.isMyFollower = false;
+        user.tobeMyFollower = false;
+        user.isMyBoss = true;
+        user.tobeMyBoss = false;
 
     }
 
     $scope.agreeTobeMyBoss = function(index){
         $scope.addBoss(index);
-        $scope.deleteTobeMyBoss(index);
+        user.isMyFollower = false;
+        user.tobeMyFollower = false;
+        user.isMyBoss = true;
+        user.tobeMyBoss = false;
     }
 
     $scope.disagreeTobeMyBoss = function(index){
-        $scope.deleteTobeMyBoss(index);
+        $scope.deleteBoss(index);
+        user.isMyFollower = false;
+        user.tobeMyFollower = false;
+        user.isMyBoss = false;
+        user.tobeMyBoss = false;
     }
 
-    $scope.saveTobeBosses = function(userId, tobeBosses){
-        var formData = {
-            'userId':userId,
-            'tobeBosses':tobeBosses
-        };
-        var jdata = 'mydata='+JSON.stringify(formData);
-
-        var method = 'POST';
-        var inserturl = '/user/tobebosses';
-        $http({
-            method: method,
-            url: inserturl,
-            data:  jdata ,
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            cache: $templateCache
-        }).
-            success(function(response) {
-                //alert("save tobeBosses successed!");
-                $scope.codeStatus = response.data;
-                console.log($scope.codeStatus);
-
-            }).
-            error(function(response) {
-                alert("save tobeBosses error!");
-                $scope.codeStatus = response || "Request failed";
-                console.log($scope.codeStatus);
-            });
-
+    $scope.deleteTobeMyFollower = function(index){
+        $scope.deleteFollower(index);
+        user.isMyFollower = false;
+        user.tobeMyFollower = false;
+        user.isMyBoss = false;
+        user.tobeMyBoss = false;
     }
 
-    $scope.saveTobeFollowers = function(userId, tobeFollowers){
-        var formData = {
-            'userId':userId,
-            'tobeFollowers':tobeFollowers
-        };
-        var jdata = 'mydata='+JSON.stringify(formData);
 
-        var method = 'POST';
-        var inserturl = '/user/tobefollowers';
-        $http({
-            method: method,
-            url: inserturl,
-            data:  jdata ,
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            cache: $templateCache
-        }).
-            success(function(response) {
-                //alert("save tobeFollowers successed!");
-                $scope.codeStatus = response.data;
-                console.log($scope.codeStatus);
 
-            }).
-            error(function(response) {
-                alert("save tobeFollowers error!");
-                $scope.codeStatus = response || "Request failed";
-                console.log($scope.codeStatus);
-            });
-
-    }
-
-    $scope.saveBosses = function(userId, bosses){
-        var formData = {
-            'userId':userId,
-            'bosses':bosses
-        };
-        var jdata = 'mydata='+JSON.stringify(formData);
-
-        var method = 'POST';
-        var inserturl = '/user/bosses';
-        $http({
-            method: method,
-            url: inserturl,
-            data:  jdata ,
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            cache: $templateCache
-        }).
-            success(function(response) {
-                //alert("save user'bosses successed!");
-                $scope.codeStatus = response.data;
-                console.log($scope.codeStatus);
-
-            }).
-            error(function(response) {
-                alert("save user's bosses error!");
-                $scope.codeStatus = response || "Request failed";
-                console.log($scope.codeStatus);
-            });
-
-    }
-
-    $scope.saveFollowers = function(userId, followers){
-        var formData = {
-            'userId':userId,
-            'followers':followers
-        };
-        var jdata = 'mydata='+JSON.stringify(formData);
-
-        var method = 'POST';
-        var inserturl = '/user/followers';
-        $http({
-            method: method,
-            url: inserturl,
-            data:  jdata ,
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            cache: $templateCache
-        }).
-            success(function(response) {
-                //alert("save user'followers successed!");
-                $scope.codeStatus = response.data;
-                console.log($scope.codeStatus);
-
-            }).
-            error(function(response) {
-                alert("save user's followers error!");
-                $scope.codeStatus = response || "Request failed";
-                console.log($scope.codeStatus);
-            });
-
-    }
 }
 
 function UserListCtrl($scope, $http, $templateCache,$window) {
@@ -342,7 +175,6 @@ function UserListCtrl($scope, $http, $templateCache,$window) {
     $scope.list();
 }
 
-
 function uuid(len, radix) {
     var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
     var uuid = [], i;
@@ -375,4 +207,47 @@ function uuid(len, radix) {
 function cutString(str1,str2){
     str2 = ',' + str2;
     return str1.replace(str2,'');
+}
+
+function getUsers(userId,userName,$scope,$http,url) {
+    if(userId.length>0){
+        var params = {
+            userName:userName,
+            userId:userId
+        };
+        $http.get(url,{params:params}).
+            success(function(data,status,headers,config) {
+                //alert("getMyFollowers success!");
+                $scope.users = data;
+                //alert($scope.users);
+            }).
+            error(function(data,status,headers,config){
+                alert("get users error!");
+            });
+    }
+};
+
+function saveRelation(userId,followerId,$http,$templateCache,url){
+    var formData = {
+        'userId':userId,
+        'followerId':followerId
+    };
+    var jdata = 'mydata='+JSON.stringify(formData);
+
+    $http({
+        method: 'POST',
+        url: url,
+        data:  jdata ,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        //,cache: $templateCache
+    }).
+        success(function(response) {
+            alert(response);
+            alert("save relation successed!");
+        }).
+        error(function(response) {
+            alert(response);
+            alert("save relation error!");
+        });
+
 }

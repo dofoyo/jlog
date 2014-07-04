@@ -2,33 +2,55 @@
 
 function LogCtrl($scope, $http, $templateCache, $window) {
     var str = "工作总结：\n\n工作计划：\n";
+
     $scope.message = str;
+
+    $scope.pageState={};
+
+    $scope.pageState.writeShow = false;
 
     $scope.loginUser = $window.sessionStorage.token ?
     {
         userId:$window.sessionStorage.loginUserId,
         userName:$window.sessionStorage.loginUserName,
-        department:$window.sessionStorage.loginUserDepartment,
-        bosses:$window.sessionStorage.loginUserBosses,
-        followers:$window.sessionStorage.loginUserFollowers,
-        tobeBosses:$window.sessionStorage.loginUserTobeBosses,
-        tobeFollowers:$window.sessionStorage.loginUserTobeFollowers
+        department:$window.sessionStorage.loginUserDepartment
     }:
     {
         userId:'',
         userName:'',
-        department:'',
-        bosses:'',
-        followers:'',
-        tobeBosses:'',
-        tobeFollowers:''
+        department:''
     };
 
-    var params = {
-        creatorid:$scope.loginUser.userId
+    $scope.getLogs = function(level){
+        var params = {
+            creatorId:$scope.loginUser.userId
+        };
+        switch (level){
+            case 0:
+                var url = '/logs/own';
+                getLog($scope,$http,url,params);
+                break;
+            case 1:
+                var url = '/logs/one';
+                getLog($scope,$http,url,params);
+                break;
+            case 2:
+                var url = '/logs/two';
+                getLog($scope,$http,url,params);
+                break;
+            case 3:
+                var url = '/logs/three';
+                getLog($scope,$http,url,params);
+                break;
+            case 4:
+                var url = '/logs/four';
+                getLog($scope,$http,url,params);
+                break;
+        }
+
     };
 
-    $scope.list = getLog($scope,$http,params);
+    $scope.getLogs(0);
 
     $scope.toggleCommentState = function(index){
         $scope.selectedIndex = index;
@@ -38,9 +60,10 @@ function LogCtrl($scope, $http, $templateCache, $window) {
         var log = $scope.logs[index];
 
         var msg = log.comment;
-        var msg = msg.replace(/[\n\r]/g,'').replace(/[\\]/g,'').replace("工作计划","    工作计划");
+        var msg = msg.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
 
         var comment = {
+            logId:log.id,
             message:msg,
             datetime:new Date(),
             creator:{
@@ -50,12 +73,11 @@ function LogCtrl($scope, $http, $templateCache, $window) {
             }
         };
 
+        var jdata = 'mydata='+JSON.stringify(comment);
+
+        saveComment($http,$templateCache,jdata);
+
         log.comments.splice(0,0,comment);
-
-        var jdata = 'mydata='+JSON.stringify(log);
-
-        saveLog($http,$templateCache,jdata);
-
         log.comment = "";
     };
 
@@ -81,10 +103,13 @@ function LogCtrl($scope, $http, $templateCache, $window) {
         $scope.logs.splice(0,0,log);
         $scope.message = str;
     };
+
+    $scope.setWriteShow = function(){
+        $scope.pageState.writeShow = !$scope.pageState.writeShow;
+    };
 }
 
-function getLog($scope, $http, params){
-    var url = '/logs';
+function getLog($scope, $http,url, params){
     $http.get(url,{params:params}).
         success(function(data,status,headers,config) {
             //alert('get logs successed!');
@@ -92,6 +117,26 @@ function getLog($scope, $http, params){
         }).
         error(function(data,status,headers,config){
             alert("get logs error!");
+            alert(data);
+        });
+}
+
+function saveComment($http,$templateCache,jdata ){
+    //alert(jdata);
+    var method = 'POST';
+    var url = '/comment';
+    $http({
+        method: method,
+        url: url,
+        data:  jdata ,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        cache: $templateCache
+    }).
+        success(function(response) {
+            //alert("save log successed!");
+        }).
+        error(function(response) {
+            alert("save comment error!");
         });
 }
 
