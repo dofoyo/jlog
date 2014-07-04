@@ -65,15 +65,28 @@ app.get('/api/restricted', function (req, res) {
 });
 
 app.get('/logs/own', function (req, res) {
-    res.header("Access-Control-Allow-Origin", "http://localhost");
-    res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.writeHead(200, {'Content-Type': 'application/json'});
     var creatorIds = [req.param('creatorId')];
-    getLogsCallback(creatorIds,res);
+    getLogs0(creatorIds,res);
 });
 
 app.get('/logs/one', function (req, res) {
-    getLogs(req,res,getLogsCallback);
+    var creatorIds = [req.param('creatorId')];
+    getLogs1(creatorIds,res,getLogsCallback);
+});
+
+app.get('/logs/two', function (req, res) {
+    var creatorIds = [req.param('creatorId')];
+    getLogs2(creatorIds,res,getLogs1Callback,getLogsCallback);
+});
+
+app.get('/logs/three', function (req, res) {
+    var creatorIds = [req.param('creatorId')];
+    getLogs3(creatorIds,res,getLogs2Callback,getLogs1Callback,getLogsCallback);
+});
+
+app.get('/logs/four', function (req, res) {
+    var creatorIds = [req.param('creatorId')];
+    getLogs4(creatorIds,res,getLogs3Callback,getLogs2Callback,getLogs1Callback,getLogsCallback);
 });
 
 app.post('/log', function (req, res){
@@ -95,14 +108,18 @@ app.post('/log', function (req, res){
     });
 });
 
-
 app.post('/comment', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    var comment = JSON.parse(req.body.mydata);
-    var logId = req.body.logId;
-    console.log("logId=" + logId);
-    comment.datetime = new Date();
+    var jdata = JSON.parse(req.body.mydata);
+    var logId = jdata.logId;
+    var d = new Date()
+
+    var comment = new Object();
+    comment.message = jdata.message;
+    comment.datetime = d.getTime();
+    comment.creator = jdata.creator;
+
 
     logdb.logs.findAndModify({
         query: { _id: logId },
@@ -519,25 +536,13 @@ function getTobeFollowersCallback(userIds,res) {
     });
 }
 
-function getLogs(req,res,callback){
+function getLogsCallback(creatorIds,res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     res.writeHead(200, {'Content-Type': 'application/json'});
-    var creatorId = req.param('creatorId');
-    userdb.users.findOne({'_id':creatorId},function(err,user){
-        if(err || !user){
-            console.log('get logs error! could NOT find followers!');
-            res.end("[]");
-        }else{
-            user.followers.splice(0,0,creatorId);
-            callback(user.followers,res);
-        }
-    });
-}
 
-function getLogsCallback(creatorIds,res){
     logdb.logs.find({'creator.id':{$in:creatorIds}}).sort({datetime:-1}, function(err, logs) {
-        //console.log('ids: ' + creatorIds);
+        console.log('ids: ' + creatorIds);
 
         if( err || !logs){
             console.log("get logs error! could NOT find logs!");
@@ -585,4 +590,156 @@ function getLogsCallback(creatorIds,res){
             res.end(str);
         }
     });
+}
+
+function getLogs0(creatorIds,res){
+    var ids = creatorIds;
+    getLogsCallback(ids,res);
+}
+
+function getLogs1(creatorIds,res,callback1){
+    userdb.users.find({'_id':{$in:creatorIds}},function(err,users){
+        var ids = creatorIds;
+        if(err || !users){
+            console.log(err);
+        }else{
+            users.forEach(function(user){
+                ids = ids.concat(user.followers);
+            });
+        }
+        ids = ids.distinct();
+        callback1(ids,res);
+    });
+}
+
+function getLogs2(creatorIds,res,callback1,callback2){
+    userdb.users.find({'_id':{$in:creatorIds}},function(err,users){
+        var ids = creatorIds;
+        if(err || !users){
+            console.log(err);
+        }else{
+            users.forEach(function(user){
+                ids = ids.concat(user.followers);
+            });
+        }
+        ids = ids.distinct();
+        callback1(ids,res,callback2);
+    });
+}
+
+function getLogs3(creatorIds,res,callback1,callback2,callback3){
+    userdb.users.find({'_id':{$in:creatorIds}},function(err,users){
+        var ids = creatorIds;
+        if(err || !users){
+            console.log(err);
+        }else{
+            users.forEach(function(user){
+                ids = ids.concat(user.followers);
+            });
+        }
+        ids = ids.distinct();
+        callback1(ids,res,callback2,callback3);
+    });
+}
+
+function getLogs4(creatorIds,res,callback1,callback2,callback3,callback4){
+    userdb.users.find({'_id':{$in:creatorIds}},function(err,users){
+        var ids = creatorIds;
+        if(err || !users){
+            console.log(err);
+        }else{
+            users.forEach(function(user){
+                ids = ids.concat(user.followers);
+            });
+        }
+        ids = ids.distinct();
+        callback1(ids,res,callback2,callback3,callback4);
+    });
+}
+
+function getLogs1Callback(creatorIds,res,callback){
+    userdb.users.find({'_id':{$in:creatorIds}},function(err,users){
+        var ids = creatorIds;
+        if(err || !users){
+            console.log('get logs error! could NOT find followers!');
+        }else{
+            users.forEach(function(user){
+                ids = ids.concat(user.followers);
+            });
+        }
+        ids = ids.distinct();
+        callback(ids,res);
+    });
+}
+
+function getLogs2Callback(creatorIds,res,callback1,callback2){
+    userdb.users.find({'_id':{$in:creatorIds}},function(err,users){
+        var ids = creatorIds;
+        if(err || !users){
+            console.log('get logs error! could NOT find followers!');
+        }else{
+            users.forEach(function(user){
+                ids = ids.concat(user.followers);
+            });
+        }
+        ids = ids.distinct();
+        callback1(ids,res,callback2);
+    });
+}
+
+function getLogs3Callback(creatorIds,res,callback1,callback2,callback3){
+    userdb.users.find({'_id':{$in:creatorIds}},function(err,users){
+        var ids = creatorIds;
+        if(err || !users){
+            console.log('get logs error! could NOT find followers!');
+        }else{
+            users.forEach(function(user){
+                ids = ids.concat(user.followers);
+            });
+        }
+        ids = ids.distinct();
+        callback1(ids,res,callback2,callback3);
+    });
+}
+
+function getLogs4Callback(creatorIds,res,callback1,callback2,callback3,callback4){
+    userdb.users.find({'_id':{$in:creatorIds}},function(err,users){
+        var ids = creatorIds;
+        if(err || !users){
+            console.log('get logs error! could NOT find followers!');
+        }else{
+            users.forEach(function(user){
+                ids = ids.concat(user.followers);
+            });
+        }
+        ids = ids.distinct();
+        callback1(ids,res,callback2,callback3,callback4);
+    });
+}
+
+
+Array.prototype.distinct=function(){
+    var sameObj=function(a,b){
+        var tag = true;
+        if(!a||!b)return false;
+        for(var x in a){
+            if(!b[x])
+                return false;
+            if(typeof(a[x])==='object'){
+                tag=sameObj(a[x],b[x]);
+            }else{
+                if(a[x]!==b[x])
+                    return false;
+            }
+        }
+        return tag;
+    }
+    var newArr=[],obj={};
+    for(var i=0,len=this.length;i<len;i++){
+        if(!sameObj(obj[typeof(this[i])+this[i]],this[i])){
+            newArr.push(this[i]);
+            obj[typeof(this[i])+this[i]]=this[i];
+        }
+    }
+    return newArr;
 }

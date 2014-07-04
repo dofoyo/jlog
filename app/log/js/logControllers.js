@@ -7,7 +7,7 @@ function LogCtrl($scope, $http, $templateCache, $window) {
 
     $scope.pageState={};
 
-    $scope.pageState.writeShow = true;
+    $scope.pageState.writeShow = false;
 
     $scope.loginUser = $window.sessionStorage.token ?
     {
@@ -21,11 +21,36 @@ function LogCtrl($scope, $http, $templateCache, $window) {
         department:''
     };
 
-    var params = {
-        creatorId:$scope.loginUser.userId
+    $scope.getLogs = function(level){
+        var params = {
+            creatorId:$scope.loginUser.userId
+        };
+        switch (level){
+            case 0:
+                var url = '/logs/own';
+                getLog($scope,$http,url,params);
+                break;
+            case 1:
+                var url = '/logs/one';
+                getLog($scope,$http,url,params);
+                break;
+            case 2:
+                var url = '/logs/two';
+                getLog($scope,$http,url,params);
+                break;
+            case 3:
+                var url = '/logs/three';
+                getLog($scope,$http,url,params);
+                break;
+            case 4:
+                var url = '/logs/four';
+                getLog($scope,$http,url,params);
+                break;
+        }
+
     };
 
-    $scope.list = getLog($scope,$http,params);
+    $scope.getLogs(0);
 
     $scope.toggleCommentState = function(index){
         $scope.selectedIndex = index;
@@ -38,6 +63,7 @@ function LogCtrl($scope, $http, $templateCache, $window) {
         var msg = msg.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
 
         var comment = {
+            logId:log.id,
             message:msg,
             datetime:new Date(),
             creator:{
@@ -48,7 +74,6 @@ function LogCtrl($scope, $http, $templateCache, $window) {
         };
 
         var jdata = 'mydata='+JSON.stringify(comment);
-        jdata =+ ',logId='+log.id;
 
         saveComment($http,$templateCache,jdata);
 
@@ -79,13 +104,12 @@ function LogCtrl($scope, $http, $templateCache, $window) {
         $scope.message = str;
     };
 
-    $scope.setWriteShow = function(flag){
-        $scope.pageState.writeShow = flag;
+    $scope.setWriteShow = function(){
+        $scope.pageState.writeShow = !$scope.pageState.writeShow;
     };
 }
 
-function getLog($scope, $http, params){
-    var url = '/logs/own';
+function getLog($scope, $http,url, params){
     $http.get(url,{params:params}).
         success(function(data,status,headers,config) {
             //alert('get logs successed!');
