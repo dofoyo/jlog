@@ -5,7 +5,7 @@
         <input type="radio" name="radio1" ng-click="getTobeMyFollowers()">我关注的(待确认)<br>
         <input type="radio" name="radio1" ng-click="getMyBosses()">关注我的&nbsp;&nbsp;
         <input type="radio" name="radio1" ng-click="getTobeMyBosses()">关注我的(待确认)<br>
-        <input type="radio" name="radio1" ng-click="getUnrelated()">无关系&nbsp;&nbsp;
+        <input type="radio" name="radio1" ng-click="getUnrelated()">无直接关系&nbsp;&nbsp;
     </div>
     <div ng-repeat="user in users | filter:{'userName':userFilterService.searchText}"  class="partial2_div2_none">
         <div>

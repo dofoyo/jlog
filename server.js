@@ -72,13 +72,13 @@ app.get('/api/restricted', function (req, res) {
 //------ for log begin --------
 app.get('/logs/own', function (req, res) {
     var creatorIds = [req.param('creatorId')];
-    getLogs(creatorIds,res);
+    getLogs(creatorIds,req,res);
 });
 
 app.get('/logs/one', function (req, res) {
     var creatorIds = [req.param('creatorId')];
     getNextLevelCreatorIds(creatorIds)
-        .then(function(creatorIds){getLogs(creatorIds,res)})
+        .then(function(creatorIds){getLogs(creatorIds,req,res)})
         ;
 });
 
@@ -86,7 +86,7 @@ app.get('/logs/two', function (req, res) {
     var creatorIds = [req.param('creatorId')];
     getNextLevelCreatorIds(creatorIds)
         .then(function(creatorIds){return getNextLevelCreatorIds(creatorIds)})
-        .then(function(creatorIds){getLogs(creatorIds,res)})
+        .then(function(creatorIds){getLogs(creatorIds,req,res)})
         ;
 });
 
@@ -95,7 +95,7 @@ app.get('/logs/three', function (req, res) {
     getNextLevelCreatorIds(creatorIds)
         .then(function(creatorIds){return getNextLevelCreatorIds(creatorIds)})
         .then(function(creatorIds){return getNextLevelCreatorIds(creatorIds)})
-        .then(function(creatorIds){getLogs(creatorIds,res)})
+        .then(function(creatorIds){getLogs(creatorIds,req,res)})
         ;
 });
 
@@ -105,7 +105,7 @@ app.get('/logs/four', function (req, res) {
         .then(function(creatorIds){return getNextLevelCreatorIds(creatorIds)})
         .then(function(creatorIds){return getNextLevelCreatorIds(creatorIds)})
         .then(function(creatorIds){return getNextLevelCreatorIds(creatorIds)})
-        .then(function(creatorIds){getLogs(creatorIds,res)})
+        .then(function(creatorIds){getLogs(creatorIds,req,res)})
         ;
 });
 
@@ -179,12 +179,12 @@ var getNextLevelCreatorIds = function(creatorIds){
     });
 }
 
-var getLogs = function(creatorIds,res){
+var getLogs = function(creatorIds,req,res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     res.writeHead(200, {'Content-Type': 'application/json'});
 
-    logdb.logs.find({'creator.id':{$in:creatorIds}}).sort({datetime:-1}, function(err, logs) {
+    logdb.logs.find({'creator.id':{$in:creatorIds}}).limit(100).sort({datetime:-1}, function(err, logs) {
         //console.log('ids: ' + creatorIds);
         if( err || !logs){
             console.log("get logs error! could NOT find logs!");

@@ -5,9 +5,10 @@ function LogCtrl($scope, $http, $templateCache, $window) {
 
     $scope.message = str;
 
-    $scope.pageState={};
+    $scope.pageState={
+        writeShow: false
+    };
 
-    $scope.pageState.writeShow = false;
 
     $scope.loginUser = $window.sessionStorage.token ?
     {
@@ -23,7 +24,9 @@ function LogCtrl($scope, $http, $templateCache, $window) {
 
     $scope.getLogs = function(level){
         var params = {
-            creatorId:$scope.loginUser.userId
+            creatorId:$scope.loginUser.userId,
+            page:$scope.pageState.page,
+            limit:$scope.pageState.limit
         };
         switch (level){
             case 0:
