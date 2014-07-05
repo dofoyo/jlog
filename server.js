@@ -9,6 +9,8 @@ var logCollections = ["logs"];
 var userdb = require("mongojs").connect(databaseUrl, userCollections);
 var logdb = require("mongojs").connect(databaseUrl, logCollections);
 
+var Promise = require('es6-promise').Promise;
+
 var app = express();
 
 // We are going to protect /api routes with JWT
@@ -717,7 +719,6 @@ function getLogs4Callback(creatorIds,res,callback1,callback2,callback3,callback4
     });
 }
 
-
 Array.prototype.distinct=function(){
     var sameObj=function(a,b){
         var tag = true;
@@ -743,3 +744,120 @@ Array.prototype.distinct=function(){
     }
     return newArr;
 }
+
+//----------------- promise test ---
+app.get('/logs/promise', function (req, res) {
+    var creatorIds = [req.param('creatorId')];
+    getLogCreatorIds(creatorIds,0)
+        .then(function(creatorIds){return getLogCreatorIds(creatorIds,1)})
+        .then(function(creatorIds){return getLogCreatorIds(creatorIds,2)})
+        ;
+});
+
+var getLogCreatorIds = function(creatorIds,level){
+    return new Promise(function(resolve){
+        console.log(level + ':' + creatorIds);
+        userdb.users.find({'_id':{$in:creatorIds}},function(err,users){
+            if(err || !users){
+                console.log(err);
+            }else{
+                users.forEach(function(user){
+                    creatorIds = creatorIds.concat(user.followers);
+                });
+            }
+            creatorIds = creatorIds.distinct();
+            resolve(creatorIds);
+        });
+    });
+}
+
+//------------ 下面是无用的---------
+var getLogs = function(ids){
+    return new Promise(function(resolve, reject){
+        getCreatorIds(ids,{
+            success:function() {
+                console.log("0:" + ids);
+                resolve(ids);
+            },
+            error: function() {
+                reject();
+            }
+        });
+    });
+};
+
+var getCreatorIds = function(ids,obj){
+    //var creatorIds=['2129957A788518AA7842048A'];
+    var creatorIds = ids;
+    userdb.users.find({'_id':{$in:creatorIds}},function(err,users){
+        if(err || !users){
+            console.log(err);
+            obj.error();
+        }else{
+            users.forEach(function(user){
+                creatorIds = creatorIds.concat(user.followers);
+            });
+        }
+        creatorIds = creatorIds.distinct();
+        console.log("1:" + creatorIds);
+        obj.success();
+    });
+}
+
+
+var getLogsAndResponse = function(creatorIds,res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    res.writeHead(200, {'Content-Type': 'application/json'});
+
+    logdb.logs.find({'creator.id':{$in:creatorIds}}).sort({datetime:-1}, function(err, logs) {
+        console.log('ids: ' + creatorIds);
+
+        if( err || !logs){
+            console.log("get logs error! could NOT find logs!");
+            console.log(err);
+            res.end("[]");
+        } else {
+            //console.log("there are "+ logs.length +" logs Found!");
+            var str='[';
+            if(logs.length>0){
+                logs.forEach( function(log) {
+                    str += '{';
+                    str += '"id":"' + log._id + '",';
+                    str += '"message":"' + log.message + '",';
+                    str += '"datetime":"' + log.datetime + '",';
+                    str += '"creator":{';
+                    str += '"id":"' + log.creator.id + '",';
+                    str += '"name":"' + log.creator.name + '",';
+                    str += '"department":"' + log.creator.department + '"';
+                    str += '},';
+                    str += '"comments":[';
+                    for(var i=0; i<log.comments.length; i++){
+                        var comment = log.comments[i];
+                        str += '{';
+                        str += '"message":"' + comment.message + '",';
+                        str += '"datetime":"' + comment.datetime + '",';
+                        str += '"creator":{';
+                        str += '"id":"' + comment.creator.id + '",';
+                        str += '"name":"' + comment.creator.name + '",';
+                        str += '"department":"' + comment.creator.department + '"';
+                        str += '}},';
+                    }
+                    if(log.comments.length>0){
+                        str = str.trim();
+                        str = str.substring(0,str.length-1);
+                    }
+                    str += ']';
+                    str += '},';
+                    str += '\n';
+                });
+                str = str.trim();
+                str = str.substring(0,str.length-1);
+            }
+            str = str + ']';
+            //console.log("get logs successed!")
+            res.end(str);
+        }
+    });
+}
+
