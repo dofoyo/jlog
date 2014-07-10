@@ -183,8 +183,9 @@ var getLogs = function(creatorIds,req,res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     res.writeHead(200, {'Content-Type': 'application/json'});
-
-    logdb.logs.find({'creator.id':{$in:creatorIds}}).limit(100).sort({datetime:-1}, function(err, logs) {
+    var offset = req.param('offset') ? 1*req.param('offset') : 0;
+    var limit = req.param('limit') ? 1*req.param('limit') : 20;
+    logdb.logs.find({'creator.id':{$in:creatorIds}}).skip(offset).limit(limit).sort({datetime:-1}, function(err, logs) {
         //console.log('ids: ' + creatorIds);
         if( err || !logs){
             console.log("get logs error! could NOT find logs!");
@@ -228,7 +229,6 @@ var getLogs = function(creatorIds,req,res){
                 str = str.substring(0,str.length-1);
             }
             str = str + ']';
-            //console.log("get logs successed!")
             res.end(str);
         }
     });

@@ -3,10 +3,16 @@
 function LogCtrl($scope, $http, $templateCache, $window) {
     var str = "工作总结：\n\n工作计划：\n";
 
+    $scope.logs = new Array();
+
     $scope.message = str;
 
     $scope.pageState={
-        writeShow: false
+        writeShow: false,
+        hasMore:true,
+        offset:0,
+        level:0,
+        limit:20
     };
 
 
@@ -22,38 +28,51 @@ function LogCtrl($scope, $http, $templateCache, $window) {
         department:''
     };
 
-    $scope.getLogs = function(level){
+    $scope.getMore = function(){
+        $scope.pageState.offset = $scope.logs.length;
+        $scope.getLogs();
+    }
+
+    $scope.getLogsByLevel = function(level){
+        $scope.logs = new Array();
+        $scope.pageState.offset = 0;
+        $scope.pageState.level = level;
+        $scope.getLogs();
+    }
+
+    $scope.getLogs = function(){
         var params = {
             creatorId:$scope.loginUser.userId,
-            page:$scope.pageState.page,
-            limit:$scope.pageState.limit
+            offset:$scope.pageState.offset,
+            limit:$scope.pageState.limit,
+            level:$scope.pageState.level
         };
-        switch (level){
+
+        switch ($scope.pageState.level){
             case 0:
                 var url = '/logs/own';
-                getLog($scope,$http,url,params);
+                getLogsByHttp($scope,$http,url,params);
                 break;
             case 1:
                 var url = '/logs/one';
-                getLog($scope,$http,url,params);
+                getLogsByHttp($scope,$http,url,params);
                 break;
             case 2:
                 var url = '/logs/two';
-                getLog($scope,$http,url,params);
+                getLogsByHttp($scope,$http,url,params);
                 break;
             case 3:
                 var url = '/logs/three';
-                getLog($scope,$http,url,params);
+                getLogsByHttp($scope,$http,url,params);
                 break;
             case 4:
                 var url = '/logs/four';
-                getLog($scope,$http,url,params);
+                getLogsByHttp($scope,$http,url,params);
                 break;
         }
-
     };
 
-    $scope.getLogs(0);
+    $scope.getLogs();
 
     $scope.toggleCommentState = function(index){
         $scope.selectedIndex = index;
@@ -112,20 +131,21 @@ function LogCtrl($scope, $http, $templateCache, $window) {
     };
 }
 
-function getLog($scope, $http,url, params){
+function getLogsByHttp($scope, $http,url, params){
     $http.get(url,{params:params}).
         success(function(data,status,headers,config) {
-            //alert('get logs successed!');
-            $scope.logs = data;
+            var j = data.length;
+            $scope.pageState.hasMore  = j==$scope.pageState.limit ? true : false;
+            for(var i=0; i<j; i++){
+                $scope.logs.push(data[i]);
+            }
         }).
         error(function(data,status,headers,config){
-            alert("get logs error!");
-            alert(data);
+            alert("get logs error!" + data);
         });
 }
 
 function saveComment($http,$templateCache,jdata ){
-    //alert(jdata);
     var method = 'POST';
     var url = '/comment';
     $http({

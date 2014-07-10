@@ -1,10 +1,10 @@
 <div>
 <button ng-click="setWriteShow()">写日志</button>
-<button ng-click="getLogs(0)">0</button>
-<button ng-click="getLogs(1)">1</button>
-<button ng-click="getLogs(2)">2</button>
-<button ng-click="getLogs(3)">3</button>
-<button ng-click="getLogs(4)">4</button>
+<button ng-click="getLogsByLevel(0)">0</button>
+<button ng-click="getLogsByLevel(1)">1</button>
+<button ng-click="getLogsByLevel(2)">2</button>
+<button ng-click="getLogsByLevel(3)">3</button>
+<button ng-click="getLogsByLevel(4)">4</button>
 </div>
 
 <div ng-show="pageState.writeShow">
@@ -31,7 +31,7 @@
     </li>
 </ul>
 <hr>
-<label>共{{logs.length}}篇,最多只显示100篇。</label>
+<button ng-click="getMore();" ng-show="pageState.hasMore">更多</button>
 </div>
 
 <style type="text/css">
