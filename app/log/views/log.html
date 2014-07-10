@@ -24,9 +24,9 @@
                 {{comment.message}}<font size="1" color="grey">({{comment.datetime | date:'yyyy-MM-dd hh:mm:ss'}})</font>
             </li>
         </ul>
-        <button ng-click='toggleCommentState($index);'>点评</button>
+        <button ng-click='toggleCommentState($index);'>{{log.creator.id==loginUser.userId ? "补充" : "点评"}}</button>
         <div  ng-class="{showComment: $index!=selectedIndex}">
-            <input ng-model="log.comment"><button ng-click="submitComment($index);">提交</button>
+            <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="log.comment"></TEXTAREA><button ng-click="submitComment($index);" style="width: 30px;height: 40px;">提交</button>
         </div>
     </li>
 </ul>
