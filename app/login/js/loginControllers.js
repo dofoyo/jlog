@@ -16,14 +16,14 @@ function LoginCtrl($scope, $http, $window) {
 
     //allPrpos($scope.loginUser);
     $scope.isAuthenticated = $window.sessionStorage.token ? true : false;
-    $scope.welcome = $scope.isAuthenticated  ? "Hi, " + $scope.loginUser.userName + "! you has already logined." : "";
+    $scope.loginMessage = $scope.isAuthenticated  ? $scope.loginUser.userName : "登录";
     $scope.message = '';
 
     $scope.login = function () {
         $http
             .post('/authenticate', $scope.loginUser)
             .success(function (data, status, headers, config) {
-                alert('authenticate successed!');
+                //alert('authenticate successed!');
                 $window.sessionStorage.token = data.token;
                 $window.sessionStorage.loginUserId = data.loginUser.userId;
                 $window.sessionStorage.loginUserName = data.loginUser.userName;
@@ -33,26 +33,18 @@ function LoginCtrl($scope, $http, $window) {
                      userName:$window.sessionStorage.loginUserName,
                      department:$window.sessionStorage.loginUserDepartment
                 };
-                //$scope.loginUser = data.loginUser;
                 $scope.isAuthenticated = true;
-                //var profile = parseProfile(data.token);
-                //$scope.welcome = 'Welcome ' + profile.userid + '!';
-                $scope.welcome = 'Welcome ' + data.loginUser.userName + '!';
+                $scope.loginMessage = $scope.loginUser.userName;
+                location.reload();
             })
             .error(function (data, status, headers, config) {
                 alert('authenticate ERROR!');
-                // Erase the token if the user fails to log in
-                //delete $window.sessionStorage.token;
-                //$scope.isAuthenticated = false;
-
-                // Handle login errors here
                 $scope.error = 'Error: Invalid user or password';
-                //$scope.welcome = '';
             });
     };
 
     $scope.logout = function () {
-        $scope.welcome = '';
+        $scope.loginMessage = '登录';
         $scope.message = '';
         $scope.isAuthenticated = false;
         $scope.loginUser = {userId:'',userName:'',department:''};
@@ -60,7 +52,7 @@ function LoginCtrl($scope, $http, $window) {
         delete $window.sessionStorage.loginUserId;
         delete $window.sessionStorage.loginUserName;
         delete $window.sessionStorage.loginUserDepartment;
-
+        location.reload();
     };
 
     $scope.callRestricted = function () {
@@ -75,7 +67,6 @@ function LoginCtrl($scope, $http, $window) {
 
     $scope.getLoginUser = function() {
         var url = '/user';
-        //alert($scope.loginUser.userid);
         $http.get(url,{params:{userId:$scope.loginUser.userId}}).
             success(function(data,status,headers,config) {
                 allPrpos(data);
@@ -91,7 +82,6 @@ function parseProfile(token){
     var profile = {};
     if (token) {
         var encodedProfile = token.split('.')[1];
-        //alert(encodedProfile);
         profile = JSON.parse(url_base64_decode(encodedProfile));
     }
     return profile;
@@ -112,7 +102,6 @@ function url_base64_decode(str) {
             throw 'Illegal base64url string!';
     }
     return window.atob(output); //polifyll https://github.com/davidchambers/Base64.js
-    //return unescape(decodeURIComponent(window.atob(output)));
 }
 
 function allPrpos(obj) {

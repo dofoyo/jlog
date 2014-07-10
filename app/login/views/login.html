@@ -7,10 +7,10 @@
     </form>
     <div>{{error}}</div>
     <div ng-show="isAuthenticated">
+        <a ng-click="logout()" href="">点击退出登录</a><br><br>
         <a ng-click="callRestricted()" href="">Shh, this is private!</a>
         <br>
         <div>{{message}}</div>
-        <a ng-click="logout()" href="">Logout</a>
     </div>
 
     <div>
@@ -19,5 +19,4 @@
         userName: {{loginUser.userName}}<br>
         department: {{loginUser.department}}<br>
     </div>
-
 </div>

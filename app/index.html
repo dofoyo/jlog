@@ -16,11 +16,10 @@
 
 <body>
   <ul class="menu">
-    <li ng-controller="LoginCtrl">{{loginUser.userName}}</li>
     <li><a href="#/log">日志</a></li>
     <li><a href="#/relationship">关注</a></li>
-    <li><a href="#/login">登录</a></li>
-    <li><a href="#/user">用户</a></li>
+      <li><a href="#/user">用户</a></li>
+    <li ng-controller="LoginCtrl"><a href="#/login">{{loginMessage}}</a></li>
   </ul>
 
   <!--[if lt IE 7]>
