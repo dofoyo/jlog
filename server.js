@@ -54,7 +54,7 @@ app.post('/authenticate', function (req, res) {
                 tobeBosses:user.tobeBosses,
                 tobeFollowers:user.tobeFollowers
             };
-            console.log("authenticate: succeeded!");
+            //console.log("authenticate: succeeded!");
             var token = jwt.sign(profile, secret, { expiresInMinutes: 60*5 });
             res.json({token: token,loginUser:loginUser });
         }
