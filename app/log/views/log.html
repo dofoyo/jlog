@@ -1,15 +1,16 @@
 <div>
-<button ng-click="setWriteShow()">写日志</button>
-<button ng-click="getLogsByLevel(0)">0</button>
-<button ng-click="getLogsByLevel(1)">1</button>
-<button ng-click="getLogsByLevel(2)">2</button>
-<button ng-click="getLogsByLevel(3)">3</button>
-<button ng-click="getLogsByLevel(4)">4</button>
+<button ng-click="setWriteShow()" class="btn btn-success btn-xs">写日志</button>
+<button ng-click="getLogsByLevel(0)" class="btn btn-success btn-xs">0</button>
+<button ng-click="getLogsByLevel(1)" class="btn btn-success btn-xs">1</button>
+<button ng-click="getLogsByLevel(2)" class="btn btn-success btn-xs">2</button>
+<button ng-click="getLogsByLevel(3)" class="btn btn-success btn-xs">3</button>
+<button ng-click="getLogsByLevel(4)" class="btn btn-success btn-xs">4</button>
 </div>
 
 <div ng-show="pageState.writeShow">
 <TEXTAREA NAME="" ROWS="4" COLS="28" ng-model="message"></TEXTAREA>
-<button ng-click="submitLog();" style="width: 45px; height: 75px;">提交</button>
+<br>
+<button ng-click="submitLog();" class="btn btn-success btn-xs">提交</button>
 </div>
 
 <hr>
@@ -24,18 +25,74 @@
                 {{comment.message}}<font size="1" color="grey">({{comment.datetime | date:'yyyy-MM-dd hh:mm:ss'}})</font>
             </li>
         </ul>
-        <button ng-click='toggleCommentState($index);'>{{log.creator.id==loginUser.userId ? "补充" : "点评"}}</button>
-        <div  ng-class="{showComment: $index!=selectedIndex}">
-            <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="log.comment"></TEXTAREA><button ng-click="submitComment($index);" style="width: 30px;height: 40px;">提交</button>
+        <button ng-click='toggleCommentState($index);' class="btn btn-success btn-xs">{{log.creator.id==loginUser.userId ? "补充" : "点评"}}</button>
+        <button ng-click='toggleAttachmentState($index);' class="btn btn-success btn-xs">附件</button>
+        <div  ng-class="{showComment: $index!=commentIndex}">
+            <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="log.comment"></TEXTAREA>
+            <br>
+            <button ng-click="submitComment($index);" class="btn btn-success btn-xs">提交</button>
+        </div>
+        <div  ng-class="{showAttachment: $index!=attachmentIndex}">
+            <br>
+            <input ng-file-select type="file" multiple/>
+            <table class="table">
+                <tbody>
+                <tr ng-repeat="item in uploader.queue">
+                    <td><strong>{{ item.file.name }}</strong></td>
+                    <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+                    <td ng-show="uploader.isHTML5">
+                        <div class="progress" style="margin-bottom: 0;">
+                            <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                        <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                        <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                    </td>
+                    <td nowrap>
+                        <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                            <span class="glyphicon glyphicon-upload"></span> Upload
+                        </button>
+                        <button type="button" class="btn btn-warning btn-xs" ng-click="item.cancel()" ng-disabled="!item.isUploading">
+                            <span class="glyphicon glyphicon-ban-circle"></span> Cancel
+                        </button>
+                        <button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
+                            <span class="glyphicon glyphicon-trash"></span> Remove
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div>
+                <p>
+                <div class="progress" style="">
+                    <div class="progress-bar" role="progressbar" ng-style="{ 'width': uploader.progress + '%' }"></div>
+                </div>
+                </p>
+                <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
+                    <span class="glyphicon glyphicon-upload"></span> 上传
+                </button>
+                <button type="button" class="btn btn-warning btn-s" ng-click="uploader.cancelAll()" ng-disabled="!uploader.isUploading">
+                    <span class="glyphicon glyphicon-ban-circle"></span> 取消
+                </button>
+                <button type="button" class="btn btn-danger btn-s" ng-click="uploader.clearQueue()" ng-disabled="!uploader.queue.length">
+                    <span class="glyphicon glyphicon-trash"></span> 删除
+                </button>
+            </div>
+
         </div>
     </li>
 </ul>
 <hr>
-<button ng-click="getMore();" ng-show="pageState.hasMore">更多</button>
+<button ng-click="getMore();" ng-show="pageState.hasMore" class="btn btn-success btn-xs">更多</button>
 </div>
 
 <style type="text/css">
     .showComment {
+        display:none;
+    }
+    .showAttachment {
         display:none;
     }
 </style>

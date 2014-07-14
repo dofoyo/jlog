@@ -11,6 +11,6 @@
     "angular-cookies": "~1.2.16",
     "auth0.js": "~2.1.4",
     "auth0-widget.js": "~4.0.13",
-    "html5-boilerplate": "~4.3.0"
+    "bootstrap":"x"
   }
 }

@@ -1,13 +1,21 @@
 var express = require('express');
+
+// ------- for authenticate
 var jwt = require('jsonwebtoken');  //https://npmjs.org/package/node-jsonwebtoken
 var expressJwt = require('express-jwt'); //https://npmjs.org/package/express-jwt
 var secret = 'this is the secret secret secret 12356';
 
+//--------- for mongodb
 var databaseUrl = "jlog"; // "username:password@example.com/mydb"
 var userCollections = ["users"];
 var logCollections = ["logs"];
 var userdb = require("mongojs").connect(databaseUrl, userCollections);
 var logdb = require("mongojs").connect(databaseUrl, logCollections);
+
+//------- for fileupload
+var formidable = require('formidable');
+var util = require('util');
+var fs=require('fs');
 
 var Promise = require('es6-promise').Promise;
 
@@ -33,6 +41,56 @@ app.use(function(err, req, res, next){
   }
 });
 
+//---- for fileupload---------
+app.post('/upload',function(req,res){
+    var form = new formidable.IncomingForm();
+
+    form.uploadDir = "uploads/tmp";
+
+    form.parse(req, function(err, fields, files) {
+        console.log(util.inspect({files: files}));
+        if(err){
+            console.log(err);
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end('parse upload error!');
+        }else{
+            var d = new Date();
+            var t = d.getTime();
+            var filename = files.file.name;
+            var old_path = files.file.path;
+            var new_path = 'uploads/'+ t;
+            fs.mkdir(new_path,function(err){
+                if(err){
+                    console.log(err);
+                    res.writeHead(500, {'Content-Type': 'application/json'});
+                    res.end('{}');
+                }else{
+                    new_path += '/' + filename;
+                    console.info('filename:' + filename);
+                    console.info('old_path:' + old_path);
+                    console.info('new_path:' + new_path);
+                    fs.rename(old_path,new_path,function(err){
+                        if(err){
+                            console.log(err);
+                            res.writeHead(500, {'Content-Type': 'application/json'});
+                            res.end('{}');
+                        }else{
+                            console.log('fs.rename complete');
+                            res.writeHead(200, {'Content-Type': 'application/json'});
+                            var str = "{";
+                            str += '"filename":' + '"' + filename + '"';
+                            str += ',"url":' + '"' + new_path + '"';
+                            str += "}";
+                            console.log(str);
+                            res.end(str);
+                        }
+                    })
+
+                }
+            });
+        }
+    });
+});
 
 // ---------for  authenticate begin--------
 app.post('/authenticate', function (req, res) {

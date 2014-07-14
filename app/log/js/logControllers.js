@@ -1,9 +1,11 @@
 'use strict';
 
-function LogCtrl($scope, $http, $templateCache, $window) {
+function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     var str = "工作总结：\n\n工作计划：\n";
 
     $scope.logs = new Array();
+
+    $scope.attachmentIndex = -1;
 
     $scope.message = str;
 
@@ -75,7 +77,14 @@ function LogCtrl($scope, $http, $templateCache, $window) {
     $scope.getLogs();
 
     $scope.toggleCommentState = function(index){
-        $scope.selectedIndex = index;
+        $scope.commentIndex = index;
+        $scope.attachmentIndex = -1;
+
+    };
+
+    $scope.toggleAttachmentState = function(index){
+        $scope.attachmentIndex = index;
+        $scope.commentIndex = -1;
     };
 
     $scope.submitComment = function(index){
@@ -129,6 +138,65 @@ function LogCtrl($scope, $http, $templateCache, $window) {
     $scope.setWriteShow = function(){
         $scope.pageState.writeShow = !$scope.pageState.writeShow;
     };
+
+
+    //-------- file upload-----------
+    var uploader = $scope.uploader = $fileUploader.create({
+        scope: $scope,                          // to automatically update the html. Default: $rootScope
+        url: '/upload',
+        formData: [
+            { key: 'value' }
+        ]
+    });
+
+    // REGISTER HANDLERS
+    uploader.bind('afteraddingfile', function (event, item) {
+        //alert('After adding a file', item);
+    });
+
+    uploader.bind('whenaddingfilefailed', function (event, item) {
+        //alert('When adding a file failed', item);
+    });
+
+    uploader.bind('afteraddingall', function (event, items) {
+        //alert('After adding all files', items);
+    });
+
+    uploader.bind('beforeupload', function (event, item) {
+        //alert('Before upload', item);
+    });
+
+    uploader.bind('progress', function (event, item, progress) {
+        //alert('Progress: ' + progress, item);
+    });
+    uploader.bind('success', function (event, xhr, item, response) {
+       var log = $scope.logs[$scope.attachmentIndex];
+        log.comment = response.url;
+        $scope.submitComment($scope.attachmentIndex);
+        //alert('Success', xhr, item, response);
+    });
+
+    uploader.bind('cancel', function (event, xhr, item) {
+        //alert('Cancel', xhr, item);
+    });
+
+    uploader.bind('error', function (event, xhr, item, response) {
+        //alert('Error', xhr, item, response);
+    });
+
+    uploader.bind('progressall', function (event, progress) {
+       //alert('Total progress: ' + progress);
+    });
+
+    uploader.bind('completeall', function (event, items) {
+        //alert('Complete all', items);
+        uploader.clearQueue();
+    });
+     uploader.bind('complete', function (event, xhr, item, response) {
+        //alert('Complete', xhr, item, response);
+         //item.remove();
+     });
+
 }
 
 function getLogsByHttp($scope, $http,url, params){
