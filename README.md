@@ -7,13 +7,16 @@ npm install
 
 2.init
 
-1). cd app, bower install
+1). cd app, bower install.
+
 2). cd test, bower install
 
 3.test
 
 npm test
+
 you can see karma test result console.
+
 you can also see karma-coverage test result in jlog\test\unit\coverage\Chrome 27.0.1453 (Windows XP)\index.html
 
 
