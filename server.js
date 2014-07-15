@@ -96,7 +96,7 @@ app.post('/authenticate', function (req, res) {
     userdb.users.find({userName:req.body.userName,password:req.body.password}, function(err, users) {
         if( err || !users || users.length==0){
             res.send(401, 'Wrong user or password');
-            console.log("authenticate: wrong user or password!");
+            //console.log("authenticate: wrong user or password!");
         }else {
             var user = users[0];
             var profile = {
@@ -408,7 +408,7 @@ app.post('/user', function (req, res){
                 console.log(msg);
             }else{
                 var msg = "User saved.";
-                console.log(msg);
+                //console.log(msg);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(msg);
             }
@@ -566,7 +566,7 @@ app.post('/user/notfollower', function (req, res){
             console.log(err);
         }else{
             var msg = " follower or tobeFollower has deleted.";
-            console.log(msg);
+            //console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
         }

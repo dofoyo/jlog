@@ -1,40 +1,34 @@
 <!DOCTYPE html ng-app="myApp">
-<html lang="en" ng-app="myApp" class="no-js">
+<html lang="zh-cn" ng-app="myApp" class="no-js">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>JLOG - 吉峰工作日志</title>
   <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="common/css/app.css"/>
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+
 </head>
 
 <body>
-  <div>
-  <ul class="menu">
-    <li><a href="#/log">日志</a></li>
-    <li><a href="#/relationship">关注</a></li>
-      <li><a href="#/user">用户</a></li>
-    <li ng-controller="LoginCtrl"><a href="#/login">{{loginMessage}}</a></li>
+
+  <ul id="myTab" class="nav nav-tabs" role="tablist">
+      <li class="active"><a href="#log">日志</a></li>
+      <li><a href="#relationship">关注</a></li>
+      <li><a href="#user">用户</a></li>
+      <li ng-controller="LoginCtrl"><a href="#login">{{loginMessage}}</a></li>
   </ul>
-  </div>
+
+   <br>
 
   <div ng-view></div>
-
-  <div style="position:absolute; top:1850px;left:50px;">
-      <hr>
-      <h3>TODO</h3>
-      <ul>
-          <li>人员头像。</li>
-          <li>丰富的编辑框取代textarea。</li>
-          <li>在同意关注时，有传递和非传递二种属性。</li>
-      </ul>
-  </div>
-
   <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
   <script src="bower_components/angular/angular.min.js"></script>
   <script src="bower_components/angular-route/angular-route.min.js"></script>
   <script src="bower_components/angular-resource/angular-resource.min.js"></script>
   <script src="bower_components/angular-file-upload/angular-file-upload.js"></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
   <script src="common/js/app.js"></script>
   <script src="common/js/services.js"></script>
   <script src="common/js/controllers.js"></script>
@@ -48,5 +42,11 @@
   <script src="login/js/loginControllers.js"></script>
   <script src="login/js/loginServices.js"></script>
 
+    <script>
+        $('#myTab a').click(function (e) {
+            //e.preventDefault();
+            $(this).tab('show');
+        });
+    </script>
 </body>
 </html>

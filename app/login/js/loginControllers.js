@@ -35,7 +35,7 @@ function LoginCtrl($scope, $http, $window) {
                 };
                 $scope.isAuthenticated = true;
                 $scope.loginMessage = $scope.loginUser.userName;
-                location.reload();
+                location.replace('#log');
             })
             .error(function (data, status, headers, config) {
                 alert('authenticate ERROR!');

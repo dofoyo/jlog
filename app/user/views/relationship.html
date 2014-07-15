@@ -1,33 +1,55 @@
 <div ng-controller="UserCtrl">
     <div>
-    关键字：<input type="text" id="searchTextBox" ng-model="userFilterService.searchText"><br>
-        <input type="radio" name="radio1" ng-click="getMyFollowers()">我关注的&nbsp;&nbsp;
-        <input type="radio" name="radio1" ng-click="getTobeMyFollowers()">我关注的(待确认)<br>
-        <input type="radio" name="radio1" ng-click="getMyBosses()">关注我的&nbsp;&nbsp;
-        <input type="radio" name="radio1" ng-click="getTobeMyBosses()">关注我的(待确认)<br>
-        <input type="radio" name="radio1" ng-click="getUnrelated()">无直接关系&nbsp;&nbsp;
+        <div class="btn-group">
+            <button type="button" class="btn btn-default" ng-click="getMyFollowers()">我关注的</button>
+            <button type="button" class="btn btn-default" ng-click="getTobeMyFollowers()">我关注的(待确认)</button>
+            <button type="button" class="btn btn-default" ng-click="getMyBosses()">关注我的</button>
+            <button type="button" class="btn btn-default" ng-click="getTobeMyBosses()">关注我的(待确认)</button>
+            <button type="button" class="btn btn-default" ng-click="getUnrelated()">无直接关系</button>
+        </div>
+        <br>
+        <div class="input-group">
+            <span class="input-group-addon">关键字：</span>
+            <input type="text" id="searchTextBox"  class="form-control" ng-model="userFilterService.searchText">
+        </div>
     </div>
-    <div ng-repeat="user in users | filter:{'userName':userFilterService.searchText}"  class="partial2_div2_none">
-        <div>
-            姓名：<font color="blue">{{user.userName}}</font><br>
-            部门：{{user.department}}<br>
-            <span ng-show="user.isMyFollower">我已关注{{user.userName}}</span>
-                <button ng-show="user.isMyFollower" ng-click="deleteFollower($index)">取消关注</button>
-                <button ng-show="!user.isMyFollower && !user.tobeMyFollower" ng-click="addTobeMyFollower($index)">关注{{user.userName}}</button><br>
-
-            <span ng-show="user.isMyBoss">{{user.userName}}已关注我</span>
-                <button ng-show="user.isMyBoss" ng-click="deleteBoss($index)">取消关注</button>
-                <button ng-show="!user.isMyBoss && !user.tobeMyBoss" ng-click="addBoss($index)">请{{user.userName}}关注我</button><br>
-
-            <span ng-show="user.tobeMyBoss">{{user.userName}}提请关注我</span>
-                <button ng-show="user.tobeMyBoss" ng-click="agreeTobeMyBoss($index)">同意{{user.userName}}关注我</button>
-                <button ng-show="user.tobeMyBoss" ng-click="disagreeTobeMyBoss($index)">不同意{{user.userName}}关注我</button><br>
-
-            <span ng-show="user.tobeMyFollower">我已提请关注{{user.userName}}</span>
-                <button ng-show="user.tobeMyFollower" ng-click="deleteTobeMyFollower($index)">取消关注</button>
 
 
+
+    <div ng-repeat="user in users | filter:{'userName':userFilterService.searchText}"  class="panel_container">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                {{user.userName}}<br>
+                {{user.department}}
+            </div>
+            <div class="panel-body">
+                <span ng-show="user.isMyFollower">我已关注{{user.userName}}</span>
+                <button type="button" class="btn btn-default" ng-show="user.isMyFollower" ng-click="deleteFollower($index)">取消关注</button>
+                <button type="button" class="btn btn-default" ng-show="!user.isMyFollower && !user.tobeMyFollower" ng-click="addTobeMyFollower($index)">关注{{user.userName}}</button><br>
+
+                <span ng-show="user.tobeMyFollower">我已提请关注{{user.userName}}</span>
+                <button type="button" class="btn btn-default" ng-show="user.tobeMyFollower" ng-click="deleteTobeMyFollower($index)">取消关注</button><br>
+
+                <span ng-show="user.isMyBoss">{{user.userName}}已关注我</span>
+                <button type="button" class="btn btn-default" ng-show="user.isMyBoss" ng-click="deleteBoss($index)">取消关注</button>
+                <button type="button" class="btn btn-default" ng-show="!user.isMyBoss && !user.tobeMyBoss" ng-click="addBoss($index)">请{{user.userName}}关注我</button><br>
+
+                <span ng-show="user.tobeMyBoss">{{user.userName}}提请关注我</span>
+                <button type="button" class="btn btn-default" ng-show="user.tobeMyBoss" ng-click="agreeTobeMyBoss($index)">同意{{user.userName}}关注我</button>
+                <button type="button" class="btn btn-default" ng-show="user.tobeMyBoss" ng-click="disagreeTobeMyBoss($index)">不同意{{user.userName}}关注我</button>
+            </div>
         </div>
     </div>
 </div>
 
+<style type="text/css">
+    .panel_container{
+        float: left;
+        margin:10px;
+        border-color: #FFFFFF;
+    }
+</style>
+
+<script>
+    $('#myTab a[href="#relationship"]').tab('show');
+</script>

@@ -1,39 +1,45 @@
-
-<div class="container-fluid" >
-    <div class="row-fluid">
-        <div class="span10">
-            <form name="myform" id="myform1" ng-submit="save()">
-                <fieldset>
-                    <legend>Add New User</legend>
-                    <div class="control-group">
-                        <input type="text" placeholder="Username…" ng-model="userName" size=30 required/><br>
-                        <input type="text" placeholder="Password…" ng-model="password" size=30 required/><br>
-                        <input type="text" placeholder="Department" ng-model="department" size=30 required/>
-                    </div>
-                </fieldset>
-                <p>
-                <div><button type="submit" >Save now...</button></div>
-                </p>
-            </form>
+<div>
+    <h3>Add New User</h3>
+    <form ng-submit="save()">
+        <div class="control-group">
+            <input type="text" placeholder="Username…" ng-model="userName" size=30 required class="form-control" />
+            <input type="text" placeholder="Password…" ng-model="password" size=30 required class="form-control" />
+            <input type="text" placeholder="Department" ng-model="department" size=30 requiredv class="form-control" />
+            <button type="submit" class="btn btn-default">Save now...</button>
         </div>
-    </div>
+    </form>
 </div>
 
 <hr>
-
-<div class="container-fluid">
-<div class="row-fluid">
-	  <div class="span2">
-		<!--Sidebar content-->
-		Search: <input ng-model="search.userName"><button ng-click="list()" >Go</button>
-		<div class="span10">
-			<ul class="users">
-			  <li ng-repeat="user in users | filter:{'userName':search.userName}">
-				{{user.userId}},{{user.userName}},{{user.password}},{{user.department}}
-			  </li>
-			</ul>
-		  </div>
-	  </div>
-</div>
+<br><br>
+<h3>User List</h3>
+<div class="input-group">
+    <span class="input-group-addon">关键字：</span>
+    <input type="text" ng-model="search.userName"  class="form-control"/>
+    <span class="input-group-btn">
+        <button class="btn btn-default" type="button" ng-click="list()" >more...</button>
+    </span>
 </div>
 
+<table class="table table-hover">
+   <thead>
+   <tr class="info">
+       <td>userId</td>
+       <td>userName</td>
+       <td>password</td>
+       <td>department</td>
+   </tr>
+   </thead>
+    <tbody>
+    <tr ng-repeat="user in users | filter:{'userName':search.userName}">
+        <td>{{user.userId}}</td>
+        <td>{{user.userName}}</td>
+        <td>{{user.password}}</td>
+        <td>{{user.department}}</td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    $('#myTab a[href="#user"]').tab('show');
+</script>

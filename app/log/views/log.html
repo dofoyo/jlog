@@ -1,35 +1,42 @@
 <div>
-<button ng-click="setWriteLogShow()" class="btn btn-success btn-xs">写日志</button>
-<button ng-click="setFindShow()" class="btn btn-success btn-xs">搜索</button>
+<button type="button" ng-click="setWriteLogShow()" class="btn btn-success">写日志</button>
+<button type="button" ng-click="setFindShow()" class="btn btn-primary">搜索</button>
 </div>
 
 <div ng-show="pageState.writeLogShow">
-<TEXTAREA NAME="" ROWS="4" COLS="28" ng-model="message"></TEXTAREA>
 <br>
-<button ng-click="submitLog();" class="btn btn-success btn-xs">提交</button>
+<TEXTAREA NAME="" ROWS="4" COLS="28" ng-model="message" class="form-control"></TEXTAREA>
+<button type="button" ng-click="submitLog();" class="btn btn-default">提交</button>
 </div>
 
 <div ng-show="pageState.findShow">
     <br>
-    <label>层&nbsp;&nbsp;&nbsp;&nbsp;级：</label>
-    <button ng-click="getLogsByLevel(0)" class="btn btn-success btn-xs">0</button>
-    <button ng-click="getLogsByLevel(1)" class="btn btn-success btn-xs">1</button>
-    <button ng-click="getLogsByLevel(2)" class="btn btn-success btn-xs">2</button>
-    <button ng-click="getLogsByLevel(3)" class="btn btn-success btn-xs">3</button>
-    <button ng-click="getLogsByLevel(4)" class="btn btn-success btn-xs">4</button>
-    <br>
-    <label>姓&nbsp;&nbsp;&nbsp;&nbsp;名：</label><input type="text" ng-model="pageState.userName"/>
-    <br>
-    <label>关键字：</label><input type="text" ng-model="pageState.keyWord"/>
-    <br>
-    <button ng-click="find();" class="btn btn-success btn-xs">GO</button>
-    <button ng-click="resetFind();" class="btn btn-success btn-xs">清除</button>
+    <div class="input-group">
+        <span class="input-group-addon">层&nbsp;&nbsp;&nbsp;&nbsp;级：</span>
+        <button type="button" ng-click="getLogsByLevel(0)" class="btn btn-default">0</button>
+        <button type="button" ng-click="getLogsByLevel(1)" class="btn btn-default">1</button>
+        <button type="button" ng-click="getLogsByLevel(2)" class="btn btn-default">2</button>
+        <button type="button" ng-click="getLogsByLevel(3)" class="btn btn-default">3</button>
+        <button type="button" ng-click="getLogsByLevel(4)" class="btn btn-default">4</button>
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">姓&nbsp;&nbsp;&nbsp;&nbsp;名：</span>
+        <input type="text" ng-model="pageState.userName" class="form-control" />
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">关键字：</span>
+        <input type="text" ng-model="pageState.keyWord" class="form-control" />
+    </div>
+    <button type="button" ng-click="find();" class="btn btn-default">GO</button>
+    <button type="button" ng-click="resetFind();" class="btn btn-default">清除</button>
 </div>
 
-<hr>
+<br>
+
 <div>
-<ul class="partial1_logview">
-    <li ng-repeat="log in logs">
+<ul class="list-group">
+    <li ng-repeat="log in logs" class="list-group-item">
+        <span class="badge">{{$index+1}}</span>
         <font color="blue">{{log.creator.name}}</font><font size="1" color="grey">({{log.creator.department}})</font><br>
         {{log.message}}<font size="1" color="grey">({{log.datetime  | date:'yyyy-MM-dd hh:mm:ss'}})</font>
         <ul>
@@ -38,12 +45,11 @@
                 {{comment.message | attachmentName}}&nbsp;&nbsp;&nbsp;&nbsp;<span ng-show="{{comment.message | hasAttachment}}"><a href="{{comment.message | attachmentUrl}}">下载</a></span><font size="1" color="grey">({{comment.datetime | date:'yyyy-MM-dd hh:mm:ss'}})</font>
             </li>
         </ul>
-        <button ng-click='toggleCommentState($index);' class="btn btn-success btn-xs">{{log.creator.id==loginUser.userId ? "补充" : "点评"}}</button>
-        <button ng-click='toggleAttachmentState($index);' class="btn btn-success btn-xs">附件</button>
+        <button type="button" ng-click='toggleCommentState($index);' class="btn btn-default">{{log.creator.id==loginUser.userId ? "补充" : "点评"}}</button>
+        <button type="button" ng-click='toggleAttachmentState($index);' class="btn btn-default">附件</button>
         <div  ng-class="{showComment: $index!=commentIndex || pageState.writeCommentShow}">
-            <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="log.comment"></TEXTAREA>
-            <br>
-            <button ng-click="submitComment($index);" class="btn btn-success btn-xs">提交</button>
+            <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="log.comment"  class="form-control"></TEXTAREA>
+            <button type="button" ng-click="submitComment($index);" class="btn btn-default">提交</button>
         </div>
         <div  ng-class="{showAttachment: $index!=attachmentIndex || pageState.attachmentShow}">
             <br>
@@ -92,7 +98,7 @@
     </li>
 </ul>
 <hr>
-<button ng-click="getMore();" ng-show="pageState.hasMore" class="btn btn-success btn-xs">更多</button>
+<button type="button" ng-click="getMore();" ng-show="pageState.hasMore" class="btn btn-default">更多</button>
 </div>
 
 <style type="text/css">
@@ -104,3 +110,6 @@
     }
 </style>
 
+<script>
+    $('#myTab a[href="#log"]').tab('show');
+</script>

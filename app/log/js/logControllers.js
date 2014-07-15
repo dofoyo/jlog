@@ -135,26 +135,30 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     };
 
     $scope.submitLog = function(){
-        var msg = $scope.message;
-        var msg = msg.replace(/[\n\r]/g,'').replace(/[\\]/g,'').replace("工作计划","    工作计划");
+        if($window.sessionStorage.token){
+            var msg = $scope.message;
+            var msg = msg.replace(/[\n\r]/g,'').replace(/[\\]/g,'').replace("工作计划","    工作计划");
 
-        var log = {
-            id:uuid(24,11),
-            message:msg,
-            datetime:new Date(),
-            creator:{
-                "id":$scope.loginUser.userId,
-                "name":$scope.loginUser.userName,
-                "department":$scope.loginUser.department
-            },
-            comments:[]
-        };
+            var log = {
+                id:uuid(24,11),
+                message:msg,
+                datetime:new Date(),
+                creator:{
+                    "id":$scope.loginUser.userId,
+                    "name":$scope.loginUser.userName,
+                    "department":$scope.loginUser.department
+                },
+                comments:[]
+            };
 
-        var jdata = 'mydata='+JSON.stringify(log);
-        saveLog($http,$templateCache,jdata);
+            var jdata = 'mydata='+JSON.stringify(log);
+            saveLog($http,$templateCache,jdata);
 
-        $scope.logs.splice(0,0,log);
-        $scope.message = str;
+            $scope.logs.splice(0,0,log);
+            $scope.message = str;
+        }else{
+            alert('请先登录');
+        }
     };
 
     $scope.setWriteLogShow = function(){

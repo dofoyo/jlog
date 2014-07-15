@@ -145,7 +145,7 @@ function UserListCtrl($scope, $http, $templateCache,$window) {
             cache: $templateCache
         }).
             success(function(response) {
-                alert("save user successed!");
+                //alert("save user successed!");
                 $scope.codeStatus = response.data;
                 console.log($scope.codeStatus);
 
@@ -242,8 +242,8 @@ function saveRelation(userId,followerId,$http,$templateCache,url){
         //,cache: $templateCache
     }).
         success(function(response) {
-            alert(response);
-            alert("save relation successed!");
+            //alert(response);
+            //alert("save relation successed!");
         }).
         error(function(response) {
             alert(response);
