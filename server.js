@@ -75,12 +75,12 @@ app.post('/upload',function(req,res){
                             res.end('{}');
                         }else{
                             //console.log('fs.rename complete');
-                            res.writeHead(200, {'Content-Type': 'application/json'});
                             var str = "{";
                             str += '"filename":' + '"' + filename + '"';
                             str += ',"url":' + '"' + new_path + '"';
                             str += "}";
                             //console.log(str);
+                            res.writeHead(200, {'Content-Type': 'application/json'});
                             res.end(str);
                         }
                     })
@@ -176,10 +176,12 @@ app.post('/log', function (req, res){
         if( err || !saved ){
             var msg ="log not saved";
             console.log(msg);
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
             var msg = "log saved.";
-            console.log(msg);
+            //console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
         }
     });
@@ -208,10 +210,12 @@ app.post('/comment', function (req, res){
         if( err ){
             var msg ="comment not added";
             console.log(msg);
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
             var msg = "comment added.";
             //console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
         }
     });
@@ -239,17 +243,26 @@ var getNextLevelCreatorIds = function(creatorIds){
 var getLogs = function(creatorIds,req,res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.writeHead(200, {'Content-Type': 'application/json'});
+    //console.log(req.param('userName'));
+    //console.log(req.param('keyWord'));
+    var keyWord = req.param('keyWord');
+    var userName = req.param('userName');
     var offset = req.param('offset') ? 1*req.param('offset') : 0;
     var limit = req.param('limit') ? 1*req.param('limit') : 20;
-    logdb.logs.find({'creator.id':{$in:creatorIds}}).skip(offset).limit(limit).sort({datetime:-1}, function(err, logs) {
+    logdb.logs.
+        find({'creator.id':{$in:creatorIds},'creator.name':{$regex:userName},'message':{$regex:keyWord}}).
+        skip(offset).
+        limit(limit).
+        sort({datetime:-1},
+        function(err, logs) {
         //console.log('ids: ' + creatorIds);
         if( err || !logs){
             console.log("get logs error! could NOT find logs!");
             console.log(err);
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end("[]");
         } else {
-            //console.log("there are "+ logs.length +" logs Found!");
+            console.log("there are "+ logs.length +" logs Found!");
             var str='[';
             if(logs.length>0){
                 logs.forEach( function(log) {
@@ -286,6 +299,7 @@ var getLogs = function(creatorIds,req,res){
                 str = str.substring(0,str.length-1);
             }
             str = str + ']';
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(str);
         }
     });
@@ -324,11 +338,11 @@ Array.prototype.distinct=function(){
 app.get('/user', function (req, res) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.writeHead(200, {'Content-Type': 'application/json'});
     console.log("userId: " + req.param("userId"))
     userdb.users.findOne({_id:req.param("userId")}, function(err, user) {
         if( err || !user){
             console.log("No users found");
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end('{}');
         }else{
             var str='{';
@@ -339,6 +353,7 @@ app.get('/user', function (req, res) {
             str += '}';
             console.log("get user successed!")
             //console.log(str);
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end( str);
         }
     });
@@ -347,10 +362,10 @@ app.get('/user', function (req, res) {
 app.get('/users', function (req, res) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.writeHead(200, {'Content-Type': 'application/json'});
     userdb.users.find({userName:{$regex:req.param("userName")}}, function(err, users) {
         if( err || !users){
             console.log("No users found");
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end( "[]");
         }else{
             var str='[';
@@ -367,6 +382,7 @@ app.get('/users', function (req, res) {
                 str = str.substring(0,str.length-1);
             }
             str = str + ']';
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end( str);
         }
     });
@@ -387,11 +403,13 @@ app.post('/user', function (req, res){
         }, function(err, saved) {
             if( err || !saved ){
                 var msg ="User not saved";
+                res.writeHead(500, {'Content-Type': 'application/json'});
                 res.end(msg);
                 console.log(msg);
             }else{
                 var msg = "User saved.";
                 console.log(msg);
+                res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(msg);
             }
         });
@@ -413,10 +431,10 @@ app.get('/users/boss', function (req, res) {
     //console.log(req.param("userId"));
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.writeHead(200, {'Content-Type': 'application/json'});
     userdb.users.find({followers:[req.param("userId")]}, function(err, users) {
         if( err || !users){
             console.log("No users found");
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end( "[]");
         }else{
             var str='[';
@@ -437,6 +455,7 @@ app.get('/users/boss', function (req, res) {
                 str = str.substring(0,str.length-1);
             }
             str = str + ']';
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end( str);
         }
     });
@@ -446,10 +465,10 @@ app.get('/users/tobeboss', function (req, res) {
     //console.log(req.param("userId"));
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.writeHead(200, {'Content-Type': 'application/json'});
     userdb.users.find({tobeFollowers:[req.param("userId")]}, function(err, users) {
         if( err || !users){
             console.log("No users found");
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end( "[]");
         }else{
             var str='[';
@@ -470,6 +489,7 @@ app.get('/users/tobeboss', function (req, res) {
                 str = str.substring(0,str.length-1);
             }
             str = str + ']';
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end( str);
         }
     });
@@ -490,11 +510,13 @@ app.post('/user/tobefollower', function (req, res){
     }, function(err, doc, lastErrorObject) {
         if( err ){
             var msg ="tobefollower not added";
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
             console.log(msg);
         }else{
             var msg = "tobefollower added.";
             //console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
         }
     });
@@ -514,11 +536,13 @@ app.post('/user/befollower', function (req, res){
     }, function(err, doc, lastErrorObject) {
         if( err ){
             var msg ="follower not added";
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
             console.log(msg);
         }else{
             var msg = "follower added.";
             //console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
         }
     });
@@ -536,12 +560,14 @@ app.post('/user/notfollower', function (req, res){
     }, function(err, doc, lastErrorObject,followerId) {
         if( err ){
             var msg = " follower or tobeFollower has NOT deleted.";
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
             console.log(msg);
             console.log(err);
         }else{
             var msg = " follower or tobeFollower has deleted.";
             console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
         }
     });
@@ -552,6 +578,7 @@ function getUnrelated(req,res,callback1,callback2,callback3){
     userdb.users.findOne({_id:userId}, function(err, user) {
         if( err || !user){
             //console.log("could not find user by id: " + userId);
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end('[]');
         }else{
             //console.log("found a user by id: " + userId);
@@ -592,10 +619,10 @@ function getUnrelatedCallback2(relatedIds,userId,res,callback3){
 function getUnrelatedCallback3(relatedIds,res) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.writeHead(200, {'Content-Type': 'application/json'});
     userdb.users.find({_id:{$nin:relatedIds}}, function(err, users) {
         if( err || !users){
             //console.log("the user has no followers");
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end('[]');
         }else{
             //console.log("the user has " + users.length + " followers");
@@ -614,6 +641,7 @@ function getUnrelatedCallback3(relatedIds,res) {
             }
             str = str + ']';
             //console.log(str);
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(str);
         }
     });
@@ -622,11 +650,11 @@ function getUnrelatedCallback3(relatedIds,res) {
 function getFollowers(req,res,callback){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.writeHead(200, {'Content-Type': 'application/json'});
     var userId = req.param('userId');
     userdb.users.findOne({_id:userId}, function(err, user) {
         if( err || !user){
             //console.log("could not find user.followers by id: " + userId);
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end('[]');
         }else{
             //console.log("found user.followers by id: " + userId);
@@ -638,11 +666,11 @@ function getFollowers(req,res,callback){
 function getTobeFollowers(req,res,callback){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.writeHead(200, {'Content-Type': 'application/json'});
     var userId = req.param('userId');
     userdb.users.findOne({_id:userId}, function(err, user) {
         if( err || !user){
             //console.log("could not find user by id: " + userId);
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end('[]');
         }else{
             //console.log("found a user by id: " + userId);
@@ -655,6 +683,7 @@ function getFollowersCallback(userIds,res) {
     userdb.users.find({_id:{$in:userIds}}, function(err, users) {
         if( err || !users){
             //console.log("the user has no followers");
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end('[]');
         }else{
             //console.log("the user has " + users.length + " followers");
@@ -677,6 +706,7 @@ function getFollowersCallback(userIds,res) {
             }
             str = str + ']';
             //console.log(str);
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(str);
         }
     });
@@ -686,6 +716,7 @@ function getTobeFollowersCallback(userIds,res) {
     userdb.users.find({_id:{$in:userIds}}, function(err, users) {
         if( err || !users){
             //console.log("the user has no followers");
+            res.writeHead(500, {'Content-Type': 'application/json'});
             res.end('[]');
         }else{
             //console.log("the user has " + users.length + " followers");
@@ -708,6 +739,7 @@ function getTobeFollowersCallback(userIds,res) {
             }
             str = str + ']';
             //console.log(str);
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(str);
         }
     });

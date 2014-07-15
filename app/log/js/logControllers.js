@@ -10,6 +10,9 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     $scope.message = str;
 
     $scope.pageState={
+        userName:'',
+        keyWord:'',
+        findShow: false,
         writeLogShow: false,
         writeCommentShow: true,
         attachmentShow: true,
@@ -49,7 +52,9 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
             creatorId:$scope.loginUser.userId,
             offset:$scope.pageState.offset,
             limit:$scope.pageState.limit,
-            level:$scope.pageState.level
+            level:$scope.pageState.level,
+            userName:$scope.pageState.userName,
+            keyWord:$scope.pageState.keyWord
         };
 
         switch ($scope.pageState.level){
@@ -75,6 +80,17 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
                 break;
         }
     };
+
+    $scope.find = function(){
+        $scope.logs = new Array();
+        $scope.pageState.offset = 0;
+        $scope.getLogs();
+    }
+
+    $scope.resetFind = function(){
+        $scope.pageState.userName = '';
+        $scope.pageState.keyWord = '';
+    }
 
     $scope.getLogs();
 
@@ -143,8 +159,13 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
 
     $scope.setWriteLogShow = function(){
         $scope.pageState.writeLogShow = !$scope.pageState.writeLogShow;
+        $scope.pageState.findShow = false;
     };
 
+    $scope.setFindShow = function(){
+        $scope.pageState.writeLogShow = false;
+        $scope.pageState.findShow = !$scope.pageState.findShow;
+    };
 
     //-------- file upload-----------
     var uploader = $scope.uploader = $fileUploader.create({

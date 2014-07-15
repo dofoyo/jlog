@@ -1,16 +1,29 @@
 <div>
 <button ng-click="setWriteLogShow()" class="btn btn-success btn-xs">写日志</button>
-<button ng-click="getLogsByLevel(0)" class="btn btn-success btn-xs">0</button>
-<button ng-click="getLogsByLevel(1)" class="btn btn-success btn-xs">1</button>
-<button ng-click="getLogsByLevel(2)" class="btn btn-success btn-xs">2</button>
-<button ng-click="getLogsByLevel(3)" class="btn btn-success btn-xs">3</button>
-<button ng-click="getLogsByLevel(4)" class="btn btn-success btn-xs">4</button>
+<button ng-click="setFindShow()" class="btn btn-success btn-xs">搜索</button>
 </div>
 
 <div ng-show="pageState.writeLogShow">
 <TEXTAREA NAME="" ROWS="4" COLS="28" ng-model="message"></TEXTAREA>
 <br>
 <button ng-click="submitLog();" class="btn btn-success btn-xs">提交</button>
+</div>
+
+<div ng-show="pageState.findShow">
+    <br>
+    <label>层&nbsp;&nbsp;&nbsp;&nbsp;级：</label>
+    <button ng-click="getLogsByLevel(0)" class="btn btn-success btn-xs">0</button>
+    <button ng-click="getLogsByLevel(1)" class="btn btn-success btn-xs">1</button>
+    <button ng-click="getLogsByLevel(2)" class="btn btn-success btn-xs">2</button>
+    <button ng-click="getLogsByLevel(3)" class="btn btn-success btn-xs">3</button>
+    <button ng-click="getLogsByLevel(4)" class="btn btn-success btn-xs">4</button>
+    <br>
+    <label>姓&nbsp;&nbsp;&nbsp;&nbsp;名：</label><input type="text" ng-model="pageState.userName"/>
+    <br>
+    <label>关键字：</label><input type="text" ng-model="pageState.keyWord"/>
+    <br>
+    <button ng-click="find();" class="btn btn-success btn-xs">GO</button>
+    <button ng-click="resetFind();" class="btn btn-success btn-xs">清除</button>
 </div>
 
 <hr>
