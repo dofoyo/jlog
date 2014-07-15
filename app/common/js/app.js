@@ -5,6 +5,7 @@ angular.module('myApp', [
   'ngRoute',
   'angularFileUpload',
   'myApp.logServices',
+  'myApp.logFilters',
   'myApp.userServices',
   'myApp.userFilterServices',
   'myApp.loginServices',

@@ -1,5 +1,5 @@
 <div>
-<button ng-click="setWriteShow()" class="btn btn-success btn-xs">写日志</button>
+<button ng-click="setWriteLogShow()" class="btn btn-success btn-xs">写日志</button>
 <button ng-click="getLogsByLevel(0)" class="btn btn-success btn-xs">0</button>
 <button ng-click="getLogsByLevel(1)" class="btn btn-success btn-xs">1</button>
 <button ng-click="getLogsByLevel(2)" class="btn btn-success btn-xs">2</button>
@@ -7,7 +7,7 @@
 <button ng-click="getLogsByLevel(4)" class="btn btn-success btn-xs">4</button>
 </div>
 
-<div ng-show="pageState.writeShow">
+<div ng-show="pageState.writeLogShow">
 <TEXTAREA NAME="" ROWS="4" COLS="28" ng-model="message"></TEXTAREA>
 <br>
 <button ng-click="submitLog();" class="btn btn-success btn-xs">提交</button>
@@ -22,17 +22,17 @@
         <ul>
             <li ng-repeat="comment in log.comments">
                 <font color="blue">{{comment.creator.name}}</font><font size="1" color="grey">({{comment.creator.department}})</font><br>
-                <a href="/{{comment.message}}" target="_blank">{{comment.message}}</a><font size="1" color="grey">({{comment.datetime | date:'yyyy-MM-dd hh:mm:ss'}})</font>
+                {{comment.message | attachmentName}}&nbsp;&nbsp;&nbsp;&nbsp;<span ng-show="{{comment.message | hasAttachment}}"><a href="{{comment.message | attachmentUrl}}">下载</a></span><font size="1" color="grey">({{comment.datetime | date:'yyyy-MM-dd hh:mm:ss'}})</font>
             </li>
         </ul>
         <button ng-click='toggleCommentState($index);' class="btn btn-success btn-xs">{{log.creator.id==loginUser.userId ? "补充" : "点评"}}</button>
         <button ng-click='toggleAttachmentState($index);' class="btn btn-success btn-xs">附件</button>
-        <div  ng-class="{showComment: $index!=commentIndex}">
+        <div  ng-class="{showComment: $index!=commentIndex || pageState.writeCommentShow}">
             <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="log.comment"></TEXTAREA>
             <br>
             <button ng-click="submitComment($index);" class="btn btn-success btn-xs">提交</button>
         </div>
-        <div  ng-class="{showAttachment: $index!=attachmentIndex}">
+        <div  ng-class="{showAttachment: $index!=attachmentIndex || pageState.attachmentShow}">
             <br>
             <input ng-file-select type="file" multiple/>
             <table class="table">
@@ -51,14 +51,8 @@
                         <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
                     </td>
                     <td nowrap>
-                        <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
-                            <span class="glyphicon glyphicon-upload"></span> Upload
-                        </button>
-                        <button type="button" class="btn btn-warning btn-xs" ng-click="item.cancel()" ng-disabled="!item.isUploading">
-                            <span class="glyphicon glyphicon-ban-circle"></span> Cancel
-                        </button>
                         <button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
-                            <span class="glyphicon glyphicon-trash"></span> Remove
+                            <span class="glyphicon glyphicon-trash"></span>  删除
                         </button>
                     </td>
                 </tr>

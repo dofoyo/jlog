@@ -10,7 +10,9 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     $scope.message = str;
 
     $scope.pageState={
-        writeShow: false,
+        writeLogShow: false,
+        writeCommentShow: true,
+        attachmentShow: true,
         hasMore:true,
         offset:0,
         level:0,
@@ -77,12 +79,14 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     $scope.getLogs();
 
     $scope.toggleCommentState = function(index){
+        $scope.pageState.writeCommentShow = ! $scope.pageState.writeCommentShow;
         $scope.commentIndex = index;
         $scope.attachmentIndex = -1;
 
     };
 
     $scope.toggleAttachmentState = function(index){
+        $scope.pageState.attachmentShow = ! $scope.pageState.attachmentShow;
         $scope.attachmentIndex = index;
         $scope.commentIndex = -1;
     };
@@ -110,6 +114,8 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
 
         log.comments.splice(0,0,comment);
         log.comment = "";
+        $scope.pageState.writeCommentShow = ! $scope.pageState.writeCommentShow;
+        $scope.pageState.attachmentShow = ! $scope.pageState.attachmentShow;
     };
 
     $scope.submitLog = function(){
@@ -135,8 +141,8 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
         $scope.message = str;
     };
 
-    $scope.setWriteShow = function(){
-        $scope.pageState.writeShow = !$scope.pageState.writeShow;
+    $scope.setWriteLogShow = function(){
+        $scope.pageState.writeLogShow = !$scope.pageState.writeLogShow;
     };
 
 
@@ -154,6 +160,7 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
         var log = $scope.logs[$scope.attachmentIndex];
         log.comment = response.url;
         $scope.submitComment($scope.attachmentIndex);
+
         //alert('Success', xhr, item, response);
     });
     uploader.bind('completeall', function (event, items) {
@@ -277,12 +284,4 @@ function uuid(len, radix) {
     }
 
     return uuid.join('');
-}
-
-function getAttachmentName(str){
-    if(str && str.lastIndexOf('/')!=-1){
-        return str.substring(str.lastIndexOf('/')+1);
-    }else{
-        return str;
-    }
 }
