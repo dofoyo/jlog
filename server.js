@@ -262,7 +262,7 @@ var getLogs = function(creatorIds,req,res){
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end("[]");
         } else {
-            console.log("there are "+ logs.length +" logs Found!");
+            //console.log("there are "+ logs.length +" logs Found!");
             var str='[';
             if(logs.length>0){
                 logs.forEach( function(log) {
