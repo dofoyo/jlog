@@ -22,7 +22,7 @@
         <ul>
             <li ng-repeat="comment in log.comments">
                 <font color="blue">{{comment.creator.name}}</font><font size="1" color="grey">({{comment.creator.department}})</font><br>
-                {{comment.message}}<font size="1" color="grey">({{comment.datetime | date:'yyyy-MM-dd hh:mm:ss'}})</font>
+                <a href="/{{comment.message}}" target="_blank">{{comment.message}}</a><font size="1" color="grey">({{comment.datetime | date:'yyyy-MM-dd hh:mm:ss'}})</font>
             </li>
         </ul>
         <button ng-click='toggleCommentState($index);' class="btn btn-success btn-xs">{{log.creator.id==loginUser.userId ? "补充" : "点评"}}</button>

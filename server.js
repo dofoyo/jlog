@@ -29,11 +29,10 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 
-// 用于开发调试，可以看e2e测试结果
-app.use('/', express.static(__dirname + '/'));
-
-// 正式发布后，修改为一下
-//app.use('/', express.static(__dirname + '/app'));
+// 开发调试可用(1)，可以看e2e测试结果。正式运行可用（2）
+var working_path =  '';     // (1)
+//var working_path =  'app/';  //  (2)
+app.use('/', express.static(__dirname + '/' + working_path));
 
 app.use(function(err, req, res, next){
   if (err.constructor.name === 'UnauthorizedError') {
@@ -42,13 +41,13 @@ app.use(function(err, req, res, next){
 });
 
 //---- for fileupload---------
+var upload_path = working_path + "uploads/";
 app.post('/upload',function(req,res){
     var form = new formidable.IncomingForm();
-
-    form.uploadDir = "uploads/tmp";
+    form.uploadDir = upload_path + "tmp";
 
     form.parse(req, function(err, fields, files) {
-        console.log(util.inspect({files: files}));
+        //console.log(util.inspect({files: files}));
         if(err){
             console.log(err);
             res.writeHead(500, {'Content-Type': 'application/json'});
@@ -58,7 +57,7 @@ app.post('/upload',function(req,res){
             var t = d.getTime();
             var filename = files.file.name;
             var old_path = files.file.path;
-            var new_path = 'uploads/'+ t;
+            var new_path = upload_path + t;
             fs.mkdir(new_path,function(err){
                 if(err){
                     console.log(err);
@@ -66,22 +65,22 @@ app.post('/upload',function(req,res){
                     res.end('{}');
                 }else{
                     new_path += '/' + filename;
-                    console.info('filename:' + filename);
-                    console.info('old_path:' + old_path);
-                    console.info('new_path:' + new_path);
+                    //console.info('filename:' + filename);
+                    //console.info('old_path:' + old_path);
+                    //console.info('new_path:' + new_path);
                     fs.rename(old_path,new_path,function(err){
                         if(err){
                             console.log(err);
                             res.writeHead(500, {'Content-Type': 'application/json'});
                             res.end('{}');
                         }else{
-                            console.log('fs.rename complete');
+                            //console.log('fs.rename complete');
                             res.writeHead(200, {'Content-Type': 'application/json'});
                             var str = "{";
                             str += '"filename":' + '"' + filename + '"';
                             str += ',"url":' + '"' + new_path + '"';
                             str += "}";
-                            console.log(str);
+                            //console.log(str);
                             res.end(str);
                         }
                     })

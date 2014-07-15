@@ -150,6 +150,17 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     });
 
     // REGISTER HANDLERS
+    uploader.bind('success', function (event, xhr, item, response) {
+        var log = $scope.logs[$scope.attachmentIndex];
+        log.comment = response.url;
+        $scope.submitComment($scope.attachmentIndex);
+        //alert('Success', xhr, item, response);
+    });
+    uploader.bind('completeall', function (event, items) {
+        //alert('Complete all', items);
+        uploader.clearQueue();
+    });
+/*
     uploader.bind('afteraddingfile', function (event, item) {
         //alert('After adding a file', item);
     });
@@ -169,13 +180,6 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     uploader.bind('progress', function (event, item, progress) {
         //alert('Progress: ' + progress, item);
     });
-    uploader.bind('success', function (event, xhr, item, response) {
-       var log = $scope.logs[$scope.attachmentIndex];
-        log.comment = response.url;
-        $scope.submitComment($scope.attachmentIndex);
-        //alert('Success', xhr, item, response);
-    });
-
     uploader.bind('cancel', function (event, xhr, item) {
         //alert('Cancel', xhr, item);
     });
@@ -188,15 +192,11 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
        //alert('Total progress: ' + progress);
     });
 
-    uploader.bind('completeall', function (event, items) {
-        //alert('Complete all', items);
-        uploader.clearQueue();
-    });
      uploader.bind('complete', function (event, xhr, item, response) {
         //alert('Complete', xhr, item, response);
          //item.remove();
      });
-
+*/
 }
 
 function getLogsByHttp($scope, $http,url, params){
@@ -277,4 +277,12 @@ function uuid(len, radix) {
     }
 
     return uuid.join('');
+}
+
+function getAttachmentName(str){
+    if(str && str.lastIndexOf('/')!=-1){
+        return str.substring(str.lastIndexOf('/')+1);
+    }else{
+        return str;
+    }
 }
