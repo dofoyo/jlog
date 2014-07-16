@@ -1,15 +1,28 @@
+JLOG is a log for organization. the different with blog is: when focus on someone, it must be agreed.
+
+JLOG is builded on Angularjs + Nodejs + Mongodb.
 
 1.install
 
-first install all neccessary node_modules to run the system, just like express, express-jwt, jsonwebtoken, mongodb ...
+first, install Nodejs and Mongodb.
 
-npm install
+second, install all neccessary node_modules to run the system:
+
+1.1 npm install -g
+
+bower,es6-promise,formidable,mongodb,mongojs,http-server,karma,protractor...
+
+1.2 npm install
+
+express, express-jwt, jsonwebtoken...
+
 
 2.init
 
-1). cd app, bower install.
+2.1 cd app, bower install.
 
-2). cd test, bower install
+2.2 cd test, bower install
+
 
 3.test
 
