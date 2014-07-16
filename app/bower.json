@@ -1,16 +1,14 @@
 {
   "name": "jlog",
   "description": "a work log of jifeng",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "angular": "1.2.x",
-    "angular-resource": "1.2.x",
-    "angular-route": "1.2.x",
-    "angular-loader": "1.2.x",    
-    "angular-cookies": "~1.2.16",
-    "auth0.js": "~2.1.4",
-    "auth0-widget.js": "~4.0.13",
-    "bootstrap":"x"
+        "jQuery":"x",
+        "bootstrap":"x",
+        "angular": "x",
+        "angular-resource": "x",
+        "angular-route": "x",
+        "angular-file-upload":"x"
   }
 }
