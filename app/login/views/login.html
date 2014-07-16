@@ -1,8 +1,8 @@
 <div>
     <span ng-show="isAuthenticated">{{welcome}}</span>
     <form ng-show="!isAuthenticated" ng-submit="login()">
-        <input ng-model="loginUser.userName" type="text" name="user" placeholder="Username" />
-        <input ng-model="loginUser.password" type="password" name="pass" placeholder="Password" />
+        <input ng-model="loginUser.userName" type="text" name="user" placeholder="Username" class="form-control"/>
+        <input ng-model="loginUser.password" type="password" name="pass" placeholder="Password" class="form-control"/>
         <button type="submit" ng-click="submitComment($index);" class="btn btn-default">登录</button>
     </form>
     <div>{{error}}</div>
