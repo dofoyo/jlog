@@ -9,8 +9,11 @@ var secret = 'this is the secret secret secret 12356';
 var databaseUrl = "jlog"; // "username:password@example.com/mydb"
 var userCollections = ["users"];
 var logCollections = ["logs"];
+var processCollections = ["processes"];
 var userdb = require("mongojs").connect(databaseUrl, userCollections);
 var logdb = require("mongojs").connect(databaseUrl, logCollections);
+var processdb = require("mongojs").connect(databaseUrl, processCollections);
+
 
 //------- for fileupload
 var formidable = require('formidable');
@@ -126,6 +129,153 @@ app.get('/api/restricted', function (req, res) {
 });
 // ---------for  authenticate begin--------
 
+//--- for process begin -------
+app.post('/process-comment', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jdata = JSON.parse(req.body.mydata);
+    var processId = jdata.processId;
+    var d = new Date()
+
+    var comment = new Object();
+    comment.message = jdata.message;
+    comment.datetime = d.getTime();
+    comment.creator = jdata.creator;
+
+    processdb.processes.findAndModify({
+        query: { _id: processId },
+        update: {
+            $addToSet: { comments:comment }
+        },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="process comment not added";
+            console.log(msg);
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }else{
+            var msg = "process comment added.";
+            //console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }
+    });
+});
+
+
+app.post('/process', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jsonData = JSON.parse(req.body.mydata);
+    var d = new Date();
+
+    processdb.processes.save({
+        _id:jsonData.id,
+        subject:jsonData.subject,
+        description:jsonData.description,
+        creator: jsonData.creator,
+        createDatetime:d.getTime(),
+        completeDateTime:'',
+        closeDateTime:'',
+        stopDateTime:'',
+        comments:[],
+        readers:[],
+        advisers:[],
+        executers:[]
+        }, function(err, saved) {
+        if( err || !saved ){
+            var msg ="process not saved";
+            console.log(msg);
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }else{
+            var msg = "process saved.";
+            //console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }
+    });
+});
+app.get('/processes',function(req,res){
+    getProcesses(req,res);
+});
+
+var getProcesses = function(req,res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    //console.log(req.param('userName'));
+    //console.log(req.param('keyWord'));
+    var keyWord = req.param('keyWord');
+    var offset = req.param('offset') ? 1*req.param('offset') : 0;
+    var limit = req.param('limit') ? 1*req.param('limit') : 20;
+    processdb.processes.
+        find({'subject':{$regex:keyWord}}).
+        skip(offset).
+        limit(limit).
+        sort({createDatetime:-1},
+        function(err, processes) {
+            //console.log('ids: ' + creatorIds);
+            if( err || !processes){
+                console.log("get processed error! could NOT find processes!");
+                console.log(err);
+                res.writeHead(500, {'Content-Type': 'application/json'});
+                res.end("[]");
+            } else {
+                //console.log("there are "+ processes.length +" processes Found!");
+                var str='[';
+                if(processes.length>0){
+                    processes.forEach( function(process) {
+                        str += '{';
+                        str += '"id":"' + process._id + '",';
+                        str += '"subject":"' + process.subject + '",';
+                        str += '"description":"' + process.description + '",';
+                        str += '"createDatetime":"' + process.createDatetime + '",';
+                        str += '"completeDateTime":"' + process.completeDateTime + '",';
+                        str += '"closeDateTime":"' + process.closeDateTime + '",';
+                        str += '"stopDateTime":"' + process.stopDateTime + '",';
+                        str += '"creator":{';
+                        str += '"id":"' + process.creator.id + '",';
+                        str += '"name":"' + process.creator.name + '",';
+                        str += '"department":"' + process.creator.department + '"';
+                        str += '},';
+                        str += '"comments":[';
+                        for(var i=process.comments.length-1; i>-1; i--){
+                            var comment = process.comments[i];
+                            str += '{';
+                            str += '"message":"' + comment.message + '",';
+                            str += '"datetime":"' + comment.datetime + '",';
+                            str += '"creator":{';
+                            str += '"id":"' + comment.creator.id + '",';
+                            str += '"name":"' + comment.creator.name + '",';
+                            str += '"department":"' + comment.creator.department + '"';
+                            str += '}},';
+                        }
+                        if(process.comments.length>0){
+                            str = str.trim();
+                            str = str.substring(0,str.length-1);
+                        }
+                        str += '],';
+
+                        str += '"readers":[],';
+                        str += '"advisers":[],';
+                        str += '"executers":[]';
+
+                        str += '},';
+                        str += '\n';
+                    });
+                    str = str.trim();
+                    str = str.substring(0,str.length-1);
+                }
+                str = str + ']';
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(str);
+            }
+        });
+}
+
+//--- for process begin -------
+
 //------ for log begin --------
 app.get('/logs/own', function (req, res) {
     var creatorIds = [req.param('creatorId')];
@@ -187,13 +337,13 @@ app.post('/log', function (req, res){
     });
 });
 
-app.post('/comment', function (req, res){
+app.post('/log-comment', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
     var logId = jdata.logId;
     var d = new Date()
-
+    //console.log(jdata);
     var comment = new Object();
     comment.message = jdata.message;
     comment.datetime = d.getTime();
@@ -208,20 +358,17 @@ app.post('/comment', function (req, res){
         new: true
     }, function(err, doc, lastErrorObject) {
         if( err ){
-            var msg ="comment not added";
+            var msg ="log comment not added";
             console.log(msg);
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
-            var msg = "comment added.";
+            var msg = "log comment added.";
             //console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
         }
     });
-
-
-
 });
 
 var getNextLevelCreatorIds = function(creatorIds){

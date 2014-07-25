@@ -126,7 +126,7 @@ function LogCtrl($scope, $http, $templateCache, $window,$fileUploader) {
 
         var jdata = 'mydata='+JSON.stringify(comment);
 
-        saveComment($http,$templateCache,jdata);
+        saveLogComment($http,$templateCache,jdata);
 
         log.comments.splice(0,0,comment);
         log.comment = "";
@@ -245,9 +245,9 @@ function getLogsByHttp($scope, $http,url, params){
         });
 }
 
-function saveComment($http,$templateCache,jdata ){
+function saveLogComment($http,$templateCache,jdata ){
     var method = 'POST';
-    var url = '/comment';
+    var url = '/log-comment';
     $http({
         method: method,
         url: url,
@@ -256,7 +256,6 @@ function saveComment($http,$templateCache,jdata ){
         cache: $templateCache
     }).
         success(function(response) {
-            //alert("save log successed!");
         }).
         error(function(response) {
             alert("save comment error!");
