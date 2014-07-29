@@ -124,11 +124,13 @@ function UserListCtrl($scope, $http, $templateCache,$window) {
         var formData = {
             'userId':uuid(24,11),
             'userName' : this.userName,
+            'pinyin' : this.pinyin,
             'password' : this.password,
             'department' : this.department
         };
         this.userId = '';
         this.userName = '';
+        this.pinyin = '';
         this.password = '';
         this.department = '';
 

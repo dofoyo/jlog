@@ -22,6 +22,8 @@ var fs=require('fs');
 
 var Promise = require('es6-promise').Promise;
 
+//var pinyin = require("pinyin");
+
 var app = express();
 
 // We are going to protect /api routes with JWT
@@ -495,6 +497,7 @@ app.get('/user', function (req, res) {
             var str='{';
             str += '"userId":"'         + user._id              + '"'              + ',';
             str += '"userName":"'       + user.userName         + '"'        + ',';
+            str += '"pinyin":"'       + user.pinyin         + '"'        + ',';
             str += '"password":"'       + user.password         + '"'          + ',';
             str += '"department":"'     + user.department     + '"'          +  '';
             str += '}';
@@ -521,8 +524,40 @@ app.get('/users', function (req, res) {
                     str += '{';
                     str += '"userId":"'         + user._id                                                                    + '"'       + ',';
                     str += '"userName":"'       + user.userName                                                              + '"'       + ',';
+                    str += '"pinyin":"'       + user.pinyin                                                              + '"'       + ',';
                     str += '"password":"'       + user.password                                                               + '"'       + ',';
                     str += '"department":"'     + user.department                                                           + '"'       +  '';
+                    str += '},' +'\n';
+                });
+                str = str.trim();
+                str = str.substring(0,str.length-1);
+            }
+            str = str + ']';
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end( str);
+        }
+    });
+});
+
+app.get('/executers', function (req, res) {
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    //console.log("term:" + req.param('term'));
+    userdb.users.find({$or:[{userName:{$regex:req.param("term")}},{pinyin:{$regex:req.param("term")}}]}, function(err, users) {
+        if( err || !users){
+            console.log("No users found");
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end( "[]");
+        }else{
+            var str='[';
+            if(users.length>0){
+                users.forEach( function(user) {
+                    str += '{';
+                    str += '"userId":"'         + user._id                                                                    + '"'       + ',';
+                    str += '"userName":"'       + user.userName                                                              + '"'       + ',';
+                    str += '"pinyin":"'       + user.pinyin                                                              + '"'       + ',';
+                    str += '"department":"'     + user.department                                                           + '"'       +  ',';
+                    str += '"value":"' +  user.userName + ':' + user.department                                                           + '"'       +  '';
                     str += '},' +'\n';
                 });
                 str = str.trim();
@@ -539,10 +574,12 @@ app.post('/user', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jsonData = JSON.parse(req.body.mydata);
+
     userdb.users.save(
         {
             _id:jsonData.userId,
             userName: jsonData.userName,
+            pinyin: jsonData.pinyin,
             password: jsonData.password,
             department: jsonData.department,
             followers:[],

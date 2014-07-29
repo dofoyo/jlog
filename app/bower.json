@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
         "jQuery":"x",
+	"jquery-ui":"1.11.0",
         "bootstrap":"x",
         "angular": "x",
         "angular-resource": "x",
