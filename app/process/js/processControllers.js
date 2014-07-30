@@ -9,32 +9,40 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
         comment:''
     };
 
-    $scope.attachmentIndex = -1;
-
     $scope.pageState={
         keyWord:'',
+        userName:'',
+        users:[],
         findShow: false,
         createShow: false,
         todoShow: false,
         downShow: false,
         hasMore:true,
-        detailShow:false,
+
         yesBtnShow:true,
         noBtnShow:true,
         transferBtnShow:true,
-        addExecuterBtnShow:true,
-        addAdviserBtnShow:true,
+        setUserBtnShow:true,
         sayBtnShow:true,
         stopBtnShow:true,
         restartBtnShow:true,
-        commentShow:true,
-        attachmentShow:true,
+
+        detailDivShow:false,
+        commentDivShow:true,
+        attachmentDivShow:true,
+        userDivShow:true,
+
+        initDivShow: function(){
+            $scope.pageState.commentDivShow=true;
+            $scope.pageState.attachmentDivShow=true;
+            $scope.pageState.userDivShow=true;
+        },
+
         index:-1,
         offset:0,
         level:0,
         limit:20
     };
-
 
     $scope.loginUser = $window.sessionStorage.token ?
     {
@@ -73,14 +81,49 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
         alert('getStoped');
     }
 
-    $scope.getExecutes = function(){
-        alert('getExecutes');
-        /*
-        $scope.logs = new Array();
-        $scope.pageState.offset = 0;
-        $scope.pageState.level = level;
-        $scope.getProceses();
-        */
+    $scope.setDivShow = function(divClass){
+        var state = $scope.pageState[divClass];
+        $scope.pageState.initDivShow();
+        $scope.pageState[divClass] = !state;
+    }
+
+    $scope.getUsers = function(){
+        var params = {
+            userName:$scope.pageState.userName
+        };
+        $http.get('/users',{params:params}).
+            success(function(data,status,headers,config) {
+                //alert("get users success!");
+                $scope.pageState.users = data;
+            }).
+            error(function(data,status,headers,config){
+                alert("get users error!");
+            });
+    }
+    $scope.addExecuter = function(index){
+        var executer = $scope.pageState.users[index];
+        $scope.pageState.users.splice(index,1);
+        var process = $scope.processes[$scope.pageState.index];
+        process.executers.push(executer);
+    }
+    $scope.delExecuter = function(index){
+        var process = $scope.processes[$scope.pageState.index];
+        var executer = process.executers[index];
+        process.executers.splice(index,1);
+        $scope.pageState.users.push(executer);
+    }
+
+    $scope.addAdviser = function(index){
+        var adviser = $scope.pageState.users[index];
+        $scope.pageState.users.splice(index,1);
+        var process = $scope.processes[$scope.pageState.index];
+        process.advisers.push(adviser);
+    }
+    $scope.delAdviser = function(index){
+        var process = $scope.processes[$scope.pageState.index];
+        var adviser = process.advisers[index];
+        process.advisers.splice(index,1);
+        $scope.pageState.users.push(adviser);
     }
 
     $scope.getProceses = function(){
@@ -107,38 +150,22 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
 
     $scope.getProceses();
 
-    $scope.setDetailShow = function(index){
+    $scope.setDetailDivShow = function(index){
         if($scope.pageState.index == index){
-            $scope.pageState.detailShow = ! $scope.pageState.detailShow;
+            $scope.pageState.detailDivShow = ! $scope.pageState.detailDivShow;
         }
 
         $scope.pageState.index = index;
-        if(!$scope.pageState.detailShow){
+
+        if(!$scope.pageState.detailDivShow){
             $scope.setYesBtn();
             $scope.setNoBtn();
             $scope.setTransferBtn();
-            $scope.setAddExecuterBtn();
-            $scope.setAddAdviserBtn();
+            $scope.setUserBtn();
             $scope.setSayBtn();
             $scope.setStopBtn();
             $scope.setRestartBtn();
         }
-    };
-
-    $scope.setCommentShow = function(index){
-        if($scope.pageState.index == index){
-            $scope.pageState.commentShow = ! $scope.pageState.commentShow;
-            $scope.pageState.attachmentShow = true;
-        }
-        $scope.pageState.index = index;
-    };
-
-    $scope.setAttachmentShow = function(index){
-        if($scope.pageState.index == index){
-            $scope.pageState.attachmentShow = ! $scope.pageState.attachmentShow;
-            $scope.pageState.commentShow = true;
-        }
-        $scope.pageState.index = index;
     };
 
     $scope.submitComment = function(index){
@@ -242,6 +269,7 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
 
         //alert('Success', xhr, item, response);
     });
+
     uploader.bind('completeall', function (event, items) {
         //alert('Complete all', items);
         uploader.clearQueue();
@@ -350,14 +378,9 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
         $scope.pageState.sayBtnShow = !$scope.hasStoped() && !$scope.hasClosed() && ($scope.isExecuter() || $scope.isAdviser() || $scope.isCreator());
     };
 
-    //参与人随时都可拉会签人进来，即使该流程已关闭或终止
-    $scope.setAddAdviserBtn = function(){
-        $scope.pageState.addAdviserBtnShow = $scope.isExecuter() || $scope.isAdviser() || $scope.isCreator();
-    };
-
-    //未关闭、未终止的流程，发起人和处理人随时都可拉处理人进来
-    $scope.setAddExecuterBtn = function(){
-        $scope.pageState.addExecuterBtnShow = !$scope.hasStoped() && !$scope.hasClosed() && ($scope.isExecuter() || $scope.isCreator());
+    //参与人随时都可拉会签人和处理人进来，即使该流程已关闭或终止
+    $scope.setUserBtn = function(){
+        $scope.pageState.setUserBtnShow = $scope.isExecuter() || $scope.isAdviser() || $scope.isCreator();
     };
 
     //未关闭、未终止的流程，当前的处理人将处理权转给其他人
@@ -421,7 +444,7 @@ function saveProcess($http,$templateCache,jdata ){
         cache: $templateCache
     }).
         success(function(response) {
-            alert("save process successed!");
+            //alert("save process successed!");
         }).
         error(function(response) {
             alert("save process error!");

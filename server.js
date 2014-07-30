@@ -242,26 +242,41 @@ var getProcesses = function(req,res){
                         str += '"department":"' + process.creator.department + '"';
                         str += '},';
                         str += '"comments":[';
-                        for(var i=process.comments.length-1; i>-1; i--){
-                            var comment = process.comments[i];
-                            str += '{';
-                            str += '"message":"' + comment.message + '",';
-                            str += '"datetime":"' + comment.datetime + '",';
-                            str += '"creator":{';
-                            str += '"id":"' + comment.creator.id + '",';
-                            str += '"name":"' + comment.creator.name + '",';
-                            str += '"department":"' + comment.creator.department + '"';
-                            str += '}},';
-                        }
-                        if(process.comments.length>0){
-                            str = str.trim();
-                            str = str.substring(0,str.length-1);
-                        }
+                            for(var i=process.comments.length-1; i>-1; i--){
+                                var comment = process.comments[i];
+                                str += '{';
+                                str += '"message":"' + comment.message + '",';
+                                str += '"datetime":"' + comment.datetime + '",';
+                                str += '"creator":{';
+                                str += '"id":"' + comment.creator.id + '",';
+                                str += '"name":"' + comment.creator.name + '",';
+                                str += '"department":"' + comment.creator.department + '"';
+                                str += '}},';
+                            }
+                            if(process.comments.length>0){
+                                str = str.trim();
+                                str = str.substring(0,str.length-1);
+                            }
                         str += '],';
 
                         str += '"readers":[],';
                         str += '"advisers":[],';
-                        str += '"executers":[]';
+                        str += '"executers":[';
+                            for(var i=process.executers.length-1; i>-1; i--){
+                                var executer = process.executers[i];
+                                str += '{';
+                                str += '"id":"' + executer.id + '",';
+                                str += '"name":"' + executer.name + '",';
+                                str += '"department":"' + executer.department + '",';
+                                str += '"createDatetime":"' + executer.createDatetime + '",';
+                                str += '"completeDateTime":"' + executer.completeDateTime + '"';
+                                str += '},';
+                            }
+                            if(process.executers.length>0){
+                                str = str.trim();
+                                str = str.substring(0,str.length-1);
+                            }
+                        str += ']';
 
                         str += '},';
                         str += '\n';
@@ -512,12 +527,14 @@ app.get('/user', function (req, res) {
 app.get('/users', function (req, res) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
+    console.log("get users by " + req.param('userName'));
     userdb.users.find({userName:{$regex:req.param("userName")}}, function(err, users) {
         if( err || !users){
             console.log("No users found");
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end( "[]");
         }else{
+            console.log('finded ' + users.length + ' users');
             var str='[';
             if(users.length>0){
                 users.forEach( function(user) {
