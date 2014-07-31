@@ -4,6 +4,8 @@
 angular.module('myApp', [
   'ngRoute',
   'angularFileUpload',
+        'myApp.processControllers',
+        'myApp.processServices',
   'myApp.logServices',
   'myApp.logFilters',
   'myApp.userServices',

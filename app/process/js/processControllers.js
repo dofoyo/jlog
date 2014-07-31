@@ -1,6 +1,17 @@
 'use strict';
+var pc = angular.module('myApp.processControllers', []);
 
-function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
+pc.controller('ProcessCtrl',[
+    '$scope',
+    '$http',
+    '$templateCache',
+    '$window',
+    '$fileUploader',
+    'CommentType',
+    function($scope, $http, $templateCache, $window,$fileUploader,CommentType){
+
+    alert(CommentType.EXECUTER);
+
     $scope.processes = new Array();
 
     $scope.process = {
@@ -190,10 +201,10 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     $scope.find = function(){
         alert('find by key ' + $scope.pageState.keyWord);
         /*
-        $scope.processes = new Array();
-        $scope.pageState.offset = 0;
-        $scope.getProcesses();
-        */
+         $scope.processes = new Array();
+         $scope.pageState.offset = 0;
+         $scope.getProcesses();
+         */
 
     }
 
@@ -324,42 +335,42 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
         uploader.clearQueue();
     });
     /*
-    uploader.bind('afteraddingfile', function (event, item) {
-        //alert('After adding a file', item);
-    });
+     uploader.bind('afteraddingfile', function (event, item) {
+     //alert('After adding a file', item);
+     });
 
-    uploader.bind('whenaddingfilefailed', function (event, item) {
-        //alert('When adding a file failed', item);
-    });
+     uploader.bind('whenaddingfilefailed', function (event, item) {
+     //alert('When adding a file failed', item);
+     });
 
-    uploader.bind('afteraddingall', function (event, items) {
-        //alert('After adding all files', items);
-    });
+     uploader.bind('afteraddingall', function (event, items) {
+     //alert('After adding all files', items);
+     });
 
-    uploader.bind('beforeupload', function (event, item) {
-        //alert('Before upload', item);
-    });
+     uploader.bind('beforeupload', function (event, item) {
+     //alert('Before upload', item);
+     });
 
-    uploader.bind('progress', function (event, item, progress) {
-        //alert('Progress: ' + progress, item);
-    });
-    uploader.bind('cancel', function (event, xhr, item) {
-        //alert('Cancel', xhr, item);
-    });
+     uploader.bind('progress', function (event, item, progress) {
+     //alert('Progress: ' + progress, item);
+     });
+     uploader.bind('cancel', function (event, xhr, item) {
+     //alert('Cancel', xhr, item);
+     });
 
-    uploader.bind('error', function (event, xhr, item, response) {
-        //alert('Error', xhr, item, response);
-    });
+     uploader.bind('error', function (event, xhr, item, response) {
+     //alert('Error', xhr, item, response);
+     });
 
-    uploader.bind('progressall', function (event, progress) {
-       //alert('Total progress: ' + progress);
-    });
+     uploader.bind('progressall', function (event, progress) {
+     //alert('Total progress: ' + progress);
+     });
 
      uploader.bind('complete', function (event, xhr, item, response) {
-        //alert('Complete', xhr, item, response);
-         //item.remove();
+     //alert('Complete', xhr, item, response);
+     //item.remove();
      });
-    */
+     */
 
 
 
@@ -448,7 +459,7 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     $scope.setNoBtn = function(){
         $scope.pageState.noBtnShow = !$scope.hasStoped() && !$scope.hasClosed() && $scope.isAuthor();
     };
-}
+}]);
 
 function getProcesesByHttp($scope, $http,url,params){
     $http.get(url,{params:params}).
@@ -482,7 +493,6 @@ function saveProcessComment($http,$templateCache,jdata ){
             alert("save comment error!");
         });
 }
-
 
 function saveProcessExecuter($http,$templateCache,jdata ){
     var method = 'POST';
