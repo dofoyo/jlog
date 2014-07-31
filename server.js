@@ -313,6 +313,7 @@ app.post('/process', function (req, res){
 });
 
 app.get('/processes',function(req,res){
+    console.log("/processes");
     getProcesses(req,res);
 });
 
@@ -336,7 +337,7 @@ var getProcesses = function(req,res){
                 res.writeHead(500, {'Content-Type': 'application/text'});
                 res.end("[]");
             } else {
-                //console.log("there are "+ processes.length +" processes Found!");
+                console.log("there are "+ processes.length +" processes Found!");
                 var str='[';
                 if(processes.length>0){
                     processes.forEach( function(process) {

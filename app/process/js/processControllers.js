@@ -9,8 +9,12 @@ pc.controller('ProcessCtrl',[
     '$fileUploader',
     'CommentType',
     'uuid',
-    function($scope, $http, $templateCache, $window,$fileUploader,CommentType,uuid){
-    $scope.processes = new Array();
+    'Processes',
+    function($scope, $http, $templateCache, $window,$fileUploader,CommentType,uuid,Processes){
+
+        $scope.processes = Processes.query({},function(data){
+
+        });
 
     $scope.process = {
         subject:'',
@@ -206,7 +210,7 @@ pc.controller('ProcessCtrl',[
 
     }
 
-    $scope.getProceses();
+    //$scope.getProceses();
 
     $scope.setDetailDivShow = function(index){
         if($scope.pageState.index == index){
