@@ -105,12 +105,25 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
         $scope.pageState.users.splice(index,1);
         var process = $scope.processes[$scope.pageState.index];
         process.executers.push(executer);
+
+        executer.add = true;
+        executer.processId = process.id;
+        executer.createDateTime = new Date();
+        var jdata = 'mydata='+JSON.stringify(executer);
+        saveProcessExecuter($http,$templateCache,jdata);
+
     }
     $scope.delExecuter = function(index){
         var process = $scope.processes[$scope.pageState.index];
         var executer = process.executers[index];
         process.executers.splice(index,1);
         $scope.pageState.users.push(executer);
+
+        executer.del = true;
+        executer.processId = process.id;
+        //alert(executer.id);
+        var jdata = 'mydata='+JSON.stringify(executer);
+        saveProcessExecuter($http,$templateCache,jdata);
     }
 
     $scope.addAdviser = function(index){
@@ -206,9 +219,9 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
                 subject:subject,
                 description:description,
                 createDatetime:new Date(),
-                completeDateTime:"",
-                closeDateTime:"",
-                stopDateTime:"",
+                completeDatetime:"",
+                closeDatetime:"",
+                stopDatetime:"",
                 creator:{
                     "id":$scope.loginUser.userId,
                     "name":$scope.loginUser.userName,
@@ -429,6 +442,25 @@ function saveProcessComment($http,$templateCache,jdata ){
         }).
         error(function(response) {
             alert("save comment error!");
+        });
+}
+
+
+function saveProcessExecuter($http,$templateCache,jdata ){
+    var method = 'POST';
+    var url = '/process-executer';
+    $http({
+        method: method,
+        url: url,
+        data:  jdata ,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        cache: $templateCache
+    }).
+        success(function(response) {
+            alert("save process-executer successed!");
+        }).
+        error(function(response) {
+            alert("save process-executer error!");
         });
 }
 

@@ -132,6 +132,63 @@ app.get('/api/restricted', function (req, res) {
 // ---------for  authenticate begin--------
 
 //--- for process begin -------
+app.post('/process-executer', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jdata = JSON.parse(req.body.mydata);
+    var processId = jdata.processId;
+    var d = new Date()
+
+    if(jdata.add){
+        var executer = new Object();
+        executer.id = jdata.userId;
+        executer.name = jdata.userName;
+        executer.department = jdata.department;
+        executer.createDatetime = d.getTime();
+        processdb.processes.findAndModify({
+            query: { _id: processId },
+            update: {
+                $addToSet: { executers:executer }
+            },
+            new: true
+        }, function(err, doc, lastErrorObject) {
+            if( err ){
+                var msg ="process executer not added";
+                console.log(msg);
+                res.writeHead(500, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }else{
+                var msg = "process executer added.";
+                console.log(msg);
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }
+        });
+    }else if(jdata.del){
+        processdb.processes.findAndModify({
+            query: { _id: processId },
+            update: {
+                $pull: { executers:{id:jdata.id}}
+            },
+            new: true
+        }, function(err, doc, lastErrorObject) {
+            if( err ){
+                var msg ="process executer " + jdata.id + " not deleted";
+                console.log(msg);
+                res.writeHead(500, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }else{
+                //console.log(doc);
+                var msg = "process executer " + jdata.id + " deleted.";
+                console.log(msg);
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }
+        });
+    }
+});
+
+
 app.post('/process-comment', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
@@ -164,7 +221,6 @@ app.post('/process-comment', function (req, res){
         }
     });
 });
-
 
 app.post('/process', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
@@ -233,9 +289,9 @@ var getProcesses = function(req,res){
                         str += '"subject":"' + process.subject + '",';
                         str += '"description":"' + process.description + '",';
                         str += '"createDatetime":"' + process.createDatetime + '",';
-                        str += '"completeDateTime":"' + process.completeDateTime + '",';
-                        str += '"closeDateTime":"' + process.closeDateTime + '",';
-                        str += '"stopDateTime":"' + process.stopDateTime + '",';
+                        str += '"completeDatetime":"' + process.completeDatetime + '",';
+                        str += '"closeDatetime":"' + process.closeDatetime + '",';
+                        str += '"stopDatetime":"' + process.stopDatetime + '",';
                         str += '"creator":{';
                         str += '"id":"' + process.creator.id + '",';
                         str += '"name":"' + process.creator.name + '",';
@@ -269,7 +325,7 @@ var getProcesses = function(req,res){
                                 str += '"name":"' + executer.name + '",';
                                 str += '"department":"' + executer.department + '",';
                                 str += '"createDatetime":"' + executer.createDatetime + '",';
-                                str += '"completeDateTime":"' + executer.completeDateTime + '"';
+                                str += '"completeDatetime":""';
                                 str += '},';
                             }
                             if(process.executers.length>0){
