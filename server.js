@@ -201,6 +201,7 @@ app.post('/process-executer', function (req, res){
         executer.name = jdata.name;
         executer.department = jdata.department;
         executer.createDatetime = d.getTime().toString();
+        executer.completeDatetime = '';
         processdb.processes.findAndModify({
             query: { _id: processId },
             update: {
@@ -329,11 +330,10 @@ var getProcesses = function(req,res){
         limit(limit).
         sort({createDatetime:-1},
         function(err, processes) {
-            //console.log('ids: ' + creatorIds);
             if( err || !processes){
                 console.log("get processed error! could NOT find processes!");
                 console.log(err);
-                res.writeHead(500, {'Content-Type': 'application/json'});
+                res.writeHead(500, {'Content-Type': 'application/text'});
                 res.end("[]");
             } else {
                 //console.log("there are "+ processes.length +" processes Found!");
@@ -383,7 +383,7 @@ var getProcesses = function(req,res){
                                 str += '"completeDatetime":"' + adviser.completeDatetime + '"';
                                 str += '},';
                             }
-                            if(process.executers.length>0){
+                            if(process.advisers.length>0){
                                 str = str.trim();
                                 str = str.substring(0,str.length-1);
                             }
@@ -412,6 +412,7 @@ var getProcesses = function(req,res){
                     str = str.substring(0,str.length-1);
                 }
                 str = str + ']';
+                //console.log(str);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(str);
             }

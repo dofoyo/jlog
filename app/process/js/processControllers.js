@@ -404,7 +404,8 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
 
     $scope.hasStoped = function(){
         var process = $scope.processes[$scope.pageState.index];
-
+        //alert('process.stopDatetime.length=' + process.stopDatetime.length);
+        //alert('process.stopDatetime=' + process.stopDatetime);
         return process.stopDatetime.length!=0 ? true : false;
     };
 
@@ -449,7 +450,7 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     };
 }
 
-function getProcesesByHttp($scope, $http,url, params){
+function getProcesesByHttp($scope, $http,url,params){
     $http.get(url,{params:params}).
         success(function(data,status,headers,config) {
             //alert("get Proceses successed! " + data);
@@ -460,7 +461,7 @@ function getProcesesByHttp($scope, $http,url, params){
             }
         }).
         error(function(data,status,headers,config){
-            alert("get Proceses By Http error!" + data);
+            alert("get Proceses By Http error!");
         });
 }
 
@@ -494,7 +495,7 @@ function saveProcessExecuter($http,$templateCache,jdata ){
         cache: $templateCache
     }).
         success(function(response) {
-            alert("save process-executer successed!");
+            //alert("save process-executer successed!");
         }).
         error(function(response) {
             alert("save process-executer error!");
@@ -512,7 +513,7 @@ function saveProcessAdviser($http,$templateCache,jdata ){
         cache: $templateCache
     }).
         success(function(response) {
-            alert("save process-adviser successed!");
+            //alert("save process-adviser successed!");
         }).
         error(function(response) {
             alert("save process-adviser error!");
