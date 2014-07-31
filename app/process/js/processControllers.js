@@ -150,18 +150,29 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
         $scope.pageState.users.splice(index,1);
         var process = $scope.processes[$scope.pageState.index];
         process.advisers.push(adviser);
+
+        adviser.add = true;
+        adviser.processId = process.id;
+        var jdata = 'mydata='+JSON.stringify(adviser);
+        saveProcessAdviser($http,$templateCache,jdata);
+
     }
     $scope.delAdviser = function(index){
         var process = $scope.processes[$scope.pageState.index];
         var adviser = process.advisers[index];
         var user = {
-            userId:executer.id,
-            userName:executer.name,
-            department:executer.department
+            userId:adviser.id,
+            userName:adviser.name,
+            department:adviser.department
         };
 
         process.advisers.splice(index,1);
         $scope.pageState.users.push(adviser);
+
+        adviser.del = true;
+        adviser.processId = process.id;
+        var jdata = 'mydata='+JSON.stringify(adviser);
+        saveProcessAdviser($http,$templateCache,jdata);
     }
 
     $scope.getProceses = function(){
@@ -382,8 +393,8 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
         for(var i=0; i<process.executers.length; i++){
             var executer = process.executers[i];
             if($scope.loginUser.userId == executer.id
-                && executer.createDateTime.length != 0
-                && executer.completeDateTime.length == 0
+                && executer.createDatetime.length != 0
+                && executer.completeDatetime.length == 0
                 ){
                 return true;
             }
@@ -393,12 +404,13 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
 
     $scope.hasStoped = function(){
         var process = $scope.processes[$scope.pageState.index];
-        return process.stopDateTime.length!=0 ? true : false;
+
+        return process.stopDatetime.length!=0 ? true : false;
     };
 
     $scope.hasClosed = function(){
         var process = $scope.processes[$scope.pageState.index];
-        return process.closeDateTime.length!=0 ? true : false;
+        return process.closeDatetime.length!=0 ? true : false;
     };
 
     // 未关闭、未终止的流程，发起人和当前处理人都可终止流程
@@ -486,6 +498,24 @@ function saveProcessExecuter($http,$templateCache,jdata ){
         }).
         error(function(response) {
             alert("save process-executer error!");
+        });
+}
+
+function saveProcessAdviser($http,$templateCache,jdata ){
+    var method = 'POST';
+    var url = '/process-adviser';
+    $http({
+        method: method,
+        url: url,
+        data:  jdata ,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        cache: $templateCache
+    }).
+        success(function(response) {
+            alert("save process-adviser successed!");
+        }).
+        error(function(response) {
+            alert("save process-adviser error!");
         });
 }
 

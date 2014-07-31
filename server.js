@@ -132,6 +132,62 @@ app.get('/api/restricted', function (req, res) {
 // ---------for  authenticate begin--------
 
 //--- for process begin -------
+app.post('/process-adviser', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jdata = JSON.parse(req.body.mydata);
+    var processId = jdata.processId;
+    var d = new Date()
+
+    if(jdata.add){
+        var adviser = new Object();
+        adviser.id = jdata.id;
+        adviser.name = jdata.name;
+        adviser.department = jdata.department;
+        adviser.createDatetime = d.getTime().toString();
+        processdb.processes.findAndModify({
+            query: { _id: processId },
+            update: {
+                $addToSet: { advisers:adviser }
+            },
+            new: true
+        }, function(err, doc, lastErrorObject) {
+            if( err ){
+                var msg ="process adviser not added";
+                console.log(msg);
+                res.writeHead(500, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }else{
+                var msg = "process adviser added.";
+                console.log(msg);
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }
+        });
+    }else if(jdata.del){
+        processdb.processes.findAndModify({
+            query: { _id: processId },
+            update: {
+                $pull: { advisers:{id:jdata.id,createDatetime:jdata.createDatetime}}
+            },
+            new: true
+        }, function(err, doc, lastErrorObject) {
+            if( err ){
+                var msg ="process adviser " + jdata.id + "," + jdata.createDatetime + " not deleted";
+                console.log(msg);
+                res.writeHead(500, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }else{
+                //console.log(doc);
+                var msg = "process adviser " + jdata.id + "," + jdata.createDatetime  + " deleted.";
+                console.log(msg);
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }
+        });
+    }
+});
+
 app.post('/process-executer', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
@@ -188,7 +244,6 @@ app.post('/process-executer', function (req, res){
     }
 });
 
-
 app.post('/process-comment', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
@@ -234,9 +289,9 @@ app.post('/process', function (req, res){
         description:jsonData.description,
         creator: jsonData.creator,
         createDatetime:d.getTime().toString(),
-        completeDateTime:'',
-        closeDateTime:'',
-        stopDateTime:'',
+        completeDatetime:'',
+        closeDatetime:'',
+        stopDatetime:'',
         comments:[],
         readers:[],
         advisers:[],
@@ -255,6 +310,7 @@ app.post('/process', function (req, res){
         }
     });
 });
+
 app.get('/processes',function(req,res){
     getProcesses(req,res);
 });
@@ -316,7 +372,22 @@ var getProcesses = function(req,res){
                         str += '],';
 
                         str += '"readers":[],';
-                        str += '"advisers":[],';
+                        str += '"advisers":[';
+                            for(var i=process.advisers.length-1; i>-1; i--){
+                                var adviser = process.advisers[i];
+                                str += '{';
+                                str += '"id":"' + adviser.id + '",';
+                                str += '"name":"' + adviser.name + '",';
+                                str += '"department":"' + adviser.department + '",';
+                                str += '"createDatetime":"' + adviser.createDatetime + '",';
+                                str += '"completeDatetime":"' + adviser.completeDatetime + '"';
+                                str += '},';
+                            }
+                            if(process.executers.length>0){
+                                str = str.trim();
+                                str = str.substring(0,str.length-1);
+                            }
+                        str += '],';
                         str += '"executers":[';
                             for(var i=process.executers.length-1; i>-1; i--){
                                 var executer = process.executers[i];
@@ -325,7 +396,7 @@ var getProcesses = function(req,res){
                                 str += '"name":"' + executer.name + '",';
                                 str += '"department":"' + executer.department + '",';
                                 str += '"createDatetime":"' + executer.createDatetime + '",';
-                                str += '"completeDatetime":""';
+                                str += '"completeDatetime":"' + executer.completeDatetime + '"';
                                 str += '},';
                             }
                             if(process.executers.length>0){
