@@ -101,14 +101,20 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
             });
     }
     $scope.addExecuter = function(index){
-        var executer = $scope.pageState.users[index];
+        var user = $scope.pageState.users[index];
+        var executer = {
+            id:user.userId,
+            name:user.userName,
+            department:user.department,
+            createDatetime: new Date(),
+            completeDatetime:''
+        };
         $scope.pageState.users.splice(index,1);
         var process = $scope.processes[$scope.pageState.index];
         process.executers.push(executer);
 
         executer.add = true;
         executer.processId = process.id;
-        executer.createDateTime = new Date();
         var jdata = 'mydata='+JSON.stringify(executer);
         saveProcessExecuter($http,$templateCache,jdata);
 
@@ -117,7 +123,12 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
         var process = $scope.processes[$scope.pageState.index];
         var executer = process.executers[index];
         process.executers.splice(index,1);
-        $scope.pageState.users.push(executer);
+        var user = {
+            userId:executer.id,
+            userName:executer.name,
+            department:executer.department
+        };
+        $scope.pageState.users.push(user);
 
         executer.del = true;
         executer.processId = process.id;
@@ -127,7 +138,15 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     }
 
     $scope.addAdviser = function(index){
-        var adviser = $scope.pageState.users[index];
+        var user = $scope.pageState.users[index];
+        var adviser = {
+            id:user.userId,
+            name:user.userName,
+            department:user.department,
+            createDatetime: new Date(),
+            completeDatetime:''
+        };
+
         $scope.pageState.users.splice(index,1);
         var process = $scope.processes[$scope.pageState.index];
         process.advisers.push(adviser);
@@ -135,6 +154,12 @@ function ProcessCtrl($scope, $http, $templateCache, $window,$fileUploader) {
     $scope.delAdviser = function(index){
         var process = $scope.processes[$scope.pageState.index];
         var adviser = process.advisers[index];
+        var user = {
+            userId:executer.id,
+            userName:executer.name,
+            department:executer.department
+        };
+
         process.advisers.splice(index,1);
         $scope.pageState.users.push(adviser);
     }

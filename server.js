@@ -59,7 +59,7 @@ app.post('/upload',function(req,res){
             res.end('parse upload error!');
         }else{
             var d = new Date();
-            var t = d.getTime();
+            var t = d.getTime().toString();
             var filename = files.file.name;
             var old_path = files.file.path;
             var new_path = upload_path + t;
@@ -141,10 +141,10 @@ app.post('/process-executer', function (req, res){
 
     if(jdata.add){
         var executer = new Object();
-        executer.id = jdata.userId;
-        executer.name = jdata.userName;
+        executer.id = jdata.id;
+        executer.name = jdata.name;
         executer.department = jdata.department;
-        executer.createDatetime = d.getTime();
+        executer.createDatetime = d.getTime().toString();
         processdb.processes.findAndModify({
             query: { _id: processId },
             update: {
@@ -168,18 +168,18 @@ app.post('/process-executer', function (req, res){
         processdb.processes.findAndModify({
             query: { _id: processId },
             update: {
-                $pull: { executers:{id:jdata.id}}
+                $pull: { executers:{id:jdata.id,createDatetime:jdata.createDatetime}}
             },
             new: true
         }, function(err, doc, lastErrorObject) {
             if( err ){
-                var msg ="process executer " + jdata.id + " not deleted";
+                var msg ="process executer " + jdata.id + "," + jdata.createDatetime + " not deleted";
                 console.log(msg);
                 res.writeHead(500, {'Content-Type': 'application/json'});
                 res.end(msg);
             }else{
                 //console.log(doc);
-                var msg = "process executer " + jdata.id + " deleted.";
+                var msg = "process executer " + jdata.id + "," + jdata.createDatetime  + " deleted.";
                 console.log(msg);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(msg);
@@ -198,7 +198,7 @@ app.post('/process-comment', function (req, res){
 
     var comment = new Object();
     comment.message = jdata.message;
-    comment.datetime = d.getTime();
+    comment.datetime = d.getTime().toString();
     comment.creator = jdata.creator;
 
     processdb.processes.findAndModify({
@@ -233,7 +233,7 @@ app.post('/process', function (req, res){
         subject:jsonData.subject,
         description:jsonData.description,
         creator: jsonData.creator,
-        createDatetime:d.getTime(),
+        createDatetime:d.getTime().toString(),
         completeDateTime:'',
         closeDateTime:'',
         stopDateTime:'',
@@ -395,7 +395,7 @@ app.post('/log', function (req, res){
     var jsonData = JSON.parse(req.body.mydata);
     var d = new Date();
 
-    logdb.logs.save({_id:jsonData.id,message:jsonData.message, creator: jsonData.creator,datetime:d.getTime(),comments:[]}, function(err, saved) {
+    logdb.logs.save({_id:jsonData.id,message:jsonData.message, creator: jsonData.creator,datetime:d.getTime().toString(),comments:[]}, function(err, saved) {
         if( err || !saved ){
             var msg ="log not saved";
             console.log(msg);
@@ -419,7 +419,7 @@ app.post('/log-comment', function (req, res){
     //console.log(jdata);
     var comment = new Object();
     comment.message = jdata.message;
-    comment.datetime = d.getTime();
+    comment.datetime = d.getTime().toString();
     comment.creator = jdata.creator;
 
 
