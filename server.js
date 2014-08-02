@@ -132,6 +132,62 @@ app.get('/api/restricted', function (req, res) {
 // ---------for  authenticate begin--------
 
 //--- for process begin -------
+app.post('/process-stop', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jdata = JSON.parse(req.body.mydata);
+    var processId = jdata.processId;
+    var d = new Date();
+
+    processdb.processes.findAndModify({
+        query: { _id: processId },
+        update: {
+            $set: {stopDatetime: d.getTime().toString()}
+        },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="process stop not success.";
+            console.log(msg);
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }else{
+            var msg = "process stopped.";
+            console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }
+    });
+});
+
+app.post('/process-restart', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jdata = JSON.parse(req.body.mydata);
+    var processId = jdata.processId;
+    var d = new Date();
+
+    processdb.processes.findAndModify({
+        query: { _id: processId },
+        update: {
+            $set: {stopDatetime: '', completeDatetime:''}
+        },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="process restart not success.";
+            console.log(msg);
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }else{
+            var msg = "process restarted.";
+            console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }
+    });
+});
+
 app.post('/process-adviser', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
@@ -142,7 +198,8 @@ app.post('/process-adviser', function (req, res){
     if(jdata.add){
         var adviser = new Object();
         adviser.id = jdata.id;
-        adviser.name = jdata.name;
+        adviser.userId = jdata.userId;
+        adviser.userName = jdata.userName;
         adviser.department = jdata.department;
         adviser.createDatetime = d.getTime().toString();
         processdb.processes.findAndModify({
@@ -164,11 +221,11 @@ app.post('/process-adviser', function (req, res){
                 res.end(msg);
             }
         });
-    }else if(jdata.del){
+    }else{
         processdb.processes.findAndModify({
             query: { _id: processId },
             update: {
-                $pull: { advisers:{id:jdata.id,createDatetime:jdata.createDatetime}}
+                $pull: { advisers:{id:jdata.id}}
             },
             new: true
         }, function(err, doc, lastErrorObject) {
@@ -198,7 +255,8 @@ app.post('/process-executer', function (req, res){
     if(jdata.add){
         var executer = new Object();
         executer.id = jdata.id;
-        executer.name = jdata.name;
+        executer.userId = jdata.userId;
+        executer.userName = jdata.userName;
         executer.department = jdata.department;
         executer.createDatetime = d.getTime().toString();
         executer.completeDatetime = '';
@@ -221,11 +279,11 @@ app.post('/process-executer', function (req, res){
                 res.end(msg);
             }
         });
-    }else if(jdata.del){
+    }else{
         processdb.processes.findAndModify({
             query: { _id: processId },
             update: {
-                $pull: { executers:{id:jdata.id,createDatetime:jdata.createDatetime}}
+                $pull: { executers:{id:jdata.id}}
             },
             new: true
         }, function(err, doc, lastErrorObject) {
@@ -378,7 +436,8 @@ var getProcesses = function(req,res){
                                 var adviser = process.advisers[i];
                                 str += '{';
                                 str += '"id":"' + adviser.id + '",';
-                                str += '"name":"' + adviser.name + '",';
+                                str += '"userId":"' + adviser.userId + '",';
+                                str += '"userName":"' + adviser.userName + '",';
                                 str += '"department":"' + adviser.department + '",';
                                 str += '"createDatetime":"' + adviser.createDatetime + '",';
                                 str += '"completeDatetime":"' + adviser.completeDatetime + '"';
@@ -394,7 +453,8 @@ var getProcesses = function(req,res){
                                 var executer = process.executers[i];
                                 str += '{';
                                 str += '"id":"' + executer.id + '",';
-                                str += '"name":"' + executer.name + '",';
+                                str += '"userId":"' + executer.userId + '",';
+                                str += '"userName":"' + executer.userName + '",';
                                 str += '"department":"' + executer.department + '",';
                                 str += '"createDatetime":"' + executer.createDatetime + '",';
                                 str += '"completeDatetime":"' + executer.completeDatetime + '"';
