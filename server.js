@@ -132,6 +132,70 @@ app.get('/api/restricted', function (req, res) {
 // ---------for  authenticate begin--------
 
 //--- for process begin -------
+app.post('/process-yes', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jdata = JSON.parse(req.body.mydata);
+    var processId = jdata.processId;
+    var close_Date_time = jdata.closeDatetime;
+    var createDatetime = jdata.createDatetime;
+    var executerId = jdata.executerId;
+    var datetime = (new Date()).getTime().toString();
+
+    var comment = new Object();
+    comment.id = jdata.id;
+    comment.type = jdata.type;
+    comment.message = jdata.message;
+    comment.createDatetime = createDatetime;
+    comment.completeDatetime = datetime;
+    comment.creator = jdata.creator;
+
+    processdb.processes.findAndModify({
+        query: { _id: processId },
+        update: {
+            $set:{closeDatetime:close_Date_time},
+            $addToSet: { comments:comment }
+        },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="process comment not added";
+            console.log(msg);
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }else{
+            var msg = "process comment added.";
+            //console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }
+    });
+
+        /*
+    processdb.processes.findAndModify({
+        query: { _id: processId },
+        update: {
+            $set:{"executers.id":executerId},{"executers.$.completeDatetime":datetime}
+        },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="process comment not added";
+            console.log(msg);
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }else{
+            var msg = "process comment added.";
+            //console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }
+    });
+        */
+});
+
+
+
 app.post('/process-stop', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
@@ -170,7 +234,7 @@ app.post('/process-restart', function (req, res){
     processdb.processes.findAndModify({
         query: { _id: processId },
         update: {
-            $set: {stopDatetime: '', completeDatetime:''}
+            $set: {stopDatetime: '', closeDatetime:''}
         },
         new: true
     }, function(err, doc, lastErrorObject) {
@@ -311,9 +375,11 @@ app.post('/process-comment', function (req, res){
     var d = new Date()
 
     var comment = new Object();
+    comment.id = jdata.id;
     comment.type = jdata.type;
     comment.message = jdata.message;
-    comment.datetime = d.getTime().toString();
+    comment.createDatetime = d.getTime().toString();
+    comment.completeDatetime = d.getTime().toString();
     comment.creator = jdata.creator;
 
     processdb.processes.findAndModify({
@@ -349,7 +415,6 @@ app.post('/process', function (req, res){
         description:jsonData.description,
         creator: jsonData.creator,
         createDatetime:d.getTime().toString(),
-        completeDatetime:'',
         closeDatetime:'',
         stopDatetime:'',
         comments:[],
@@ -405,7 +470,6 @@ var getProcesses = function(req,res){
                         str += '"subject":"' + process.subject + '",';
                         str += '"description":"' + process.description + '",';
                         str += '"createDatetime":"' + process.createDatetime + '",';
-                        str += '"completeDatetime":"' + process.completeDatetime + '",';
                         str += '"closeDatetime":"' + process.closeDatetime + '",';
                         str += '"stopDatetime":"' + process.stopDatetime + '",';
                         str += '"creator":{';
@@ -417,9 +481,11 @@ var getProcesses = function(req,res){
                             for(var i=process.comments.length-1; i>-1; i--){
                                 var comment = process.comments[i];
                                 str += '{';
+                                str += '"id":"' + comment.id + '",';
                                 str += '"type":"' + comment.type + '",';
                                 str += '"message":"' + comment.message + '",';
-                                str += '"datetime":"' + comment.datetime + '",';
+                                str += '"createDatetime":"' + comment.createDatetime + '",';
+                                str += '"completeDatetime":"' + comment.completeDatetime + '",';
                                 str += '"creator":{';
                                 str += '"id":"' + comment.creator.id + '",';
                                 str += '"name":"' + comment.creator.name + '",';

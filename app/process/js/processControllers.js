@@ -97,8 +97,7 @@ pc.controller('ProcessCtrl',[
                         id:id,
                         subject:subject,
                         description:description,
-                        createDatetime:new Date(),
-                        completeDatetime:"",
+                        createDatetime:(new Date()).getTime().toString(),
                         closeDatetime:"",
                         stopDatetime:"",
                         creator:{
@@ -238,7 +237,6 @@ function Process(obj,$scope,$http,$templateCache){
     this.subject = obj.subject;
     this.description = obj.description;
     this.createDatetime = obj.createDatetime;
-    this.completeDatetime = obj.completeDatetime;
     this.closeDatetime = obj.closeDatetime;
     this.stopDatetime = obj.stopDatetime;
     this.creator = obj.creator;
@@ -273,7 +271,7 @@ function Process(obj,$scope,$http,$templateCache){
     this.isAdviser = function(){
         for(var i=0; i<this.advisers.length; i++){
             var adviser = this.advisers[i];
-            if($scope.loginUser.userId == adviser.id){
+            if($scope.loginUser.userId == adviser.userId){
                 return true;
             }
         }
@@ -283,7 +281,7 @@ function Process(obj,$scope,$http,$templateCache){
     this.isExecuter = function(){
         for(var i=0; i<this.executers.length; i++){
             var executer = this.executers[i];
-            if($scope.loginUser.userId == executer.id){
+            if($scope.loginUser.userId == executer.userId){
                 return true;
             }
         }
@@ -293,7 +291,7 @@ function Process(obj,$scope,$http,$templateCache){
     this.isAuthor = function(){
         for(var i=0; i<this.executers.length; i++){
             var executer = this.executers[i];
-            if($scope.loginUser.userId == executer.id
+            if($scope.loginUser.userId == executer.userId
                 && executer.createDatetime.length != 0
                 && executer.completeDatetime.length == 0
                 ){
@@ -301,6 +299,19 @@ function Process(obj,$scope,$http,$templateCache){
             }
         }
         return false;
+    };
+
+    this.authorIndex = function(){
+        for(var i=0; i<this.executers.length; i++){
+            var executer = this.executers[i];
+            if($scope.loginUser.userId == executer.userId
+                && executer.createDatetime.length != 0
+                && executer.completeDatetime.length == 0
+                ){
+                return i;
+            }
+        }
+        return -1;
     };
 
     this.hasStoped = function(){
@@ -311,27 +322,47 @@ function Process(obj,$scope,$http,$templateCache){
         return this.closeDatetime.length!=0 ? true : false;
     };
 
-    this.refreshToolbar = function(){
-        // 未关闭、未终止的流程，发起人和当前处理人都可终止流程
-        this.toolbar.stopBtn = (this.isCreator() || this.isAuthor()) && !this.hasStoped() && !this.hasClosed();
+    this.hasCompleted = function(){
+        for(var i=0; i<this.executers.length; i++){
+            var executer = this.executers[i];
+            if(executer.completeDatetime.length == 0){
+                return false;
+            }
+        }
+        return true;
+    };
 
-        // 已关闭或终止的流程，发起人和处理人都能重启流程
-        this.toolbar.restartBtn = (this.hasStoped() || this.hasClosed()) && (this.isExecuter() || this.isCreator());
+
+    this.refreshToolbar = function(){
+        var iscr = this.isCreator();
+        var isau = this.isAuthor();
+        var isex = this.isExecuter();
+        var isad = this.isAdviser();
+        var hass = this.hasStoped();
+        var hasc = this.hasClosed();
+        var hasco = this.hasCompleted();
+
+
+        // 未完成、未终止的流程，发起人和当前处理人都可终止流程
+        this.toolbar.stopBtn = (iscr || isau) && !hass && !hasc;
+
+        // 已关闭、已终止的流程，发起人和处理人都能重启流程
+        this.toolbar.restartBtn = (hass || hasc) && (isex || iscr);
 
         //未关闭、未终止的流程，参与人都可发言，即使是排在后面的处理人，也可先发言。发言并不影响流程的流向
-        this.toolbar.supplementBtn = !this.hasStoped() && !this.hasClosed() && (this.isExecuter() || this.isAdviser() || this.isCreator());
+        this.toolbar.supplementBtn = !hass && !hasc && (isex || isad || iscr);
 
         //未关闭、未终止的流程，参与人都可发附件，即使是排在后面的处理人，也可先发言。发言并不影响流程的流向
-        this.toolbar.attachmentBtn = !this.hasStoped() && !this.hasClosed() && (this.isExecuter() || this.isAdviser() || this.isCreator());
+        this.toolbar.attachmentBtn = !hass && !hasc && (isex || isad || iscr);
 
         //未关闭、未终止的流程,发起人和当前处理人可拉会签人和处理人进来
-        this.toolbar.userBtn = !this.hasStoped() && !this.hasClosed() && (this.isAuthor() || this.isCreator());
+        this.toolbar.userBtn = !hass && !hasc && (isau || iscr);
 
         //未关闭、未终止的流程，当前的处理人决定流程走向
-        this.toolbar.yesBtn = !this.hasStoped() && !this.hasClosed() && this.isAuthor();
+        this.toolbar.yesBtn = !hass && !hasc && isau;
 
         //未关闭、未终止的流程，当前的处理人决定流程走向
-        this.toolbar.noBtn = !this.hasStoped() && !this.hasClosed() && this.isAuthor();
+        this.toolbar.noBtn = !hass && !hasc && isau;
     };
 
     this.showDiv = function(div){
@@ -353,14 +384,59 @@ function Process(obj,$scope,$http,$templateCache){
         };
     };
 
+    this.yes = function(){
+        var i = this.authorIndex();
+        if(i != -1){
+            var datetime = (new Date()).getTime().toString();
+            var executer = this.executers[i];
+            executer.completeDatetime = datetime;
+
+            var close_Date_time = '';
+            if(this.hasCompleted()){
+                close_Date_time = datetime;
+                this.closeDatetime = datetime;
+            }
+
+            var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
+
+            var comment = {
+                processId:this.id,
+                closeDatetime: close_Date_time,
+                executerId:executer.id,
+                id:datetime,
+                type:'0',
+                message:'同意并通过：' + msg,
+                createDatetime:executer.createDatetime,
+                completeDatetime:datetime,
+                creator:{
+                    "id":$scope.loginUser.userId,
+                    "name":$scope.loginUser.userName,
+                    "department":$scope.loginUser.department
+                }
+            };
+
+            var jdata = 'mydata='+JSON.stringify(comment);
+            saveData('/process-yes',$http,$templateCache,jdata);
+
+            this.comments.splice(0,0,comment);
+            this.formData = "";
+            this.refreshToolbar();
+        }
+    };
+
+
     this.supplement = function(){
+        var datetime = (new Date()).getTime().toString();
+
         var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
 
         var comment = {
             processId:this.id,
+            id:datetime,
             type:'2',
             message:msg,
-            datetime:new Date(),
+            createDatetime:datetime,
+            completeDatetime:datetime,
             creator:{
                 "id":$scope.loginUser.userId,
                 "name":$scope.loginUser.userName,
@@ -378,15 +454,14 @@ function Process(obj,$scope,$http,$templateCache){
 
 
     this.addExecuter = function(index){
-        var d = new Date();
-
+        var datetime = (new Date()).getTime().toString();
         var user = $scope.users.list[index];
         var executer = {
-            id: d.getTime().toString(),
+            id: datetime,
             userId:user.userId,
             userName:user.userName,
             department:user.department,
-            createDatetime: new Date(),
+            createDatetime: datetime,
             completeDatetime:''
         };
         $scope.users.list.splice(index,1);
@@ -418,15 +493,14 @@ function Process(obj,$scope,$http,$templateCache){
     }
 
     this.addAdviser = function(index){
-        var d = new Date();
-
+        var datetime = (new Date()).getTime().toString();
         var user = $scope.users.list[index];
         var adviser = {
-            id:d.getTime().toString(),
+            id:datetime,
             userId:user.userId,
             userName:user.userName,
             department:user.department,
-            createDatetime: new Date(),
+            createDatetime: datetime,
             completeDatetime:''
         };
 
@@ -469,7 +543,7 @@ function Process(obj,$scope,$http,$templateCache){
 
     this.restart = function(){
         this.stopDatetime = '';
-        this.completeDatetime = '';
+        this.closeDatetime = '';
         this.refreshToolbar();
         var data = {};
         data.processId = this.id;

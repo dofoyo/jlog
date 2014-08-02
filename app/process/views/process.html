@@ -141,7 +141,7 @@
                 </div>
             </div>
             <div  ng-class="{yesDiv: $index!=processes.index || process.div.yesDiv}">
-                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData.data1"  class="form-control"></TEXTAREA>
+                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
                 <button type="button" ng-click="process.yes();" class="btn btn-default">同意并通过</button>
             </div>
             <div  ng-class="{noDiv: $index!=processes.index || process.div.noDiv}">
