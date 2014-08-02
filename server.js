@@ -311,6 +311,7 @@ app.post('/process-comment', function (req, res){
     var d = new Date()
 
     var comment = new Object();
+    comment.type = jdata.type;
     comment.message = jdata.message;
     comment.datetime = d.getTime().toString();
     comment.creator = jdata.creator;
@@ -416,6 +417,7 @@ var getProcesses = function(req,res){
                             for(var i=process.comments.length-1; i>-1; i--){
                                 var comment = process.comments[i];
                                 str += '{';
+                                str += '"type":"' + comment.type + '",';
                                 str += '"message":"' + comment.message + '",';
                                 str += '"datetime":"' + comment.datetime + '",';
                                 str += '"creator":{';
