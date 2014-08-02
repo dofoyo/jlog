@@ -114,7 +114,7 @@ pc.controller('ProcessCtrl',[
 
                     var jdata = 'mydata='+JSON.stringify(process);
                     //alert('save ' +jdata );
-                    saveProcess($http,$templateCache,jdata);
+                    saveData('/process',$http,$templateCache,jdata);
 
                     this.list.splice(0,0,new Process(process,$scope,$http,$templateCache));
 
@@ -125,7 +125,7 @@ pc.controller('ProcessCtrl',[
                 }
             }
 
-    };
+        };
 
         $scope.pageState={
             createDiv: false,
@@ -162,133 +162,58 @@ pc.controller('ProcessCtrl',[
             }
         };
 
-    $scope.getAdvises = function(){
-        alert('getAdvises, processType=' + $scope.pageState.processType);
-    }
+        $scope.getAdvises = function(){
+            alert('getAdvises, processType=' + $scope.pageState.processType);
+        }
 
-    $scope.getReads = function(){
-        alert('getReads, processType=' + $scope.pageState.processType);
-    }
+        $scope.getReads = function(){
+            alert('getReads, processType=' + $scope.pageState.processType);
+        }
 
-    $scope.getCompleted = function(){
-        alert('getComplete, processType=' + $scope.pageState.processType);
-    }
+        $scope.getCompleted = function(){
+            alert('getComplete, processType=' + $scope.pageState.processType);
+        }
 
-    $scope.getNotCompleted = function(){
-        alert('getNotComplete, processType=' + $scope.pageState.processType);
-    }
+        $scope.getNotCompleted = function(){
+            alert('getNotComplete, processType=' + $scope.pageState.processType);
+        }
 
-    $scope.getStoped = function(){
-        alert('getStoped, processType=' + $scope.pageState.processType);
-    }
+        $scope.getStoped = function(){
+            alert('getStoped, processType=' + $scope.pageState.processType);
+        }
 
+        $scope.find = function(){
+            alert('find by key ' + $scope.pageState.keyWord);
+            /*
+             $scope.processes = new Array();
+             $scope.pageState.offset = 0;
+             $scope.getProcesses();
+             */
 
+        }
 
-    $scope.find = function(){
-        alert('find by key ' + $scope.pageState.keyWord);
-        /*
-         $scope.processes = new Array();
-         $scope.pageState.offset = 0;
-         $scope.getProcesses();
-         */
+        //-------- file upload-----------
+        var uploader = $scope.uploader = $fileUploader.create({
+            scope: $scope,                          // to automatically update the html. Default: $rootScope
+            url: '/upload',
+            formData: [
+                { key: 'value' }
+            ]
+        });
 
-    }
+        // REGISTER HANDLERS
+        uploader.bind('success', function (event, xhr, item, response) {
+            var process = $scope.processes.getProcess();
+            process.formData = response.url;
+            process.supplement();
+        });
 
-    //-------- file upload-----------
-    var uploader = $scope.uploader = $fileUploader.create({
-        scope: $scope,                          // to automatically update the html. Default: $rootScope
-        url: '/upload',
-        formData: [
-            { key: 'value' }
-        ]
-    });
-
-    // REGISTER HANDLERS
-    uploader.bind('success', function (event, xhr, item, response) {
-        var process = $scope.processes.getProcess();
-        process.formData = response.url;
-        process.supplement();
-    });
-
-    uploader.bind('completeall', function (event, items) {
-        //alert('Complete all', items);
-        uploader.clearQueue();
-    });
+        uploader.bind('completeall', function (event, items) {
+            //alert('Complete all', items);
+            uploader.clearQueue();
+        });
 
 }]);
-
-function saveProcessComment($http,$templateCache,jdata ){
-    var method = 'POST';
-    var url = '/process-comment';
-    $http({
-        method: method,
-        url: url,
-        data:  jdata ,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        cache: $templateCache
-    }).
-        success(function(response) {
-            //alert("save process successed!");
-        }).
-        error(function(response) {
-            alert("save comment error!");
-        });
-}
-
-function saveProcessExecuter($http,$templateCache,jdata ){
-    var method = 'POST';
-    var url = '/process-executer';
-    $http({
-        method: method,
-        url: url,
-        data:  jdata ,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        cache: $templateCache
-    }).
-        success(function(response) {
-            //alert("save process-executer successed!");
-        }).
-        error(function(response) {
-            alert("save process-executer error!");
-        });
-}
-
-function saveProcessAdviser($http,$templateCache,jdata ){
-    var method = 'POST';
-    var url = '/process-adviser';
-    $http({
-        method: method,
-        url: url,
-        data:  jdata ,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        cache: $templateCache
-    }).
-        success(function(response) {
-            //alert("save process-adviser successed!");
-        }).
-        error(function(response) {
-            alert("save process-adviser error!");
-        });
-}
-
-function saveProcess($http,$templateCache,jdata ){
-    //alert(jdata);
-    var method = 'POST';
-    var url = '/process';
-    $http({
-        method: method,
-        url: url,
-        data:  jdata ,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        cache: $templateCache
-    }).
-        success(function(response) {
-            //alert("save process successed!");
-        }).
-        error(function(response) {
-            alert("save process error!");
-        });
-}
 
 function saveData(url,$http,$templateCache,jdata){
     //alert(jdata);
@@ -433,6 +358,7 @@ function Process(obj,$scope,$http,$templateCache){
 
         var comment = {
             processId:this.id,
+            type:'2',
             message:msg,
             datetime:new Date(),
             creator:{
@@ -444,7 +370,7 @@ function Process(obj,$scope,$http,$templateCache){
 
         var jdata = 'mydata='+JSON.stringify(comment);
 
-        saveProcessComment($http,$templateCache,jdata);
+        saveData('/process-comment',$http,$templateCache,jdata);
 
         this.comments.splice(0,0,comment);
         this.formData = "";
@@ -469,7 +395,7 @@ function Process(obj,$scope,$http,$templateCache){
         executer.add = true;
         executer.processId = this.id;
         var jdata = 'mydata='+JSON.stringify(executer);
-        saveProcessExecuter($http,$templateCache,jdata);
+        saveData('/process-executer',$http,$templateCache,jdata);
 
     }
 
@@ -488,7 +414,7 @@ function Process(obj,$scope,$http,$templateCache){
         executer.processId = this.id;
         //alert(executer.id);
         var jdata = 'mydata='+JSON.stringify(executer);
-        saveProcessExecuter($http,$templateCache,jdata);
+        saveData('/process-executer',$http,$templateCache,jdata);
     }
 
     this.addAdviser = function(index){
@@ -511,7 +437,7 @@ function Process(obj,$scope,$http,$templateCache){
         adviser.add = true;
         adviser.processId = this.id;
         var jdata = 'mydata='+JSON.stringify(adviser);
-        saveProcessAdviser($http,$templateCache,jdata);
+        saveData('/process-adviser',$http,$templateCache,jdata);
 
     }
 
@@ -529,7 +455,7 @@ function Process(obj,$scope,$http,$templateCache){
         adviser.add = false;
         adviser.processId = this.id;
         var jdata = 'mydata='+JSON.stringify(adviser);
-        saveProcessAdviser($http,$templateCache,jdata);
+        saveData('/process-adviser',$http,$templateCache,jdata);
     }
 
     this.stop = function(){

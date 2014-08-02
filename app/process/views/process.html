@@ -141,8 +141,8 @@
                 </div>
             </div>
             <div  ng-class="{yesDiv: $index!=processes.index || process.div.yesDiv}">
-                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="formData.data1"  class="form-control"></TEXTAREA>
-                <button type="button" ng-click="submitYes();" class="btn btn-default">同意并通过</button>
+                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData.data1"  class="form-control"></TEXTAREA>
+                <button type="button" ng-click="process.yes();" class="btn btn-default">同意并通过</button>
             </div>
             <div  ng-class="{noDiv: $index!=processes.index || process.div.noDiv}">
                 <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="formData.data1"  class="form-control"></TEXTAREA>
@@ -159,7 +159,7 @@
                 <div ng-repeat="executer in process.executers" class="panel panel-primary">
                     <div class="panel-heading">
                         <span class="badge">{{$index+1}}</span>
-                        执行人：{{executer.name}}
+                        执行人：{{executer.userName}}
                         <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delExecuter($index)">取消</button></div>
                         <br>
                         {{executer.department}}
@@ -168,7 +168,7 @@
                 <div ng-repeat="adviser in process.advisers" class="panel panel-info">
                     <div class="panel-heading">
                         <span class="badge">{{$index+1}}</span>
-                        会签人：{{adviser.name}}
+                        会签人：{{adviser.userName}}
                         <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delAdviser($index)">取消</button></div>
                         <br>
                         {{adviser.department}}
@@ -252,5 +252,4 @@
     5、在executers和advisers有记录即为待办
     6、在reads中有记录即为待阅
     7、process.logs记载加入人员、取消人员的操作
-    8、process.executers.executer要有独立的ID，不然无法正确删除。
 </div>
