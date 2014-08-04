@@ -403,35 +403,37 @@ app.post('/process-executer', function (req, res){
     }
 });
 
-app.post('/process-comment', function (req, res){
+app.post('/process-supplement', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
     var processId = jdata.processId;
-    var d = new Date()
+    var userId = jdata.creator.id;
+    var datetime = (new Date()).getTime().toString();
 
     var comment = new Object();
     comment.id = jdata.id;
     comment.type = jdata.type;
     comment.message = jdata.message;
-    comment.createDatetime = d.getTime().toString();
-    comment.completeDatetime = d.getTime().toString();
+    comment.createDatetime = jdata.createDatetime;
+    comment.completeDatetime = datetime;
     comment.creator = jdata.creator;
 
     processdb.processes.findAndModify({
         query: { _id: processId },
         update: {
-            $addToSet: { comments:comment }
+            $addToSet: { comments:comment },
+            $pull: { advisers:{userId:userId}}
         },
         new: true
     }, function(err, doc, lastErrorObject) {
         if( err ){
-            var msg ="process comment not added";
+            var msg ="process supplement not added";
             console.log(msg);
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
-            var msg = "process comment added.";
+            var msg = "process supplement added.";
             //console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);

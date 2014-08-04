@@ -253,7 +253,8 @@ function Process(obj,$scope,$http,$templateCache){
         supplementBtn:false,
         attachmentBtn:false,
         stopBtn:false,
-        restartBtn:false
+        restartBtn:false,
+        supplementBtnTitle:"补充"
     };
     this.div = {
         show:true,
@@ -279,6 +280,48 @@ function Process(obj,$scope,$http,$templateCache){
         }
         return false;
     };
+
+    this.getAdviseCreateDatetime = function(){
+        var datetime = "";
+        if(this.advisers.length>0){
+            var compare = function (prop) {
+                return function (obj1, obj2) {
+                    var val1 = obj1[prop];
+                    var val2 = obj2[prop];if (val1 < val2) {
+                        return -1;
+                    } else if (val1 > val2) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+
+            this.advisers.sort(compare("id"));
+
+            for(var i=0; i<this.advisers.length; i++){
+                var adviser = this.advisers[i];
+                if($scope.loginUser.userId == adviser.userId){
+                    datetime = adviser.createDatetime;
+                }
+                break;
+            }
+        }
+        return datetime;
+    }
+
+    this.rebuildAdvisers = function(){
+        var newAdvisers = [];
+        for(var i=0; i<this.advisers.length; i++){
+            var adviser = this.advisers[i];
+            if($scope.loginUser.userId != adviser.userId){
+                newAdvisers.splice(0,0,adviser);
+            }else{
+                //alert("finded");
+            }
+        }
+        this.advisers = newAdvisers;
+    }
 
     this.isExecuter = function(){
         for(var i=0; i<this.executers.length; i++){
@@ -359,6 +402,7 @@ function Process(obj,$scope,$http,$templateCache){
 
         //未关闭、未终止的流程，参与人都可发言，即使是排在后面的处理人，也可先发言。发言并不影响流程的流向
         this.toolbar.supplementBtn = !hass && !hasc && (isex || isad || iscr);
+        this.toolbar.supplementBtnTitle = isad ? "会签" : "补充";
 
         //未关闭、未终止的流程，参与人都可发附件，即使是排在后面的处理人，也可先发言。发言并不影响流程的流向
         this.toolbar.attachmentBtn = !hass && !hasc && (isex || isad || iscr);
@@ -473,6 +517,8 @@ function Process(obj,$scope,$http,$templateCache){
     this.supplement = function(){
         var datetime = (new Date()).getTime().toString();
 
+        var createDatetime = this.getAdviseCreateDatetime();
+
         var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
 
         var comment = {
@@ -480,7 +526,7 @@ function Process(obj,$scope,$http,$templateCache){
             id:datetime,
             type:'2',
             message:msg,
-            createDatetime:datetime,
+            createDatetime:createDatetime=="" ? datetime : createDatetime,
             completeDatetime:datetime,
             creator:{
                 "id":$scope.loginUser.userId,
@@ -491,10 +537,13 @@ function Process(obj,$scope,$http,$templateCache){
 
         var jdata = 'mydata='+JSON.stringify(comment);
 
-        saveData('/process-comment',$http,$templateCache,jdata);
+        saveData('/process-supplement',$http,$templateCache,jdata);
 
         this.comments.splice(0,0,comment);
+        this.rebuildAdvisers();
         this.formData = "";
+        this.refreshToolbar();
+        this.showDiv('supplementDiv');
     };
 
 
