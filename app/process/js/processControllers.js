@@ -367,13 +367,7 @@ function Process(obj,$scope,$http,$templateCache){
     };
 
     this.hasCompleted = function(){
-        for(var i=0; i<this.executers.length; i++){
-            var executer = this.executers[i];
-            if(executer.completeDatetime.length == 0){
-                return false;
-            }
-        }
-        return true;
+        return this.executers.length==0 ? true : false;
     };
 
 
@@ -478,23 +472,28 @@ function Process(obj,$scope,$http,$templateCache){
     this.yes = function(){
         var datetime = (new Date()).getTime().toString();
         var executer = this.executers[0];
+        var createDatetime = executer.createDatetime;
+        var executerId = executer.userId;
 
+        this.executers.splice(0,1);
         var close_Date_time = '';
         if(this.hasCompleted()){
             close_Date_time = datetime;
             this.closeDatetime = datetime;
         }
 
+        alert('close_Date_time:' + close_Date_time);
+
         var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
 
         var comment = {
             processId:this.id,
             closeDatetime: close_Date_time,
-            executerId:executer.id,
+            executerId:executerId,
             id:datetime,
             type:'0',
             message:'同意并通过：' + msg,
-            createDatetime:executer.createDatetime,
+            createDatetime:createDatetime,
             completeDatetime:datetime,
             creator:{
                 "id":$scope.loginUser.userId,
@@ -507,7 +506,6 @@ function Process(obj,$scope,$http,$templateCache){
         saveData('/process-yes',$http,$templateCache,jdata);
 
         this.comments.splice(0,0,comment);
-        this.executers.splice(0,1);
         this.formData = "";
         this.refreshToolbar();
         this.showDiv('yesDiv');

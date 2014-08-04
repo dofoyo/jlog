@@ -178,8 +178,6 @@ app.post('/process-yes', function (req, res){
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
     var processId = jdata.processId;
-    var close_Date_time = jdata.closeDatetime;
-    var createDatetime = jdata.createDatetime;
     var executerId = jdata.executerId;
     var datetime = (new Date()).getTime().toString();
 
@@ -187,15 +185,15 @@ app.post('/process-yes', function (req, res){
     comment.id = jdata.id;
     comment.type = jdata.type;
     comment.message = jdata.message;
-    comment.createDatetime = createDatetime;
+    comment.createDatetime = jdata.createDatetisme;
     comment.completeDatetime = datetime;
     comment.creator = jdata.creator;
 
     processdb.processes.findAndModify({
         query: { _id: processId },
         update: {
-            $set:{closeDatetime:close_Date_time},
-            $pull: { executers:{id:executerId}},
+            $set:{closeDatetime:jdata.closeDatetime},
+            $pull: { executers:{userId:executerId}},
             $addToSet: { comments:comment }
         },
         new: true
