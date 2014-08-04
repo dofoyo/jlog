@@ -245,6 +245,8 @@ function Process(obj,$scope,$http,$templateCache){
     this.advisers = obj.advisers;
     this.executers = obj.executers;
 
+    this.state = this.stopDatetime.length!=0 ? "已终止" : (this.closeDatetime.length!=0 ? "已完成" : "正在执行中...");
+
     this.formData = '';
     this.toolbar = {
         yesBtn:false,
@@ -387,6 +389,8 @@ function Process(obj,$scope,$http,$templateCache){
         console.log("hasStoped:" + hass);
         console.log("hasClosed:" + hasc);
         console.log("hasCompleted:" + hasco);
+
+        this.state = hass ? "已终止" : (hasc ? "已完成" : "正在执行中...");
 
         // 未完成、未终止的流程，发起人和当前处理人都可终止流程
         this.toolbar.stopBtn = (iscr || isau) && !hass && !hasc;
