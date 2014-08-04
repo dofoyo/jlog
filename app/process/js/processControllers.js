@@ -259,6 +259,8 @@ function Process(obj,$scope,$http,$templateCache){
         show:true,
         yesDiv:true,
         noDiv:true,
+        stopDiv:true,
+        restartDiv:true,
         userDiv:true,
         supplementDiv:true,
         attachmentDiv:true
@@ -289,29 +291,28 @@ function Process(obj,$scope,$http,$templateCache){
     };
 
     this.isAuthor = function(){
-        for(var i=0; i<this.executers.length; i++){
-            var executer = this.executers[i];
-            if($scope.loginUser.userId == executer.userId
-                && executer.createDatetime.length != 0
-                && executer.completeDatetime.length == 0
-                ){
-                return true;
+        var isAuthor = false;
+        if(this.executers.length>0){
+            var compare = function (prop) {
+                return function (obj1, obj2) {
+                    var val1 = obj1[prop];
+                    var val2 = obj2[prop];if (val1 < val2) {
+                        return -1;
+                    } else if (val1 > val2) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
             }
-        }
-        return false;
-    };
 
-    this.authorIndex = function(){
-        for(var i=0; i<this.executers.length; i++){
-            var executer = this.executers[i];
-            if($scope.loginUser.userId == executer.userId
-                && executer.createDatetime.length != 0
-                && executer.completeDatetime.length == 0
-                ){
-                return i;
+            this.executers.sort(compare("id"));
+            var executer = this.executers[0];
+            if($scope.loginUser.userId == executer.userId){
+                isAuthor = true;
             }
         }
-        return -1;
+        return isAuthor;
     };
 
     this.hasStoped = function(){
@@ -342,11 +343,18 @@ function Process(obj,$scope,$http,$templateCache){
         var hasc = this.hasClosed();
         var hasco = this.hasCompleted();
 
+        console.log("isCreator:" + iscr);
+        console.log("isAuthor:" + isau);
+        console.log("isExecuter:" + isex);
+        console.log("isAdviser:" + isad);
+        console.log("hasStoped:" + hass);
+        console.log("hasClosed:" + hasc);
+        console.log("hasCompleted:" + hasco);
 
         // 未完成、未终止的流程，发起人和当前处理人都可终止流程
         this.toolbar.stopBtn = (iscr || isau) && !hass && !hasc;
 
-        // 已关闭、已终止的流程，发起人和处理人都能重启流程
+        // 已关闭、已终止的流程，发起人和处理人能重启流程
         this.toolbar.restartBtn = (hass || hasc) && (isex || iscr);
 
         //未关闭、未终止的流程，参与人都可发言，即使是排在后面的处理人，也可先发言。发言并不影响流程的流向
@@ -358,10 +366,10 @@ function Process(obj,$scope,$http,$templateCache){
         //未关闭、未终止的流程,发起人和当前处理人可拉会签人和处理人进来
         this.toolbar.userBtn = !hass && !hasc && (isau || iscr);
 
-        //未关闭、未终止的流程，当前的处理人决定流程走向
+        //未关闭、未终止的流程，当前的处理人决定流程走向：通过或驳回
+        //通过后，当前处理人可以补充发言
+        //驳回后，流程处于关闭状态，发起人和处理人可重启流程
         this.toolbar.yesBtn = !hass && !hasc && isau;
-
-        //未关闭、未终止的流程，当前的处理人决定流程走向
         this.toolbar.noBtn = !hass && !hasc && isau;
     };
 
@@ -372,6 +380,12 @@ function Process(obj,$scope,$http,$templateCache){
         };
         if(div != 'noDiv'){
             this.div.noDiv = true;
+        };
+        if(div != 'stopDiv'){
+            this.div.stopDiv = true;
+        };
+        if(div != 'restartDiv'){
+            this.div.restartDiv = true;
         };
         if(div != 'userDiv'){
             this.div.userDiv = true;
@@ -384,44 +398,75 @@ function Process(obj,$scope,$http,$templateCache){
         };
     };
 
-    this.yes = function(){
-        var i = this.authorIndex();
-        if(i != -1){
-            var datetime = (new Date()).getTime().toString();
-            var executer = this.executers[i];
-            executer.completeDatetime = datetime;
+    this.no = function(){
+        var datetime = (new Date()).getTime().toString();
+        var executer = this.executers[0];
 
-            var close_Date_time = '';
-            if(this.hasCompleted()){
-                close_Date_time = datetime;
-                this.closeDatetime = datetime;
+        var close_Date_time = datetime;
+
+        var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
+
+        var comment = {
+            processId:this.id,
+            closeDatetime: close_Date_time,
+            id:datetime,
+            type:'0',
+            message:'驳回：' + msg,
+            createDatetime:executer.createDatetime,
+            completeDatetime:datetime,
+            creator:{
+                "id":$scope.loginUser.userId,
+                "name":$scope.loginUser.userName,
+                "department":$scope.loginUser.department
             }
+        };
 
-            var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
+        var jdata = 'mydata='+JSON.stringify(comment);
+        saveData('/process-no',$http,$templateCache,jdata);
 
-            var comment = {
-                processId:this.id,
-                closeDatetime: close_Date_time,
-                executerId:executer.id,
-                id:datetime,
-                type:'0',
-                message:'同意并通过：' + msg,
-                createDatetime:executer.createDatetime,
-                completeDatetime:datetime,
-                creator:{
-                    "id":$scope.loginUser.userId,
-                    "name":$scope.loginUser.userName,
-                    "department":$scope.loginUser.department
-                }
-            };
+        this.comments.splice(0,0,comment);
+        this.formData = "";
+        this.closeDatetime = close_Date_time;
+        this.refreshToolbar();
+        this.showDiv('noDiv');
+    };
 
-            var jdata = 'mydata='+JSON.stringify(comment);
-            saveData('/process-yes',$http,$templateCache,jdata);
+    this.yes = function(){
+        var datetime = (new Date()).getTime().toString();
+        var executer = this.executers[0];
 
-            this.comments.splice(0,0,comment);
-            this.formData = "";
-            this.refreshToolbar();
+        var close_Date_time = '';
+        if(this.hasCompleted()){
+            close_Date_time = datetime;
+            this.closeDatetime = datetime;
         }
+
+        var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
+
+        var comment = {
+            processId:this.id,
+            closeDatetime: close_Date_time,
+            executerId:executer.id,
+            id:datetime,
+            type:'0',
+            message:'同意并通过：' + msg,
+            createDatetime:executer.createDatetime,
+            completeDatetime:datetime,
+            creator:{
+                "id":$scope.loginUser.userId,
+                "name":$scope.loginUser.userName,
+                "department":$scope.loginUser.department
+            }
+        };
+
+        var jdata = 'mydata='+JSON.stringify(comment);
+        saveData('/process-yes',$http,$templateCache,jdata);
+
+        this.comments.splice(0,0,comment);
+        this.executers.splice(0,1);
+        this.formData = "";
+        this.refreshToolbar();
+        this.showDiv('yesDiv');
     };
 
 
@@ -533,21 +578,57 @@ function Process(obj,$scope,$http,$templateCache){
     }
 
     this.stop = function(){
-        this.stopDatetime = (new Date()).getTime().toString();
-        this.refreshToolbar();
-        var data = {};
-        data.processId = this.id;
-        var jdata = 'mydata=' + JSON.stringify(data);
+        var datetime = (new Date()).getTime().toString();
+        var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
+
+        var comment = {
+            processId:this.id,
+            id:datetime,
+            type:'0',
+            message:'终止流程：' + msg,
+            completeDatetime:datetime,
+            creator:{
+                "id":$scope.loginUser.userId,
+                "name":$scope.loginUser.userName,
+                "department":$scope.loginUser.department
+            }
+        };
+
+        var jdata = 'mydata=' + JSON.stringify(comment);
         saveData('/process-stop',$http,$templateCache,jdata);
+
+        this.comments.splice(0,0,comment);
+        this.formData = "";
+        this.stopDatetime = datetime;
+        this.refreshToolbar();
+        this.showDiv('stopDiv');
     }
 
     this.restart = function(){
+        var datetime = (new Date()).getTime().toString();
+        var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
+
+        var comment = {
+            processId:this.id,
+            id:datetime,
+            type:'0',
+            message:'重启流程：' + msg,
+            completeDatetime:datetime,
+            creator:{
+                "id":$scope.loginUser.userId,
+                "name":$scope.loginUser.userName,
+                "department":$scope.loginUser.department
+            }
+        };
+
+        var jdata = 'mydata=' + JSON.stringify(comment);
+        saveData('/process-restart',$http,$templateCache,jdata);
+
+        this.comments.splice(0,0,comment);
+        this.formData = "";
         this.stopDatetime = '';
         this.closeDatetime = '';
         this.refreshToolbar();
-        var data = {};
-        data.processId = this.id;
-        var jdata = 'mydata=' + JSON.stringify(data);
-        saveData('/process-restart',$http,$templateCache,jdata);
+        this.showDiv('restartDiv');
     }
 }

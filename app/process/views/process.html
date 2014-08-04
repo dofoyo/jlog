@@ -8,6 +8,12 @@
     .noDiv {
         display:none;
     }
+    .stopDiv {
+        display:none;
+    }
+    .restartDiv {
+        display:none;
+    }
     .userDiv {
         display:none;
     }
@@ -105,7 +111,7 @@
                     <span class="text-muted">({{comment.creator.department}})</span><br>
                     <span class="text-primary">{{comment.message | attachmentName}}</span>
                     <span ng-show="{{comment.message | hasAttachment}}"><a href="{{comment.message | attachmentUrl}}" target="_blank">下载</a></span>
-                    <span class="text-muted">({{comment.datetime  | date:'yyyy-MM-dd hh:mm:ss'}})</span>
+                    <span class="text-muted">({{comment.completeDatetime  | date:'yyyy-MM-dd hh:mm:ss'}})</span>
                 </li>
             </ul>
 
@@ -132,10 +138,10 @@
                     </button>
                 </div>
                 <div class="btn-group">
-                    <button type="button" class="btn btn-default" ng-show="process.toolbar.stopBtn" ng-click="process.stop()">
+                    <button type="button" class="btn btn-default" ng-show="process.toolbar.stopBtn" ng-click="process.showDiv('stopDiv')">
                         <abbr title="未完成的流程可被发起人和当前处理人强制终止，终止状态的流程除加入知会人外，其他操作都被禁止。">终止</abbr>
                     </button>
-                    <button type="button" class="btn btn-default" ng-show="process.toolbar.restartBtn" ng-click="process.restart()">
+                    <button type="button" class="btn btn-default" ng-show="process.toolbar.restartBtn" ng-click="process.showDiv('restartDiv')">
                         <abbr title="流程完成后自动关闭，关闭状态的流程除加入知会人外，其他操作都被禁止。流程发起人或处理人可重启已关闭或终止的流程，流程将按新增人员运行">重启</abbr>
                     </button>
                 </div>
@@ -145,8 +151,16 @@
                 <button type="button" ng-click="process.yes();" class="btn btn-default">同意并通过</button>
             </div>
             <div  ng-class="{noDiv: $index!=processes.index || process.div.noDiv}">
-                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="formData.data1"  class="form-control"></TEXTAREA>
-                <button type="button" ng-click="submitNo();" class="btn btn-default">驳回到上一环节</button>
+                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
+                <button type="button" ng-click="process.no();" class="btn btn-default">驳回到发起人</button>
+            </div>
+            <div  ng-class="{stopDiv: $index!=processes.index || process.div.stopDiv}">
+                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
+                <button type="button" ng-click="process.stop();" class="btn btn-default">确定终止</button>
+            </div>
+            <div  ng-class="{restartDiv: $index!=processes.index || process.div.restartDiv}">
+                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
+                <button type="button" ng-click="process.restart();" class="btn btn-default">确定重启</button>
             </div>
             <div  ng-class="{userDiv: $index!=processes.index || process.div.userDiv}">
                 <div class="input-group">

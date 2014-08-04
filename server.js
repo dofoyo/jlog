@@ -132,6 +132,47 @@ app.get('/api/restricted', function (req, res) {
 // ---------for  authenticate begin--------
 
 //--- for process begin -------
+
+app.post('/process-no', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jdata = JSON.parse(req.body.mydata);
+    var processId = jdata.processId;
+    var close_Date_time = jdata.closeDatetime;
+    var createDatetime = jdata.createDatetime;
+    var datetime = (new Date()).getTime().toString();
+
+    var comment = new Object();
+    comment.id = jdata.id;
+    comment.type = jdata.type;
+    comment.message = jdata.message;
+    comment.createDatetime = createDatetime;
+    comment.completeDatetime = datetime;
+    comment.creator = jdata.creator;
+
+    processdb.processes.findAndModify({
+        query: { _id: processId },
+        update: {
+            $set:{closeDatetime:close_Date_time},
+            $addToSet: { comments:comment }
+        },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="process_no not added";
+            console.log(msg);
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }else{
+            var msg = "process_no added.";
+            //console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }
+    });
+});
+
+
 app.post('/process-yes', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
@@ -154,59 +195,45 @@ app.post('/process-yes', function (req, res){
         query: { _id: processId },
         update: {
             $set:{closeDatetime:close_Date_time},
+            $pull: { executers:{id:executerId}},
             $addToSet: { comments:comment }
         },
         new: true
     }, function(err, doc, lastErrorObject) {
         if( err ){
-            var msg ="process comment not added";
+            var msg ="process yes not added";
             console.log(msg);
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
-            var msg = "process comment added.";
+            var msg = "process yes added.";
             //console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
         }
     });
-
-        /*
-    processdb.processes.findAndModify({
-        query: { _id: processId },
-        update: {
-            $set:{"executers.id":executerId},{"executers.$.completeDatetime":datetime}
-        },
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if( err ){
-            var msg ="process comment not added";
-            console.log(msg);
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.end(msg);
-        }else{
-            var msg = "process comment added.";
-            //console.log(msg);
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(msg);
-        }
-    });
-        */
 });
-
-
 
 app.post('/process-stop', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
     var processId = jdata.processId;
-    var d = new Date();
+    var datetime = (new Date()).getTime().toString();
+
+    var comment = new Object();
+    comment.id = jdata.id;
+    comment.type = jdata.type;
+    comment.message = jdata.message;
+    comment.createDatetime = datetime;
+    comment.completeDatetime = datetime;
+    comment.creator = jdata.creator;
 
     processdb.processes.findAndModify({
         query: { _id: processId },
         update: {
-            $set: {stopDatetime: d.getTime().toString()}
+            $set: {stopDatetime: datetime},
+            $addToSet: { comments:comment }
         },
         new: true
     }, function(err, doc, lastErrorObject) {
@@ -229,12 +256,21 @@ app.post('/process-restart', function (req, res){
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
     var processId = jdata.processId;
-    var d = new Date();
+    var datetime = (new Date()).getTime().toString();
+
+    var comment = new Object();
+    comment.id = jdata.id;
+    comment.type = jdata.type;
+    comment.message = jdata.message;
+    comment.createDatetime = datetime;
+    comment.completeDatetime = datetime;
+    comment.creator = jdata.creator;
 
     processdb.processes.findAndModify({
         query: { _id: processId },
         update: {
-            $set: {stopDatetime: '', closeDatetime:''}
+            $set: {stopDatetime: '', closeDatetime:''},
+            $addToSet: { comments:comment }
         },
         new: true
     }, function(err, doc, lastErrorObject) {
