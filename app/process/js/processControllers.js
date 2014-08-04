@@ -360,6 +360,20 @@ function Process(obj,$scope,$http,$templateCache){
         return isAuthor;
     };
 
+    this.isRelation = function(){
+        var relation = false;
+        if(this.comments.length>0){
+            for(var i=0; i<this.comments.length; i++){
+                var comment = this.comments[i];
+                if($scope.loginUser.userId == comment.creator.id){
+                    relation = true;
+                    break;
+                }
+            }
+        }
+        return relation;
+    }
+
     this.hasStoped = function(){
         return this.stopDatetime.length!=0 ? true : false;
     };
@@ -381,7 +395,9 @@ function Process(obj,$scope,$http,$templateCache){
         var hass = this.hasStoped();
         var hasc = this.hasClosed();
         var hasco = this.hasCompleted();
+        var isre = this.isRelation();
 
+        /*
         console.log("isCreator:" + iscr);
         console.log("isAuthor:" + isau);
         console.log("isExecuter:" + isex);
@@ -389,6 +405,7 @@ function Process(obj,$scope,$http,$templateCache){
         console.log("hasStoped:" + hass);
         console.log("hasClosed:" + hasc);
         console.log("hasCompleted:" + hasco);
+        */
 
         this.state = hass ? "已终止" : (hasc ? "已完成" : "正在执行中...");
 
@@ -399,11 +416,9 @@ function Process(obj,$scope,$http,$templateCache){
         this.toolbar.restartBtn = (hass || hasc) && (isex || iscr);
 
         //未关闭、未终止的流程，参与人都可发言，即使是排在后面的处理人，也可先发言。发言并不影响流程的流向
-        this.toolbar.supplementBtn = !hass && !hasc && (isex || isad || iscr);
+        this.toolbar.supplementBtn = !hass && !hasc && (isex || isad || iscr || isre);
         this.toolbar.supplementBtnTitle = isad ? "会签" : "补充";
-
-        //未关闭、未终止的流程，参与人都可发附件，即使是排在后面的处理人，也可先发言。发言并不影响流程的流向
-        this.toolbar.attachmentBtn = !hass && !hasc && (isex || isad || iscr);
+        this.toolbar.attachmentBtn = !hass && !hasc && (isex || isad || iscr || isre);
 
         //未关闭、未终止的流程,发起人和当前处理人可拉会签人和处理人进来
         this.toolbar.userBtn = !hass && !hasc && (isau || iscr);
