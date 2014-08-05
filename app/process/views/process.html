@@ -41,19 +41,19 @@
     <div class="input-group">
         <div class="radio-inline">
             <label>
-                <input type="radio" name="processType" id="todo1" value="2" ng-model="pageState.processType" ng-click="getExecutes()" checked>
+                <input type="radio" name="processType"  ng-click="processes.getProcesses(2)">
                 待处理
             </label>
         </div>
         <div class="radio-inline">
             <label>
-                <input type="radio" name="processType" id="todo2" value="3" ng-model="pageState.processType" ng-click="getAdvises()">
+                <input type="radio" name="processType" ng-click="processes.getProcesses(3)">
                 待签
             </label>
         </div>
         <div class="radio-inline">
             <label>
-                <input type="radio" name="processType" id="todo3" value="4" ng-model="pageState.processType" ng-click="getReads()" >
+                <input type="radio" name="processType" ng-click="processes.getProcesses(4)" >
                 待阅
             </label>
         </div>
@@ -64,19 +64,19 @@
     <div class="input-group">
         <div class="radio-inline">
             <label>
-                <input type="radio" name="processType" id="done2" value="5" ng-model="pageState.processType" ng-click="getNotCompleted()" checked>
+                <input type="radio" name="processType" ng-click="processes.getProcesses(5)" >
                 未结束
             </label>
         </div>
         <div class="radio-inline">
             <label>
-                <input type="radio" name="processType" id="done1" value="6" ng-model="pageState.processType" ng-click="getCompleted()">
+                <input type="radio" name="processType" ng-click="processes.getProcesses(6)">
                 已完成
             </label>
         </div>
         <div class="radio-inline">
             <label>
-                <input type="radio" name="processType" id="done3" value="7" ng-model="pageState.processType" ng-click="getStoped()">
+                <input type="radio" name="processType" ng-click="processes.getProcesses(7)">
                 已终止
             </label>
         </div>
@@ -260,10 +260,6 @@
 <div ng-show="false">
     todo:
     1、执行人和会签人的comment分左右排列
-    2、只有创建人和当前的执行人有权限加入人员
-    3、根据comment包含createDatetime和completeDatetime,即使创建人或知会人被从executers和advisers去除后，也能计算其用了多少小时才完成此项工作
-    4、在comments中有记录即为已办
-    5、在executers和advisers有记录即为待办
     6、在reads中有记录即为待阅
     7、process.logs记载加入人员、取消人员的操作
 </div>

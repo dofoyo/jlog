@@ -484,6 +484,7 @@ app.get('/processes',function(req,res){
     var finder;
     switch (type){
         case 1:     //1-create:我创建的
+            console.log("1-create:我创建的");
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
@@ -492,6 +493,7 @@ app.get('/processes',function(req,res){
             };
             break;
         case 2:     //2-toExecute:待处理
+            console.log("2-toExecute:待处理");
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
@@ -502,6 +504,7 @@ app.get('/processes',function(req,res){
             };
             break;
         case 3:     //3-toAdvise:待签
+            console.log("3-toAdvise:待签");
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
@@ -512,6 +515,7 @@ app.get('/processes',function(req,res){
             };
             break;
         case 4:     //4-toRead:待阅
+            console.log("4-toRead:待阅");
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
@@ -519,31 +523,34 @@ app.get('/processes',function(req,res){
                 ]
             };
             break;
-        case 5:     //5-completed:已完成
+        case 6:     //5-completed:已完成
+            console.log("6-completed:已完成");
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
                     {$not:{'closeDatetime':''}},
-                    {'comments.creator':{$elemMatch:{"id":loginUserId}}}
+                    {'comments':{$elemMatch:{"creator.id":loginUserId}}}
                 ]
             };
             break;
-        case 6:     //6-notCompleted:未完成
+        case 5:     //6-notCompleted:未完成
+            console.log("5-notCompleted:未完成");
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
                     {'closeDatetime':''},
                     {'stopDatetime':''},
-                    {$or:[{'executers':{$elemMatch:{"userId":loginUserId}}}, {'advisers':{$elemMatch:{"userId":loginUserId}}}]}
+                    {'comments':{$elemMatch:{"creator.id":loginUserId}}}
                 ]
             };
             break;
         case 7:     //7-stoped：已终止
+            console.log("7-stoped：已终止");
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
                     {$not:{'stopDatetime':''}},
-                    {$or:[{'executers':{$elemMatch:{"userId":loginUserId}}}, {'advisers':{$elemMatch:{"userId":loginUserId}}}]}
+                    {'comments':{$elemMatch:{"creator.id":loginUserId}}}
                 ]
             };
             break;

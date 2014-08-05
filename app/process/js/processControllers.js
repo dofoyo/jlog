@@ -116,8 +116,18 @@ pc.controller('ProcessCtrl',[
                 }else{
                     alert('请先登录');
                 }
-            }
+            },
 
+            getProcesses: function(type){
+                this.empty();
+                this.params.type = type;
+                this.refresh();
+            },
+
+            find: function(){
+                this.empty();
+                this.refresh();
+            }
         };
 
         $scope.pageState={
@@ -134,56 +144,17 @@ pc.controller('ProcessCtrl',[
                     this.todoDiv   = div == 'todoDiv' ? true : false;
                     this.doneDiv   = div == 'doneDiv' ? true : false;
 
-                    if(this.createDiv && currentDiv!=div){
+                    if(this.createDiv){
                         $scope.processes.empty();
                         $scope.processes.params.type = '1'  //我的流程
                         $scope.processes.refresh();
-                    }
-
-                    if(this.todoDiv && currentDiv!=div){
+                    }else{
                         $scope.processes.empty();
-                        $scope.processes.params.type = '2'  //todo的默认为待处理
-                        $scope.processes.refresh();
-                    }
-
-                    if(this.doneDiv && currentDiv!=div){
-                        $scope.processes.empty();
-                        $scope.processes.params.type = '6'  //done的默认为未完成
-                        $scope.processes.refresh();
                     }
                 }
             }
-        };
+    };
 
-        $scope.getAdvises = function(){
-            alert('getAdvises, processType=' + $scope.pageState.processType);
-        }
-
-        $scope.getReads = function(){
-            alert('getReads, processType=' + $scope.pageState.processType);
-        }
-
-        $scope.getCompleted = function(){
-            alert('getComplete, processType=' + $scope.pageState.processType);
-        }
-
-        $scope.getNotCompleted = function(){
-            alert('getNotComplete, processType=' + $scope.pageState.processType);
-        }
-
-        $scope.getStoped = function(){
-            alert('getStoped, processType=' + $scope.pageState.processType);
-        }
-
-        $scope.find = function(){
-            alert('find by key ' + $scope.pageState.keyWord);
-            /*
-             $scope.processes = new Array();
-             $scope.pageState.offset = 0;
-             $scope.getProcesses();
-             */
-
-        }
 
         //-------- file upload-----------
         var uploader = $scope.uploader = $fileUploader.create({
