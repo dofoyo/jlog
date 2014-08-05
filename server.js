@@ -172,7 +172,6 @@ app.post('/process-no', function (req, res){
     });
 });
 
-
 app.post('/process-yes', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
@@ -474,19 +473,90 @@ app.post('/process', function (req, res){
 
 app.get('/processes',function(req,res){
     console.log("/processes");
-    getProcesses(req,res);
-});
-
-var getProcesses = function(req,res){
-    res.header("Access-Control-Allow-Origin", "http://localhost");
-    res.header("Access-Control-Allow-Methods", "GET, POST");
     //console.log(req.param('userName'));
-    //console.log(req.param('keyWord'));
+    //console.log('type: ' + req.param('type'));
+    var type = 1*req.param("type");
     var keyWord = req.param('keyWord');
     var offset = req.param('offset') ? 1*req.param('offset') : 0;
     var limit = req.param('limit') ? 1*req.param('limit') : 20;
+    var loginUserId = req.param('loginUserId');
+
+    var finder;
+    switch (type){
+        case 1:     //1-create:我创建的
+            finder = {
+                $and:[
+                    {'subject':{$regex:keyWord}},
+                    {'creator.id':loginUserId}
+                ]
+            };
+            break;
+        case 2:     //2-toExecute:待处理
+            finder = {
+                $and:[
+                    {'subject':{$regex:keyWord}},
+                    {'closeDatetime':''},
+                    {'stopDatetime':''},
+                    {'executers':{$elemMatch:{"userId":loginUserId}}}
+                ]
+            };
+            break;
+        case 3:     //3-toAdvise:待签
+            finder = {
+                $and:[
+                    {'subject':{$regex:keyWord}},
+                    {'closeDatetime':''},
+                    {'stopDatetime':''},
+                    {'advisers':{$elemMatch:{"userId":loginUserId}}}
+                ]
+            };
+            break;
+        case 4:     //4-toRead:待阅
+            finder = {
+                $and:[
+                    {'subject':{$regex:keyWord}},
+                    {'readers':{$elemMatch:{"userId":loginUserId}}}
+                ]
+            };
+            break;
+        case 5:     //5-completed:已完成
+            finder = {
+                $and:[
+                    {'subject':{$regex:keyWord}},
+                    {$not:{'closeDatetime':''}},
+                    {'comments.creator':{$elemMatch:{"id":loginUserId}}}
+                ]
+            };
+            break;
+        case 6:     //6-notCompleted:未完成
+            finder = {
+                $and:[
+                    {'subject':{$regex:keyWord}},
+                    {'closeDatetime':''},
+                    {'stopDatetime':''},
+                    {$or:[{'executers':{$elemMatch:{"userId":loginUserId}}}, {'advisers':{$elemMatch:{"userId":loginUserId}}}]}
+                ]
+            };
+            break;
+        case 7:     //7-stoped：已终止
+            finder = {
+                $and:[
+                    {'subject':{$regex:keyWord}},
+                    {$not:{'stopDatetime':''}},
+                    {$or:[{'executers':{$elemMatch:{"userId":loginUserId}}}, {'advisers':{$elemMatch:{"userId":loginUserId}}}]}
+                ]
+            };
+            break;
+    }
+
+    getProcesses(finder,offset,limit,res);
+});
+
+var getProcesses = function(finder,offset,limit,res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
     processdb.processes.
-        find({'subject':{$regex:keyWord}}).
+        find(finder).
         skip(offset).
         limit(limit).
         sort({createDatetime:-1},

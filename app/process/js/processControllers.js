@@ -39,6 +39,7 @@ pc.controller('ProcessCtrl',[
             },
             list:[],
             params:{
+                loginUserId:$scope.loginUser.userId,
                 keyWord:'',
                 offset:0,
                 limit:2,
