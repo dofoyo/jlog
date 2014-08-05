@@ -10,7 +10,8 @@ pc.controller('ProcessCtrl',[
     'CommentType',
     'uuid',
     'Processes',
-    function($scope, $http, $templateCache, $window,$fileUploader,CommentType,uuid,Processes){
+    'User',
+    function($scope, $http, $templateCache, $window,$fileUploader,CommentType,uuid,Processes,User){
         $scope.loginUser = $window.sessionStorage.token ?  {
             userId:$window.sessionStorage.loginUserId,
             userName:$window.sessionStorage.loginUserName,
@@ -25,17 +26,9 @@ pc.controller('ProcessCtrl',[
             list: [],
             keyWord:'',
             refresh:function(){
-                var params = {
-                    userName:this.keyWord
-                };
-                $http.get('/users',{params:params}).
-                    success(function(data,status,headers,config) {
-                        //alert("get users success!");
-                        $scope.users.list = data;
-                    }).
-                    error(function(data,status,headers,config){
-                        alert("get users error!");
-                    });
+                User.query({userName:this.keyWord},function(data){
+                    $scope.users.list = data;
+                });
             }
         };
 
