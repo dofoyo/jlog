@@ -105,16 +105,21 @@
         </div>
         <div  ng-class="{processDiv:$index!=processes.index || process.div.show}">
             <span class="text-primary">{{process.description}}</span>
-            <ul>
-                <li ng-repeat="comment in process.comments">
-                    <span class="text-info">{{comment.userName}}</span>
-                    <span class="text-muted">({{comment.department}})</span><br>
-                    <span class="text-primary">{{comment.message | attachmentName}}</span>
-                    <span ng-show="{{comment.message | hasAttachment}}"><a href="{{comment.message | attachmentUrl}}" target="_blank">下载</a></span>
-                    <span class="text-muted">({{comment.completeDatetime  | date:'yyyy-MM-dd hh:mm:ss'}})</span>
-                </li>
-            </ul>
-
+            <table class="table">
+                <tr ng-repeat="comment in process.comments">
+                    <td align="right">
+                        <span  ng-show="!{{comment.type}}" class="text-info">{{comment.userName}}</span>
+                    </td>
+                    <td align="{{comment.type=='0' ? 'left' : 'right'}}">
+                        <span class="text-primary">{{comment.message | attachmentName}}</span>
+                        <span ng-show="{{comment.message | hasAttachment}}"><a href="{{comment.message | attachmentUrl}}" target="_blank">下载</a></span><br>
+                        <span class="text-muted">({{comment.completeDatetime  | date:'yyyy-MM-dd hh:mm:ss'}})</span>
+                    </td>
+                    <td align="left">
+                        <span ng-show="{{comment.type}}" class="text-info">{{comment.userName}}</span>
+                    </td>
+                </tr>
+            </table>
             <div class="btn-toolbar">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default" ng-show="process.toolbar.yesBtn" ng-click="process.showDiv('yesDiv')">
@@ -146,105 +151,107 @@
                     </button>
                 </div>
             </div>
-            <div  ng-class="{yesDiv: $index!=processes.index || process.div.yesDiv}">
-                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                <button type="button" ng-click="process.yes();" class="btn btn-default">同意并通过</button>
-            </div>
-            <div  ng-class="{noDiv: $index!=processes.index || process.div.noDiv}">
-                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                <button type="button" ng-click="process.no();" class="btn btn-default">驳回到发起人</button>
-            </div>
-            <div  ng-class="{stopDiv: $index!=processes.index || process.div.stopDiv}">
-                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                <button type="button" ng-click="process.stop();" class="btn btn-default">确定终止</button>
-            </div>
-            <div  ng-class="{restartDiv: $index!=processes.index || process.div.restartDiv}">
-                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                <button type="button" ng-click="process.restart();" class="btn btn-default">确定重启</button>
-            </div>
-            <div  ng-class="{userDiv: $index!=processes.index || process.div.userDiv}">
-                <div class="input-group">
-                    <span class="input-group-addon">查找：</span>
-                    <input type="text" ng-model="users.keyWord" class="form-control" placeholder="请输入姓名的关键字"/>
+            <div>
+                <div  ng-class="{yesDiv: $index!=processes.index || process.div.yesDiv}">
+                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
+                    <button type="button" ng-click="process.yes();" class="btn btn-default">同意并通过</button>
+                </div>
+                <div  ng-class="{noDiv: $index!=processes.index || process.div.noDiv}">
+                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
+                    <button type="button" ng-click="process.no();" class="btn btn-default">驳回到发起人</button>
+                </div>
+                <div  ng-class="{stopDiv: $index!=processes.index || process.div.stopDiv}">
+                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
+                    <button type="button" ng-click="process.stop();" class="btn btn-default">确定终止</button>
+                </div>
+                <div  ng-class="{restartDiv: $index!=processes.index || process.div.restartDiv}">
+                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
+                    <button type="button" ng-click="process.restart();" class="btn btn-default">确定重启</button>
+                </div>
+                <div  ng-class="{userDiv: $index!=processes.index || process.div.userDiv}">
+                    <div class="input-group">
+                        <span class="input-group-addon">查找：</span>
+                        <input type="text" ng-model="users.keyWord" class="form-control" placeholder="请输入姓名的关键字"/>
                     <span class="input-group-btn">
                         <button type="button" ng-click="users.refresh()" class="btn btn-default">GO</button>
                    </span>
-                </div>
-                <div ng-repeat="executer in process.executers" class="panel panel-primary">
-                    <div class="panel-heading">
-                        <span class="badge">{{$index+1}}</span>
-                        执行人：{{executer.userName}}
-                        <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delExecuter($index)">取消</button></div>
-                        <br>
-                        {{executer.department}}
                     </div>
-                </div>
-                <div ng-repeat="adviser in process.advisers" class="panel panel-info">
-                    <div class="panel-heading">
-                        <span class="badge">{{$index+1}}</span>
-                        会签人：{{adviser.userName}}
-                        <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delAdviser($index)">取消</button></div>
-                        <br>
-                        {{adviser.department}}
-                    </div>
-                </div>
-                <div ng-repeat="user in users.list" class="panel panel-default">
-                    <div class="panel-body">
-                        {{user.userName}}
-                        <div class="pull-right">
-                            <button type="button" class="btn btn-default btn-xs" ng-click="process.addExecuter($index)">执行人</button>
-                            <button type="button" class="btn btn-default btn-xs" ng-click="process.addAdviser($index)">会签人</button>
+                    <div ng-repeat="executer in process.executers" class="panel panel-primary">
+                        <div class="panel-heading">
+                            <span class="badge">{{$index+1}}</span>
+                            执行人：{{executer.userName}}
+                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delExecuter($index)">取消</button></div>
+                            <br>
+                            {{executer.department}}
                         </div>
-                        <br>
-                        {{user.department}}
+                    </div>
+                    <div ng-repeat="adviser in process.advisers" class="panel panel-info">
+                        <div class="panel-heading">
+                            <span class="badge">{{$index+1}}</span>
+                            会签人：{{adviser.userName}}
+                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delAdviser($index)">取消</button></div>
+                            <br>
+                            {{adviser.department}}
+                        </div>
+                    </div>
+                    <div ng-repeat="user in users.list" class="panel panel-default">
+                        <div class="panel-body">
+                            {{user.userName}}
+                            <div class="pull-right">
+                                <button type="button" class="btn btn-default btn-xs" ng-click="process.addExecuter($index)">执行人</button>
+                                <button type="button" class="btn btn-default btn-xs" ng-click="process.addAdviser($index)">会签人</button>
+                            </div>
+                            <br>
+                            {{user.department}}
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div  ng-class="{supplementDiv: $index!=processes.index || process.div.supplementDiv}">
-                <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                <button type="button" ng-click="process.supplement();" class="btn btn-default">提交</button>
-            </div>
-            <div  ng-class="{attachmentDiv: $index!=processes.index || process.div.attachmentDiv}">
-                <br>
-                <input ng-file-select type="file" multiple/>
-                <table class="table">
-                    <tbody>
-                    <tr ng-repeat="item in uploader.queue">
-                        <td><strong>{{ item.file.name }}</strong></td>
-                        <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
-                        <td ng-show="uploader.isHTML5">
-                            <div class="progress" style="margin-bottom: 0;">
-                                <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
-                            </div>
-                        </td>
-                        <td class="text-center">
-                            <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
-                            <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
-                            <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
-                        </td>
-                        <td nowrap>
-                            <button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
-                                <span class="glyphicon glyphicon-trash"></span>  删除
-                            </button>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div>
-                    <p>
-                    <div class="progress" style="">
-                        <div class="progress-bar" role="progressbar" ng-style="{ 'width': uploader.progress + '%' }"></div>
+                <div  ng-class="{supplementDiv: $index!=processes.index || process.div.supplementDiv}">
+                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
+                    <button type="button" ng-click="process.supplement();" class="btn btn-default">提交</button>
+                </div>
+                <div  ng-class="{attachmentDiv: $index!=processes.index || process.div.attachmentDiv}">
+                    <br>
+                    <input ng-file-select type="file" multiple/>
+                    <table class="table">
+                        <tbody>
+                        <tr ng-repeat="item in uploader.queue">
+                            <td><strong>{{ item.file.name }}</strong></td>
+                            <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+                            <td ng-show="uploader.isHTML5">
+                                <div class="progress" style="margin-bottom: 0;">
+                                    <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                                <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                                <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                            </td>
+                            <td nowrap>
+                                <button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
+                                    <span class="glyphicon glyphicon-trash"></span>  删除
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div>
+                        <p>
+                        <div class="progress" style="">
+                            <div class="progress-bar" role="progressbar" ng-style="{ 'width': uploader.progress + '%' }"></div>
+                        </div>
+                        </p>
+                        <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
+                            <span class="glyphicon glyphicon-upload"></span> 上传
+                        </button>
+                        <button type="button" class="btn btn-warning btn-s" ng-click="uploader.cancelAll()" ng-disabled="!uploader.isUploading">
+                            <span class="glyphicon glyphicon-ban-circle"></span> 取消
+                        </button>
+                        <button type="button" class="btn btn-danger btn-s" ng-click="uploader.clearQueue()" ng-disabled="!uploader.queue.length">
+                            <span class="glyphicon glyphicon-trash"></span> 删除
+                        </button>
                     </div>
-                    </p>
-                    <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
-                        <span class="glyphicon glyphicon-upload"></span> 上传
-                    </button>
-                    <button type="button" class="btn btn-warning btn-s" ng-click="uploader.cancelAll()" ng-disabled="!uploader.isUploading">
-                        <span class="glyphicon glyphicon-ban-circle"></span> 取消
-                    </button>
-                    <button type="button" class="btn btn-danger btn-s" ng-click="uploader.clearQueue()" ng-disabled="!uploader.queue.length">
-                        <span class="glyphicon glyphicon-trash"></span> 删除
-                    </button>
                 </div>
             </div>
         </div>
@@ -259,7 +266,6 @@
 
 <div ng-show="false">
     todo:
-    1、执行人和会签人的comment分左右排列
     6、在reads中有记录即为待阅
     7、process.logs记载加入人员、取消人员的操作
 </div>
