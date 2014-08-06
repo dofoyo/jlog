@@ -155,7 +155,7 @@ app.post('/process-no', function (req, res){
     processdb.processes.findAndModify({
         query: { _id: processId },
         update: {
-            $set:{closeDatetime:close_Date_time},
+            $set:{closeDatetime:close_Date_time,readers:jdata.readers},
             $addToSet: { comments:comment }
         },
         new: true
@@ -195,7 +195,7 @@ app.post('/process-yes', function (req, res){
     processdb.processes.findAndModify({
         query: { _id: processId },
         update: {
-            $set:{closeDatetime:jdata.closeDatetime},
+            $set:{closeDatetime:jdata.closeDatetime,readers:jdata.readers},
             $pull: { executers:{userId:executerId}},
             $addToSet: { comments:comment }
         },
@@ -235,7 +235,7 @@ app.post('/process-stop', function (req, res){
     processdb.processes.findAndModify({
         query: { _id: processId },
         update: {
-            $set: {stopDatetime: datetime},
+            $set: {stopDatetime: datetime,readers:jdata.readers},
             $addToSet: { comments:comment }
         },
         new: true
@@ -274,7 +274,7 @@ app.post('/process-restart', function (req, res){
     processdb.processes.findAndModify({
         query: { _id: processId },
         update: {
-            $set: {stopDatetime: '', closeDatetime:''},
+            $set: {stopDatetime: '', closeDatetime:'',readers:jdata.readers},
             $addToSet: { comments:comment }
         },
         new: true
@@ -286,6 +286,33 @@ app.post('/process-restart', function (req, res){
             res.end(msg);
         }else{
             var msg = "process restarted.";
+            console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }
+    });
+});
+
+app.post('/process-reader', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jdata = JSON.parse(req.body.mydata);
+    var processId = jdata.processId;
+    processdb.processes.findAndModify({
+        query: { _id: processId },
+        update: {
+            $pull: { readers:{userId:jdata.userId}}
+        },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="process reader not deleted";
+            console.log(msg);
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }else{
+            //console.log(doc);
+            var msg = "process reader deleted.";
             console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
@@ -364,6 +391,7 @@ app.post('/process-executer', function (req, res){
         executer.userName = jdata.userName;
         executer.department = jdata.department;
         executer.createDatetime = d.getTime().toString();
+        executer.completeDatetime = '';
         processdb.processes.findAndModify({
             query: { _id: processId },
             update: {
@@ -428,6 +456,7 @@ app.post('/process-supplement', function (req, res){
     processdb.processes.findAndModify({
         query: { _id: processId },
         update: {
+            $set:{readers:jdata.readers},
             $addToSet: { comments:comment },
             $pull: { advisers:{userId:userId}}
         },
@@ -499,7 +528,7 @@ app.get('/processes',function(req,res){
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
-                    {'userId':loginUserId}
+                    {'uys':loginUserId}
                 ]
             };
             break;
@@ -619,7 +648,18 @@ var getProcesses = function(finder,offset,limit,res){
                             }
                         str += '],';
 
-                        str += '"readers":[],';
+                        str += '"readers":[';
+                            for(var i=process.readers.length-1; i>-1; i--){
+                                var reader = process.readers[i];
+                                str += '{';
+                                str += '"userId":"' + reader.userId + '"';
+                                str += '},';
+                            }
+                            if(process.readers.length>0){
+                                str = str.trim();
+                                str = str.substring(0,str.length-1);
+                            }
+                        str += '],';
                         str += '"advisers":[';
                             for(var i=process.advisers.length-1; i>-1; i--){
                                 var adviser = process.advisers[i];

@@ -62,6 +62,7 @@ pc.controller('ProcessCtrl',[
 
             selectProcess: function(index){
                 var process = this.list[index];
+                process.delReader();
                 process.refreshToolbar();
                 if(this.index == index){
                     process.div.show = !process.div.show;
@@ -354,7 +355,6 @@ function Process(obj,$scope,$http,$templateCache){
         return this.executers.length==0 ? true : false;
     };
 
-
     this.refreshToolbar = function(){
         var iscr = this.isCreator();
         var isau = this.isAuthor();
@@ -423,6 +423,19 @@ function Process(obj,$scope,$http,$templateCache){
         };
     };
 
+    this.getReaders = function(){
+        var readers = [];
+        for(var i=0; i<this.comments.length; i++){
+            var comment = this.comments[i];
+            var reader = {};
+            reader.userId = comment.userId;
+            if(reader.userId != $scope.loginUser.userId){
+                readers.push(reader);
+            }
+        }
+        return readers;
+    };
+
     this.no = function(){
         var datetime = (new Date()).getTime().toString();
         var executer = this.executers[0];
@@ -432,6 +445,7 @@ function Process(obj,$scope,$http,$templateCache){
         var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
 
         var comment = {
+            readers:this.getReaders(),
             processId:this.id,
             closeDatetime: close_Date_time,
             id:datetime,
@@ -439,9 +453,9 @@ function Process(obj,$scope,$http,$templateCache){
             message:'驳回：' + msg,
             createDatetime:executer.createDatetime,
             completeDatetime:datetime,
-            "userId":$scope.loginUser.userId,
-            "userName":$scope.loginUser.userName,
-            "department":$scope.loginUser.department
+            userId:$scope.loginUser.userId,
+            userName:$scope.loginUser.userName,
+            department:$scope.loginUser.department
         };
 
         var jdata = 'mydata='+JSON.stringify(comment);
@@ -472,6 +486,7 @@ function Process(obj,$scope,$http,$templateCache){
         var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
 
         var comment = {
+            readers:this.getReaders(),
             processId:this.id,
             closeDatetime: close_Date_time,
             executerId:executerId,
@@ -480,9 +495,9 @@ function Process(obj,$scope,$http,$templateCache){
             message:'同意并通过：' + msg,
             createDatetime:createDatetime,
             completeDatetime:datetime,
-            "userId":$scope.loginUser.userId,
-            "userName":$scope.loginUser.userName,
-            "department":$scope.loginUser.department
+            userId:$scope.loginUser.userId,
+            userName:$scope.loginUser.userName,
+            department:$scope.loginUser.department
         };
 
         var jdata = 'mydata='+JSON.stringify(comment);
@@ -503,19 +518,20 @@ function Process(obj,$scope,$http,$templateCache){
         var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
 
         var comment = {
+            readers:this.getReaders(),
             processId:this.id,
             id:datetime,
             type:'2',
             message:msg,
             createDatetime:createDatetime=="" ? datetime : createDatetime,
             completeDatetime:datetime,
-            "userId":$scope.loginUser.userId,
-            "userName":$scope.loginUser.userName,
-            "department":$scope.loginUser.department
+            userId:$scope.loginUser.userId,
+            userName:$scope.loginUser.userName,
+            department:$scope.loginUser.department
         };
 
         var jdata = 'mydata='+JSON.stringify(comment);
-
+        console.log(comment);
         saveData('/process-supplement',$http,$templateCache,jdata);
 
         this.comments.splice(0,0,comment);
@@ -544,6 +560,16 @@ function Process(obj,$scope,$http,$templateCache){
         var jdata = 'mydata='+JSON.stringify(executer);
         saveData('/process-executer',$http,$templateCache,jdata);
 
+    }
+
+    this.delReader = function(){
+        var reader = {
+            processId: this.id,
+            userId:$scope.loginUser.userId
+
+        };
+        var jdata = 'mydata='+JSON.stringify(reader);
+        saveData('/process-reader',$http,$templateCache,jdata);
     }
 
     this.delExecuter = function(index){
@@ -613,9 +639,9 @@ function Process(obj,$scope,$http,$templateCache){
             type:'0',
             message:'终止流程：' + msg,
             completeDatetime:datetime,
-            "userId":$scope.loginUser.userId,
-            "userName":$scope.loginUser.userName,
-            "department":$scope.loginUser.department
+            userId:$scope.loginUser.userId,
+            userName:$scope.loginUser.userName,
+            department:$scope.loginUser.department
         };
 
         var jdata = 'mydata=' + JSON.stringify(comment);
@@ -638,9 +664,9 @@ function Process(obj,$scope,$http,$templateCache){
             type:'0',
             message:'重启流程：' + msg,
             completeDatetime:datetime,
-            "userId":$scope.loginUser.userId,
-            "userName":$scope.loginUser.userName,
-            "department":$scope.loginUser.department
+            userId:$scope.loginUser.userId,
+            userName:$scope.loginUser.userName,
+            department:$scope.loginUser.department
         };
 
         var jdata = 'mydata=' + JSON.stringify(comment);
