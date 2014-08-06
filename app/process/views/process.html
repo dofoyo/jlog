@@ -86,7 +86,7 @@
 <div ng-show="pageState.doneDiv || pageState.todoDiv">
     <div class="input-group">
         <span class="input-group-addon">关键字：</span>
-        <input type="text" ng-model="pageState.keyWord" class="form-control" />
+        <input type="text" ng-model="processes.params.keyWord" class="form-control" />
         <span class="input-group-btn">
             <button type="button" ng-click="processes.find();" class="btn btn-default">GO</button>
        </span>

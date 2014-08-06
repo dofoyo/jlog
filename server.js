@@ -521,6 +521,8 @@ app.get('/processes',function(req,res){
     var limit = req.param('limit') ? 1*req.param('limit') : 20;
     var loginUserId = req.param('loginUserId');
 
+    console.log(keyWord);
+
     var finder;
     switch (type){
         case 1:     //1-create:我创建的
