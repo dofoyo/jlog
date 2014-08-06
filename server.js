@@ -563,17 +563,17 @@ app.get('/processes',function(req,res){
                 ]
             };
             break;
-        case 6:     //5-completed:已完成
+        case 6:     //6-completed:已完成
             console.log("6-completed:已完成");
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
-                    {$not:{'closeDatetime':''}},
+                    {'closeDatetime':{$ne:''}},
                     {'comments':{$elemMatch:{"userId":loginUserId}}}
                 ]
             };
             break;
-        case 5:     //6-notCompleted:未完成
+        case 5:     //5-notCompleted:未完成
             console.log("5-notCompleted:未完成");
             finder = {
                 $and:[
@@ -589,7 +589,7 @@ app.get('/processes',function(req,res){
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
-                    {$not:{'stopDatetime':''}},
+                    {'stopDatetime':{$ne:''}},
                     {'comments':{$elemMatch:{"userId":loginUserId}}}
                 ]
             };
@@ -652,7 +652,8 @@ var getProcesses = function(finder,offset,limit,res){
                             for(var i=process.readers.length-1; i>-1; i--){
                                 var reader = process.readers[i];
                                 str += '{';
-                                str += '"userId":"' + reader.userId + '"';
+                                str += '"userId":"' + reader.userId + '",';
+                                str += '"userName":"' + reader.userName + '"';
                                 str += '},';
                             }
                             if(process.readers.length>0){

@@ -214,8 +214,6 @@ function Process(obj,$scope,$http,$templateCache){
     this.advisers = obj.advisers;
     this.executers = obj.executers;
 
-    this.state = this.stopDatetime.length!=0 ? "已终止" : (this.closeDatetime.length!=0 ? "已完成" : "正在执行中...");
-
     this.formData = '';
     this.toolbar = {
         yesBtn:false,
@@ -329,6 +327,29 @@ function Process(obj,$scope,$http,$templateCache){
         return isAuthor;
     };
 
+    this.getAuthor = function(){
+        var author = "";
+        if(this.executers.length>0){
+            var compare = function (prop) {
+                return function (obj1, obj2) {
+                    var val1 = obj1[prop];
+                    var val2 = obj2[prop];if (val1 < val2) {
+                        return -1;
+                    } else if (val1 > val2) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+
+            this.executers.sort(compare("id"));
+            var executer = this.executers[0];
+            author = executer.userName;
+        }
+        return author;
+    };
+
     this.isRelation = function(){
         var relation = false;
         if(this.comments.length>0){
@@ -396,6 +417,8 @@ function Process(obj,$scope,$http,$templateCache){
         //驳回后，流程处于关闭状态，发起人和处理人可重启流程
         this.toolbar.yesBtn = !hass && !hasc && isau;
         this.toolbar.noBtn = !hass && !hasc && isau;
+        this.state = this.stopDatetime.length!=0 ? "已终止" : (this.closeDatetime.length!=0 ? "已完成" : "正在执行中...，当前执行人：" + this.getAuthor());
+
     };
 
     this.showDiv = function(div){
@@ -429,6 +452,7 @@ function Process(obj,$scope,$http,$templateCache){
             var comment = this.comments[i];
             var reader = {};
             reader.userId = comment.userId;
+            reader.userName = comment.userName;
             if(reader.userId != $scope.loginUser.userId){
                 readers.push(reader);
             }
@@ -509,7 +533,6 @@ function Process(obj,$scope,$http,$templateCache){
         this.showDiv('yesDiv');
     };
 
-
     this.supplement = function(){
         var datetime = (new Date()).getTime().toString();
 
@@ -540,7 +563,6 @@ function Process(obj,$scope,$http,$templateCache){
         this.refreshToolbar();
         this.showDiv('supplementDiv');
     };
-
 
     this.addExecuter = function(index){
         var datetime = (new Date()).getTime().toString();
@@ -679,4 +701,7 @@ function Process(obj,$scope,$http,$templateCache){
         this.refreshToolbar();
         this.showDiv('restartDiv');
     }
+
+    this.state = this.stopDatetime.length!=0 ? "已终止" : (this.closeDatetime.length!=0 ? "已完成" : "正在执行中...，当前执行人：" + this.getAuthor());
+
 }

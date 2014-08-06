@@ -88,7 +88,7 @@
         <span class="input-group-addon">关键字：</span>
         <input type="text" ng-model="pageState.keyWord" class="form-control" />
         <span class="input-group-btn">
-            <button type="button" ng-click="find();" class="btn btn-default">GO</button>
+            <button type="button" ng-click="processes.find();" class="btn btn-default">GO</button>
        </span>
     </div>
 </div>
@@ -97,14 +97,17 @@
 <ul class="list-group">
     <li ng-repeat="process in processes.list" class="list-group-item">
         <div ng-click="processes.selectProcess($index)">
-            <span class="badge">{{$index+1}}.{{process.state}}</span>
+            <span class="badge">{{$index+1}}.{{process.state}}</span><br>
             <span class="text-info">{{process.userName}}</span>
             <span class="text-muted">({{process.department}})</span><br>
             <span class="text-primary">{{process.subject}}</span>
             <span class="text-muted">({{process.createDatetime  | date:'yyyy-MM-dd hh:mm:ss'}})</span>
         </div>
         <div  ng-class="{processDiv:$index!=processes.index || process.div.show}">
-            <span class="text-primary">{{process.description}}</span>
+            <span class="text-primary">{{process.description}}</span><br>
+            待办：<span  class="text-info" ng-repeat="executer in process.executers">{{executer.userName}}，</span><br>
+            待签：<span  class="text-info" ng-repeat="adviser in process.advisers">{{adviser.userName}}，</span><br>
+            待阅：<span  class="text-info" ng-repeat="reader in process.readers">{{reader.userName}}，</span>
             <table class="table">
                 <tr ng-repeat="comment in process.comments">
                     <td align="right">
@@ -266,6 +269,6 @@
 
 <div ng-show="false">
     todo:
-    6、在reads中有记录即为待阅
-    7、process.logs记载加入人员、取消人员的操作
+    1、process.logs记载加入人员、取消人员的操作
+    2、某人登录后，显示有多少待办、多少待阅...
 </div>
