@@ -52,6 +52,7 @@ pc.controller('ProcessCtrl',[
                 Processes.query(this.params,function(data){
                     $scope.processes.hasMore  = data.length==$scope.processes.params.limit ? true : false;
                     $scope.processes.params.offset += data.length;
+                    console.log("data.length: " + data.length)
                     for(var i=0; i<data.length; i++){
                         var process = new Process(data[i],$scope,$http,$templateCache);
                         $scope.processes.list.push(process);
@@ -94,11 +95,9 @@ pc.controller('ProcessCtrl',[
                         createDatetime:(new Date()).getTime().toString(),
                         closeDatetime:"",
                         stopDatetime:"",
-                        creator:{
-                            "id":$scope.loginUser.userId,
-                            "name":$scope.loginUser.userName,
-                            "department":$scope.loginUser.department
-                        },
+                        "userId":$scope.loginUser.userId,
+                        "userName":$scope.loginUser.userName,
+                        "department":$scope.loginUser.department,
                         comments:[],
                         readers:[],
                         advisers:[],
@@ -143,6 +142,8 @@ pc.controller('ProcessCtrl',[
                     this.createDiv = div == 'createDiv' ? true : false;
                     this.todoDiv   = div == 'todoDiv' ? true : false;
                     this.doneDiv   = div == 'doneDiv' ? true : false;
+
+                    //console.log('showDiv: ' + div);
 
                     if(this.createDiv){
                         $scope.processes.empty();
@@ -204,7 +205,9 @@ function Process(obj,$scope,$http,$templateCache){
     this.createDatetime = obj.createDatetime;
     this.closeDatetime = obj.closeDatetime;
     this.stopDatetime = obj.stopDatetime;
-    this.creator = obj.creator;
+    this.userId = obj.userId;
+    this.userName = obj.userName;
+    this.department = obj.department;
     this.comments = obj.comments;
     this.readers = obj.readers;
     this.advisers = obj.advisers;
@@ -235,7 +238,7 @@ function Process(obj,$scope,$http,$templateCache){
     };
 
     this.isCreator= function(){
-        return this.creator.id==$scope.loginUser.userId ? true : false;
+        return this.userId==$scope.loginUser.userId ? true : false;
     };
 
     this.isAdviser = function(){
@@ -330,7 +333,7 @@ function Process(obj,$scope,$http,$templateCache){
         if(this.comments.length>0){
             for(var i=0; i<this.comments.length; i++){
                 var comment = this.comments[i];
-                if($scope.loginUser.userId == comment.creator.id){
+                if($scope.loginUser.userId == comment.userId){
                     relation = true;
                     break;
                 }
@@ -436,11 +439,9 @@ function Process(obj,$scope,$http,$templateCache){
             message:'驳回：' + msg,
             createDatetime:executer.createDatetime,
             completeDatetime:datetime,
-            creator:{
-                "id":$scope.loginUser.userId,
-                "name":$scope.loginUser.userName,
-                "department":$scope.loginUser.department
-            }
+            "userId":$scope.loginUser.userId,
+            "userName":$scope.loginUser.userName,
+            "department":$scope.loginUser.department
         };
 
         var jdata = 'mydata='+JSON.stringify(comment);
@@ -466,7 +467,7 @@ function Process(obj,$scope,$http,$templateCache){
             this.closeDatetime = datetime;
         }
 
-        alert('close_Date_time:' + close_Date_time);
+        //alert('close_Date_time:' + close_Date_time);
 
         var msg = this.formData.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
 
@@ -479,11 +480,9 @@ function Process(obj,$scope,$http,$templateCache){
             message:'同意并通过：' + msg,
             createDatetime:createDatetime,
             completeDatetime:datetime,
-            creator:{
-                "id":$scope.loginUser.userId,
-                "name":$scope.loginUser.userName,
-                "department":$scope.loginUser.department
-            }
+            "userId":$scope.loginUser.userId,
+            "userName":$scope.loginUser.userName,
+            "department":$scope.loginUser.department
         };
 
         var jdata = 'mydata='+JSON.stringify(comment);
@@ -510,11 +509,9 @@ function Process(obj,$scope,$http,$templateCache){
             message:msg,
             createDatetime:createDatetime=="" ? datetime : createDatetime,
             completeDatetime:datetime,
-            creator:{
-                "id":$scope.loginUser.userId,
-                "name":$scope.loginUser.userName,
-                "department":$scope.loginUser.department
-            }
+            "userId":$scope.loginUser.userId,
+            "userName":$scope.loginUser.userName,
+            "department":$scope.loginUser.department
         };
 
         var jdata = 'mydata='+JSON.stringify(comment);
@@ -537,8 +534,7 @@ function Process(obj,$scope,$http,$templateCache){
             userId:user.userId,
             userName:user.userName,
             department:user.department,
-            createDatetime: datetime,
-            completeDatetime:''
+            createDatetime: datetime
         };
         $scope.users.list.splice(index,1);
         this.executers.push(executer);
@@ -576,8 +572,7 @@ function Process(obj,$scope,$http,$templateCache){
             userId:user.userId,
             userName:user.userName,
             department:user.department,
-            createDatetime: datetime,
-            completeDatetime:''
+            createDatetime: datetime
         };
 
         $scope.users.list.splice(index,1);
@@ -618,11 +613,9 @@ function Process(obj,$scope,$http,$templateCache){
             type:'0',
             message:'终止流程：' + msg,
             completeDatetime:datetime,
-            creator:{
-                "id":$scope.loginUser.userId,
-                "name":$scope.loginUser.userName,
-                "department":$scope.loginUser.department
-            }
+            "userId":$scope.loginUser.userId,
+            "userName":$scope.loginUser.userName,
+            "department":$scope.loginUser.department
         };
 
         var jdata = 'mydata=' + JSON.stringify(comment);
@@ -645,11 +638,9 @@ function Process(obj,$scope,$http,$templateCache){
             type:'0',
             message:'重启流程：' + msg,
             completeDatetime:datetime,
-            creator:{
-                "id":$scope.loginUser.userId,
-                "name":$scope.loginUser.userName,
-                "department":$scope.loginUser.department
-            }
+            "userId":$scope.loginUser.userId,
+            "userName":$scope.loginUser.userName,
+            "department":$scope.loginUser.department
         };
 
         var jdata = 'mydata=' + JSON.stringify(comment);

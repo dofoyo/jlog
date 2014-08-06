@@ -98,8 +98,8 @@
     <li ng-repeat="process in processes.list" class="list-group-item">
         <div ng-click="processes.selectProcess($index)">
             <span class="badge">{{$index+1}}.{{process.state}}</span>
-            <span class="text-info">{{process.creator.name}}</span>
-            <span class="text-muted">({{process.creator.department}})</span><br>
+            <span class="text-info">{{process.userName}}</span>
+            <span class="text-muted">({{process.department}})</span><br>
             <span class="text-primary">{{process.subject}}</span>
             <span class="text-muted">({{process.createDatetime  | date:'yyyy-MM-dd hh:mm:ss'}})</span>
         </div>
@@ -107,8 +107,8 @@
             <span class="text-primary">{{process.description}}</span>
             <ul>
                 <li ng-repeat="comment in process.comments">
-                    <span class="text-info">{{comment.creator.name}}</span>
-                    <span class="text-muted">({{comment.creator.department}})</span><br>
+                    <span class="text-info">{{comment.userName}}</span>
+                    <span class="text-muted">({{comment.department}})</span><br>
                     <span class="text-primary">{{comment.message | attachmentName}}</span>
                     <span ng-show="{{comment.message | hasAttachment}}"><a href="{{comment.message | attachmentUrl}}" target="_blank">下载</a></span>
                     <span class="text-muted">({{comment.completeDatetime  | date:'yyyy-MM-dd hh:mm:ss'}})</span>

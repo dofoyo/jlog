@@ -148,7 +148,9 @@ app.post('/process-no', function (req, res){
     comment.message = jdata.message;
     comment.createDatetime = createDatetime;
     comment.completeDatetime = datetime;
-    comment.creator = jdata.creator;
+    comment.userId = jdata.userId;
+    comment.userName = jdata.userName;
+    comment.department = jdata.department;
 
     processdb.processes.findAndModify({
         query: { _id: processId },
@@ -186,7 +188,9 @@ app.post('/process-yes', function (req, res){
     comment.message = jdata.message;
     comment.createDatetime = jdata.createDatetisme;
     comment.completeDatetime = datetime;
-    comment.creator = jdata.creator;
+    comment.userId = jdata.userId;
+    comment.userName = jdata.userName;
+    comment.department = jdata.department;
 
     processdb.processes.findAndModify({
         query: { _id: processId },
@@ -224,7 +228,9 @@ app.post('/process-stop', function (req, res){
     comment.message = jdata.message;
     comment.createDatetime = datetime;
     comment.completeDatetime = datetime;
-    comment.creator = jdata.creator;
+    comment.userId = jdata.userId;
+    comment.userName = jdata.userName;
+    comment.department = jdata.department;
 
     processdb.processes.findAndModify({
         query: { _id: processId },
@@ -261,7 +267,9 @@ app.post('/process-restart', function (req, res){
     comment.message = jdata.message;
     comment.createDatetime = datetime;
     comment.completeDatetime = datetime;
-    comment.creator = jdata.creator;
+    comment.userId = jdata.userId;
+    comment.userName = jdata.userName;
+    comment.department = jdata.department;
 
     processdb.processes.findAndModify({
         query: { _id: processId },
@@ -356,7 +364,6 @@ app.post('/process-executer', function (req, res){
         executer.userName = jdata.userName;
         executer.department = jdata.department;
         executer.createDatetime = d.getTime().toString();
-        executer.completeDatetime = '';
         processdb.processes.findAndModify({
             query: { _id: processId },
             update: {
@@ -405,7 +412,7 @@ app.post('/process-supplement', function (req, res){
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
     var processId = jdata.processId;
-    var userId = jdata.creator.id;
+    var userId = jdata.userId;
     var datetime = (new Date()).getTime().toString();
 
     var comment = new Object();
@@ -414,7 +421,9 @@ app.post('/process-supplement', function (req, res){
     comment.message = jdata.message;
     comment.createDatetime = jdata.createDatetime;
     comment.completeDatetime = datetime;
-    comment.creator = jdata.creator;
+    comment.userId = jdata.userId;
+    comment.userName = jdata.userName;
+    comment.department = jdata.department;
 
     processdb.processes.findAndModify({
         query: { _id: processId },
@@ -448,7 +457,9 @@ app.post('/process', function (req, res){
         _id:jsonData.id,
         subject:jsonData.subject,
         description:jsonData.description,
-        creator: jsonData.creator,
+        userId:jsonData.userId,
+        userName:jsonData.userName,
+        department:jsonData.department,
         createDatetime:d.getTime().toString(),
         closeDatetime:'',
         stopDatetime:'',
@@ -488,7 +499,7 @@ app.get('/processes',function(req,res){
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
-                    {'creator.id':loginUserId}
+                    {'userId':loginUserId}
                 ]
             };
             break;
@@ -529,7 +540,7 @@ app.get('/processes',function(req,res){
                 $and:[
                     {'subject':{$regex:keyWord}},
                     {$not:{'closeDatetime':''}},
-                    {'comments':{$elemMatch:{"creator.id":loginUserId}}}
+                    {'comments':{$elemMatch:{"userId":loginUserId}}}
                 ]
             };
             break;
@@ -540,7 +551,7 @@ app.get('/processes',function(req,res){
                     {'subject':{$regex:keyWord}},
                     {'closeDatetime':''},
                     {'stopDatetime':''},
-                    {'comments':{$elemMatch:{"creator.id":loginUserId}}}
+                    {'comments':{$elemMatch:{"userId":loginUserId}}}
                 ]
             };
             break;
@@ -550,7 +561,7 @@ app.get('/processes',function(req,res){
                 $and:[
                     {'subject':{$regex:keyWord}},
                     {$not:{'stopDatetime':''}},
-                    {'comments':{$elemMatch:{"creator.id":loginUserId}}}
+                    {'comments':{$elemMatch:{"userId":loginUserId}}}
                 ]
             };
             break;
@@ -585,11 +596,9 @@ var getProcesses = function(finder,offset,limit,res){
                         str += '"createDatetime":"' + process.createDatetime + '",';
                         str += '"closeDatetime":"' + process.closeDatetime + '",';
                         str += '"stopDatetime":"' + process.stopDatetime + '",';
-                        str += '"creator":{';
-                        str += '"id":"' + process.creator.id + '",';
-                        str += '"name":"' + process.creator.name + '",';
-                        str += '"department":"' + process.creator.department + '"';
-                        str += '},';
+                        str += '"userId":"' + process.userId + '",';
+                        str += '"userName":"' + process.userName + '",';
+                        str += '"department":"' + process.department + '",';
                         str += '"comments":[';
                             for(var i=process.comments.length-1; i>-1; i--){
                                 var comment = process.comments[i];
@@ -599,11 +608,10 @@ var getProcesses = function(finder,offset,limit,res){
                                 str += '"message":"' + comment.message + '",';
                                 str += '"createDatetime":"' + comment.createDatetime + '",';
                                 str += '"completeDatetime":"' + comment.completeDatetime + '",';
-                                str += '"creator":{';
-                                str += '"id":"' + comment.creator.id + '",';
-                                str += '"name":"' + comment.creator.name + '",';
-                                str += '"department":"' + comment.creator.department + '"';
-                                str += '}},';
+                                str += '"userId":"' + comment.userId + '",';
+                                str += '"userName":"' + comment.userName + '",';
+                                str += '"department":"' + comment.department + '"';
+                                str += '},';
                             }
                             if(process.comments.length>0){
                                 str = str.trim();
@@ -620,8 +628,7 @@ var getProcesses = function(finder,offset,limit,res){
                                 str += '"userId":"' + adviser.userId + '",';
                                 str += '"userName":"' + adviser.userName + '",';
                                 str += '"department":"' + adviser.department + '",';
-                                str += '"createDatetime":"' + adviser.createDatetime + '",';
-                                str += '"completeDatetime":"' + adviser.completeDatetime + '"';
+                                str += '"createDatetime":"' + adviser.createDatetime + '"';
                                 str += '},';
                             }
                             if(process.advisers.length>0){
@@ -637,8 +644,7 @@ var getProcesses = function(finder,offset,limit,res){
                                 str += '"userId":"' + executer.userId + '",';
                                 str += '"userName":"' + executer.userName + '",';
                                 str += '"department":"' + executer.department + '",';
-                                str += '"createDatetime":"' + executer.createDatetime + '",';
-                                str += '"completeDatetime":"' + executer.completeDatetime + '"';
+                                str += '"createDatetime":"' + executer.createDatetime + '"';
                                 str += '},';
                             }
                             if(process.executers.length>0){
