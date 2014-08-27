@@ -302,6 +302,7 @@ function Process(obj,$scope,$http,$templateCache){
         return false;
     };
 
+    /*
     this.isAuthor = function(){
         var isAuthor = false;
         if(this.executers.length>0){
@@ -349,6 +350,7 @@ function Process(obj,$scope,$http,$templateCache){
         }
         return author;
     };
+     */
 
     this.isRelation = function(){
         var relation = false;
@@ -378,7 +380,7 @@ function Process(obj,$scope,$http,$templateCache){
 
     this.refreshToolbar = function(){
         var iscr = this.isCreator();
-        var isau = this.isAuthor();
+        //var isau = this.isAuthor();
         var isex = this.isExecuter();
         var isad = this.isAdviser();
         var hass = this.hasStoped();
@@ -388,7 +390,7 @@ function Process(obj,$scope,$http,$templateCache){
 
         /*
         console.log("isCreator:" + iscr);
-        console.log("isAuthor:" + isau);
+        //console.log("isAuthor:" + isau);
         console.log("isExecuter:" + isex);
         console.log("isAdviser:" + isad);
         console.log("hasStoped:" + hass);
@@ -399,7 +401,7 @@ function Process(obj,$scope,$http,$templateCache){
         this.state = hass ? "已终止" : (hasc ? "已完成" : "正在执行中...");
 
         // 未完成、未终止的流程，发起人和当前处理人都可终止流程
-        this.toolbar.stopBtn = (iscr || isau) && !hass && !hasc;
+        this.toolbar.stopBtn = (iscr || isex) && !hass && !hasc;
 
         // 已关闭、已终止的流程，发起人和处理人能重启流程
         this.toolbar.restartBtn = (hass || hasc) && (isex || iscr);
@@ -410,14 +412,15 @@ function Process(obj,$scope,$http,$templateCache){
         this.toolbar.attachmentBtn = !hass && !hasc && (isex || isad || iscr || isre);
 
         //未关闭、未终止的流程,发起人和当前处理人可拉会签人和处理人进来
-        this.toolbar.userBtn = !hass && !hasc && (isau || iscr);
+        this.toolbar.userBtn = !hass && !hasc && (isex || iscr);
 
         //未关闭、未终止的流程，当前的处理人决定流程走向：通过或驳回
         //通过后，当前处理人可以补充发言
         //驳回后，流程处于关闭状态，发起人和处理人可重启流程
-        this.toolbar.yesBtn = !hass && !hasc && isau;
-        this.toolbar.noBtn = !hass && !hasc && isau;
-        this.state = this.stopDatetime.length!=0 ? "已终止" : (this.closeDatetime.length!=0 ? "已完成" : "正在执行中...，当前执行人：" + this.getAuthor());
+        this.toolbar.yesBtn = !hass && !hasc && isex;
+        this.toolbar.noBtn = !hass && !hasc && isex;
+        //this.state = this.stopDatetime.length!=0 ? "已终止" : (this.closeDatetime.length!=0 ? "已完成" : "正在执行中...，当前执行人：" + this.getAuthor());
+        this.state = this.stopDatetime.length!=0 ? "已终止" : (this.closeDatetime.length!=0 ? "已完成" : "正在执行中...");
 
     };
 
@@ -702,6 +705,7 @@ function Process(obj,$scope,$http,$templateCache){
         this.showDiv('restartDiv');
     }
 
-    this.state = this.stopDatetime.length!=0 ? "已终止" : (this.closeDatetime.length!=0 ? "已完成" : "正在执行中...，当前执行人：" + this.getAuthor());
+    //this.state = this.stopDatetime.length!=0 ? "已终止" : (this.closeDatetime.length!=0 ? "已完成" : "正在执行中...，当前执行人：" + this.getAuthor());
+    this.state = this.stopDatetime.length!=0 ? "已终止" : (this.closeDatetime.length!=0 ? "已完成" : "正在执行中...");
 
 }
