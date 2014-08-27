@@ -492,7 +492,7 @@ app.post('/process', function (req, res){
         createDatetime:d.getTime().toString(),
         closeDatetime:'',
         stopDatetime:'',
-        comments:[],
+        comments:[{id:jsonData.id,type:0,message:'发起',createDatetime:d.getTime().toString(),completeDatetime:d.getTime().toString(),userId:jsonData.userId,userName:jsonData.userName,department:jsonData.department}],
         readers:[],
         advisers:[],
         executers:[]
@@ -530,7 +530,7 @@ app.get('/processes',function(req,res){
             finder = {
                 $and:[
                     {'subject':{$regex:keyWord}},
-                    {'uys':loginUserId}
+                    {'userId':loginUserId}
                 ]
             };
             break;
