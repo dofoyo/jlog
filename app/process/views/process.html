@@ -34,7 +34,7 @@
 <div ng-show="pageState.createDiv">
     <input type="text" class="form-control" placeholder="主题" ng-model="processes.formData.data1">
     <TEXTAREA ROWS="4" ng-model="processes.formData.data2" class="form-control" placeholder="详细阐述"></TEXTAREA>
-    <button type="button" ng-click="processes.create()" class="btn btn-default">发起新流程</button>
+    <button type="button" ng-click="processes.create()" class="btn btn-default">保存</button>
 </div>
 
 <div ng-show="pageState.todoDiv">
@@ -271,4 +271,6 @@
     todo:
     1、process.logs记载加入人员、取消人员的操作
     2、某人登录后，显示有多少待办、多少待阅...
+    3、发起有多种类型，有特殊的，如：请假、报销，会议通知，有必须填写的字段；有通用的，如：申请、审批、任务安排、通知...。针对申请和审批，yes/no按钮显示为同意/驳回，各人员为决策人和参谋人；针对任务安排，只有yes(完成)按钮，没有no按钮，各人员为执行人和参与人，
+    4、除了executer和adviser外，还应增加reader
 </div>
