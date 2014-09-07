@@ -32,63 +32,32 @@
 </div>
 
 <div ng-show="pageState.createDiv">
-    <input type="text" class="form-control" placeholder="主题" ng-model="processes.formData.data1">
-    <TEXTAREA ROWS="4" ng-model="processes.formData.data2" class="form-control" placeholder="详细阐述"></TEXTAREA>
+    <input type="text" class="form-control" placeholder="类型" ng-model="processes.formData.type">
+    <input type="text" class="form-control" placeholder="主题" ng-model="processes.formData.subject">
+    <TEXTAREA ROWS="4" ng-model="processes.formData.description" class="form-control" placeholder="详细阐述"></TEXTAREA>
     <button type="button" ng-click="processes.create()" class="btn btn-default">保存</button>
 </div>
 
 <div ng-show="pageState.todoDiv">
     <div class="input-group">
-        <div class="radio-inline">
-            <label>
-                <input type="radio" name="processType"  ng-click="processes.getProcesses(2)">
-                待处理
-            </label>
-        </div>
-        <div class="radio-inline">
-            <label>
-                <input type="radio" name="processType" ng-click="processes.getProcesses(3)">
-                待签
-            </label>
-        </div>
-        <div class="radio-inline">
-            <label>
-                <input type="radio" name="processType" ng-click="processes.getProcesses(4)" >
-                待阅
-            </label>
-        </div>
+        <span class="input-group-addon">关键字：</span>
+        <input type="text" ng-model="processes.params.keyWord" class="form-control" />
+        <span class="input-group-btn">
+            <button type="button" ng-click="processes.getProcesses(2);" class="btn btn-default">待处理</button>
+            <button type="button" ng-click="processes.getProcesses(3);" class="btn btn-default">待参与</button>
+            <button type="button" ng-click="processes.getProcesses(4);" class="btn btn-default">待阅</button>
+       </span>
     </div>
 </div>
 
 <div ng-show="pageState.doneDiv">
     <div class="input-group">
-        <div class="radio-inline">
-            <label>
-                <input type="radio" name="processType" ng-click="processes.getProcesses(5)" >
-                未结束
-            </label>
-        </div>
-        <div class="radio-inline">
-            <label>
-                <input type="radio" name="processType" ng-click="processes.getProcesses(6)">
-                已完成
-            </label>
-        </div>
-        <div class="radio-inline">
-            <label>
-                <input type="radio" name="processType" ng-click="processes.getProcesses(7)">
-                已终止
-            </label>
-        </div>
-    </div>
-</div>
-
-<div ng-show="pageState.doneDiv || pageState.todoDiv">
-    <div class="input-group">
         <span class="input-group-addon">关键字：</span>
         <input type="text" ng-model="processes.params.keyWord" class="form-control" />
         <span class="input-group-btn">
-            <button type="button" ng-click="processes.find();" class="btn btn-default">GO</button>
+            <button type="button" ng-click="processes.getProcesses(5);" class="btn btn-default">未结束</button>
+            <button type="button" ng-click="processes.getProcesses(6);" class="btn btn-default">已结束</button>
+            <button type="button" ng-click="processes.getProcesses(7);" class="btn btn-default">已终止</button>
        </span>
     </div>
 </div>
@@ -105,8 +74,8 @@
         </div>
         <div  ng-class="{processDiv:$index!=processes.index || process.div.show}">
             <span class="text-primary">{{process.description}}</span><br>
-            待办：<span  class="text-info" ng-repeat="executer in process.executers">{{executer.userName}}，</span><br>
-            待签：<span  class="text-info" ng-repeat="adviser in process.advisers">{{adviser.userName}}，</span><br>
+            待{{process.caption.executer}}：<span  class="text-info" ng-repeat="executer in process.executers">{{executer.userName}}，</span><br>
+            待{{process.caption.adviser}}：<span  class="text-info" ng-repeat="adviser in process.advisers">{{adviser.userName}}，</span><br>
             待阅：<span  class="text-info" ng-repeat="reader in process.readers">{{reader.userName}}，</span>
             <table class="table">
                 <tr ng-repeat="comment in process.comments">
@@ -126,10 +95,10 @@
             <div class="btn-toolbar">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default" ng-show="process.toolbar.yesBtn" ng-click="process.showDiv('yesDiv')">
-                        <abbr title="流程通过本节点，进入下一执行人。">通过</abbr>
+                        <abbr title="流程通过本节点，进入下一执行人。">{{process.caption.yesBtn}}</abbr>
                     </button>
                     <button type="button" class="btn btn-default" ng-show="process.toolbar.noBtn" ng-click="process.showDiv('noDiv')">
-                        <abbr title="流程返回到上一节点">驳回</abbr>
+                        <abbr title="流程返回到上一节点">{{process.caption.noBtn}}</abbr>
                     </button>
                 </div>
                 <div class="btn-group">
@@ -157,11 +126,11 @@
             <div>
                 <div  ng-class="{yesDiv: $index!=processes.index || process.div.yesDiv}">
                     <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                    <button type="button" ng-click="process.yes();" class="btn btn-default">同意并通过</button>
+                    <button type="button" ng-click="process.yes();" class="btn btn-default">{{process.caption.yesBtn}}</button>
                 </div>
                 <div  ng-class="{noDiv: $index!=processes.index || process.div.noDiv}">
                     <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                    <button type="button" ng-click="process.no();" class="btn btn-default">驳回到发起人</button>
+                    <button type="button" ng-click="process.no();" class="btn btn-default">{{process.caption.noBtn}}</button>
                 </div>
                 <div  ng-class="{stopDiv: $index!=processes.index || process.div.stopDiv}">
                     <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
@@ -182,27 +151,37 @@
                     <div ng-repeat="executer in process.executers" class="panel panel-primary">
                         <div class="panel-heading">
                             <span class="badge">{{$index+1}}</span>
-                            执行人：{{executer.userName}}
-                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delExecuter($index)">取消</button></div>
+                            {{process.caption.executer}}：{{executer.userName}}
+                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delExecuter($index)">取消{{process.caption.executer}}</button></div>
                             <br>
                             {{executer.department}}
                         </div>
                     </div>
-                    <div ng-repeat="adviser in process.advisers" class="panel panel-info">
+                    <div ng-repeat="adviser in process.advisers" class="panel panel-success">
                         <div class="panel-heading">
                             <span class="badge">{{$index+1}}</span>
-                            会签人：{{adviser.userName}}
-                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delAdviser($index)">取消</button></div>
+                            {{process.caption.adviser}}：{{adviser.userName}}
+                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delAdviser($index)">取消{{process.caption.adviser}}</button></div>
                             <br>
                             {{adviser.department}}
+                        </div>
+                    </div>
+                    <div ng-repeat="reader in process.readers" class="panel panel-info">
+                        <div class="panel-heading">
+                            <span class="badge">{{$index+1}}</span>
+                            知会人：{{reader.userName}}
+                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delReader($index)">取消知会人</button></div>
+                            <br>
+                            {{reader.department}}
                         </div>
                     </div>
                     <div ng-repeat="user in users.list" class="panel panel-default">
                         <div class="panel-body">
                             {{user.userName}}
                             <div class="pull-right">
-                                <button type="button" class="btn btn-default btn-xs" ng-click="process.addExecuter($index)">执行人</button>
-                                <button type="button" class="btn btn-default btn-xs" ng-click="process.addAdviser($index)">会签人</button>
+                                <button type="button" class="btn btn-default btn-xs" ng-click="process.addExecuter($index)">{{process.caption.executer}}</button>
+                                <button type="button" class="btn btn-default btn-xs" ng-click="process.addAdviser($index)">{{process.caption.adviser}}</button>
+                                <button type="button" class="btn btn-default btn-xs" ng-click="process.addReader($index)">知会人</button>
                             </div>
                             <br>
                             {{user.department}}
@@ -271,6 +250,7 @@
     todo:
     1、process.logs记载加入人员、取消人员的操作
     2、某人登录后，显示有多少待办、多少待阅...
-    3、发起有多种类型，有特殊的，如：请假、报销，会议通知，有必须填写的字段；有通用的，如：申请、审批、任务安排、通知...。针对申请和审批，yes/no按钮显示为同意/驳回，各人员为决策人和参谋人；针对任务安排，只有yes(完成)按钮，没有no按钮，各人员为执行人和参与人，
-    4、除了executer和adviser外，还应增加reader
+    3、业务表单和流程分离，业务表单多种多样，但流程都一样。需要将process的显示和操作封装为directives
+    4、getProcesses返回的是process.subject，getProcess返回的是完整的process，即懒加载。
+    5、已完成了http.get的service封装，需要将http.post也封装。
 </div>

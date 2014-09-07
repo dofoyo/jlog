@@ -132,6 +132,45 @@ app.get('/api/restricted', function (req, res) {
 // ---------for  authenticate begin--------
 
 //--- for process begin -------
+app.post('/process-readed', function (req, res){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    var jdata = JSON.parse(req.body.mydata);
+    var processId = jdata.processId;
+    var datetime = (new Date()).getTime().toString();
+
+    var comment = new Object();
+    comment.id = datetime;
+    comment.type = '2';
+    comment.message = '已阅';
+    comment.createDatetime = datetime;
+    comment.completeDatetime = datetime;
+    comment.userId = jdata.userId;
+    comment.userName = jdata.userName;
+    comment.department = jdata.department;
+
+    processdb.processes.findAndModify({
+        query: { _id: processId },
+        update: {
+            $pull: { readers:{userId:jdata.userId}},
+            $addToSet: { comments:comment }
+        },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if( err ){
+            var msg ="process read comments not added";
+            console.log(msg);
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }else{
+            var msg = "process read comments added.";
+            //console.log(msg);
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(msg);
+        }
+    });
+});
+
 
 app.post('/process-no', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
@@ -186,7 +225,7 @@ app.post('/process-yes', function (req, res){
     comment.id = jdata.id;
     comment.type = jdata.type;
     comment.message = jdata.message;
-    comment.createDatetime = jdata.createDatetisme;
+    comment.createDatetime = jdata.createDatetime;
     comment.completeDatetime = datetime;
     comment.userId = jdata.userId;
     comment.userName = jdata.userName;
@@ -298,27 +337,58 @@ app.post('/process-reader', function (req, res){
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
     var processId = jdata.processId;
-    processdb.processes.findAndModify({
-        query: { _id: processId },
-        update: {
-            $pull: { readers:{userId:jdata.userId}}
-        },
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if( err ){
-            var msg ="process reader not deleted";
-            console.log(msg);
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.end(msg);
-        }else{
-            //console.log(doc);
-            var msg = "process reader deleted.";
-            console.log(msg);
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(msg);
-        }
-    });
+    var d = new Date()
+
+    if(jdata.add){
+        var reader = new Object();
+        reader.id = jdata.id;
+        reader.userId = jdata.userId;
+        reader.userName = jdata.userName;
+        reader.department = jdata.department;
+        reader.createDatetime = d.getTime().toString();
+        processdb.processes.findAndModify({
+            query: { _id: processId },
+            update: {
+                $addToSet: { readers:reader }
+            },
+            new: true
+        }, function(err, doc, lastErrorObject) {
+            if( err ){
+                var msg ="process reader not added";
+                console.log(msg);
+                res.writeHead(500, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }else{
+                var msg = "process reader added.";
+                console.log(msg);
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }
+        });
+    }else{
+        processdb.processes.findAndModify({
+            query: { _id: processId },
+            update: {
+                $pull: { readers:{userId:jdata.userId}}
+            },
+            new: true
+        }, function(err, doc, lastErrorObject) {
+            if( err ){
+                var msg ="process reader " + jdata.userId + "," + jdata.createDatetime + " not deleted";
+                console.log(msg);
+                res.writeHead(500, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }else{
+                //console.log(doc);
+                var msg = "process reader " + jdata.userId + "," + jdata.createDatetime  + " deleted.";
+                console.log(msg);
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(msg);
+            }
+        });
+    }
 });
+
 
 app.post('/process-adviser', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
@@ -484,6 +554,7 @@ app.post('/process', function (req, res){
 
     processdb.processes.save({
         _id:jsonData.id,
+        type:jsonData.type,
         subject:jsonData.subject,
         description:jsonData.description,
         userId:jsonData.userId,
@@ -622,6 +693,7 @@ var getProcesses = function(finder,offset,limit,res){
                     processes.forEach( function(process) {
                         str += '{';
                         str += '"id":"' + process._id + '",';
+                        str += '"type":"' + process.type + '",';
                         str += '"subject":"' + process.subject + '",';
                         str += '"description":"' + process.description + '",';
                         str += '"createDatetime":"' + process.createDatetime + '",';
@@ -633,16 +705,18 @@ var getProcesses = function(finder,offset,limit,res){
                         str += '"comments":[';
                             for(var i=process.comments.length-1; i>-1; i--){
                                 var comment = process.comments[i];
-                                str += '{';
-                                str += '"id":"' + comment.id + '",';
-                                str += '"type":"' + comment.type + '",';
-                                str += '"message":"' + comment.message + '",';
-                                str += '"createDatetime":"' + comment.createDatetime + '",';
-                                str += '"completeDatetime":"' + comment.completeDatetime + '",';
-                                str += '"userId":"' + comment.userId + '",';
-                                str += '"userName":"' + comment.userName + '",';
-                                str += '"department":"' + comment.department + '"';
-                                str += '},';
+                                if(comment.type != '2'){
+                                    str += '{';
+                                    str += '"id":"' + comment.id + '",';
+                                    str += '"type":"' + comment.type + '",';
+                                    str += '"message":"' + comment.message + '",';
+                                    str += '"createDatetime":"' + comment.createDatetime + '",';
+                                    str += '"completeDatetime":"' + comment.completeDatetime + '",';
+                                    str += '"userId":"' + comment.userId + '",';
+                                    str += '"userName":"' + comment.userName + '",';
+                                    str += '"department":"' + comment.department + '"';
+                                    str += '},';
+                                }
                             }
                             if(process.comments.length>0){
                                 str = str.trim();
@@ -655,7 +729,9 @@ var getProcesses = function(finder,offset,limit,res){
                                 var reader = process.readers[i];
                                 str += '{';
                                 str += '"userId":"' + reader.userId + '",';
-                                str += '"userName":"' + reader.userName + '"';
+                                str += '"userName":"' + reader.userName + '",';
+                                str += '"department":"' + reader.department + '",';
+                                str += '"createDatetime":"' + reader.createDatetime + '"';
                                 str += '},';
                             }
                             if(process.readers.length>0){
