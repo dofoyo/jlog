@@ -1,6 +1,6 @@
 'use strict';
 
-var logModule = angular.module('myApp.processFilters', []);
+var logModule = angular.module('myApp.taskFilters', []);
 logModule.filter('notAdvisersAndExecters', function(){
     var attachmentNameFilter = function(users){
         if(str && str.lastIndexOf('/') != -1){

@@ -9,10 +9,10 @@ var secret = 'this is the secret secret secret 12356';
 var databaseUrl = "jlog"; // "username:password@example.com/mydb"
 var userCollections = ["users"];
 var logCollections = ["logs"];
-var processCollections = ["processes"];
+var taskCollections = ["tasks"];
 var userdb = require("mongojs").connect(databaseUrl, userCollections);
 var logdb = require("mongojs").connect(databaseUrl, logCollections);
-var processdb = require("mongojs").connect(databaseUrl, processCollections);
+var taskdb = require("mongojs").connect(databaseUrl, taskCollections);
 
 
 //------- for fileupload
@@ -131,12 +131,12 @@ app.get('/api/restricted', function (req, res) {
 });
 // ---------for  authenticate begin--------
 
-//--- for process begin -------
-app.post('/process-readed', function (req, res){
+//--- for task begin -------
+app.post('/task-readed', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
-    var processId = jdata.processId;
+    var taskId = jdata.taskId;
     var datetime = (new Date()).getTime().toString();
 
     var comment = new Object();
@@ -149,8 +149,8 @@ app.post('/process-readed', function (req, res){
     comment.userName = jdata.userName;
     comment.department = jdata.department;
 
-    processdb.processes.findAndModify({
-        query: { _id: processId },
+    taskdb.tasks.findAndModify({
+        query: { _id: taskId },
         update: {
             $pull: { readers:{userId:jdata.userId}},
             $addToSet: { comments:comment }
@@ -158,12 +158,12 @@ app.post('/process-readed', function (req, res){
         new: true
     }, function(err, doc, lastErrorObject) {
         if( err ){
-            var msg ="process read comments not added";
+            var msg ="task read comments not added";
             console.log(msg);
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
-            var msg = "process read comments added.";
+            var msg = "task read comments added.";
             //console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
@@ -172,11 +172,11 @@ app.post('/process-readed', function (req, res){
 });
 
 
-app.post('/process-no', function (req, res){
+app.post('/task-no', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
-    var processId = jdata.processId;
+    var taskId = jdata.taskId;
     var close_Date_time = jdata.closeDatetime;
     var createDatetime = jdata.createDatetime;
     var datetime = (new Date()).getTime().toString();
@@ -191,8 +191,8 @@ app.post('/process-no', function (req, res){
     comment.userName = jdata.userName;
     comment.department = jdata.department;
 
-    processdb.processes.findAndModify({
-        query: { _id: processId },
+    taskdb.tasks.findAndModify({
+        query: { _id: taskId },
         update: {
             $set:{closeDatetime:close_Date_time,readers:jdata.readers},
             $addToSet: { comments:comment }
@@ -200,12 +200,12 @@ app.post('/process-no', function (req, res){
         new: true
     }, function(err, doc, lastErrorObject) {
         if( err ){
-            var msg ="process_no not added";
+            var msg ="task_no not added";
             console.log(msg);
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
-            var msg = "process_no added.";
+            var msg = "task_no added.";
             //console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
@@ -213,11 +213,11 @@ app.post('/process-no', function (req, res){
     });
 });
 
-app.post('/process-yes', function (req, res){
+app.post('/task-yes', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
-    var processId = jdata.processId;
+    var taskId = jdata.taskId;
     var executerId = jdata.executerId;
     var datetime = (new Date()).getTime().toString();
 
@@ -231,8 +231,8 @@ app.post('/process-yes', function (req, res){
     comment.userName = jdata.userName;
     comment.department = jdata.department;
 
-    processdb.processes.findAndModify({
-        query: { _id: processId },
+    taskdb.tasks.findAndModify({
+        query: { _id: taskId },
         update: {
             $set:{closeDatetime:jdata.closeDatetime,readers:jdata.readers},
             $pull: { executers:{userId:executerId}},
@@ -241,12 +241,12 @@ app.post('/process-yes', function (req, res){
         new: true
     }, function(err, doc, lastErrorObject) {
         if( err ){
-            var msg ="process yes not added";
+            var msg ="task yes not added";
             console.log(msg);
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
-            var msg = "process yes added.";
+            var msg = "task yes added.";
             //console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
@@ -254,11 +254,11 @@ app.post('/process-yes', function (req, res){
     });
 });
 
-app.post('/process-stop', function (req, res){
+app.post('/task-stop', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
-    var processId = jdata.processId;
+    var taskId = jdata.taskId;
     var datetime = (new Date()).getTime().toString();
 
     var comment = new Object();
@@ -271,8 +271,8 @@ app.post('/process-stop', function (req, res){
     comment.userName = jdata.userName;
     comment.department = jdata.department;
 
-    processdb.processes.findAndModify({
-        query: { _id: processId },
+    taskdb.tasks.findAndModify({
+        query: { _id: taskId },
         update: {
             $set: {stopDatetime: datetime,readers:jdata.readers},
             $addToSet: { comments:comment }
@@ -280,12 +280,12 @@ app.post('/process-stop', function (req, res){
         new: true
     }, function(err, doc, lastErrorObject) {
         if( err ){
-            var msg ="process stop not success.";
+            var msg ="task stop not success.";
             console.log(msg);
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
-            var msg = "process stopped.";
+            var msg = "task stopped.";
             console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
@@ -293,11 +293,11 @@ app.post('/process-stop', function (req, res){
     });
 });
 
-app.post('/process-restart', function (req, res){
+app.post('/task-restart', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
-    var processId = jdata.processId;
+    var taskId = jdata.taskId;
     var datetime = (new Date()).getTime().toString();
 
     var comment = new Object();
@@ -310,8 +310,8 @@ app.post('/process-restart', function (req, res){
     comment.userName = jdata.userName;
     comment.department = jdata.department;
 
-    processdb.processes.findAndModify({
-        query: { _id: processId },
+    taskdb.tasks.findAndModify({
+        query: { _id: taskId },
         update: {
             $set: {stopDatetime: '', closeDatetime:'',readers:jdata.readers},
             $addToSet: { comments:comment }
@@ -319,12 +319,12 @@ app.post('/process-restart', function (req, res){
         new: true
     }, function(err, doc, lastErrorObject) {
         if( err ){
-            var msg ="process restart not success.";
+            var msg ="task restart not success.";
             console.log(msg);
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
-            var msg = "process restarted.";
+            var msg = "task restarted.";
             console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
@@ -332,11 +332,11 @@ app.post('/process-restart', function (req, res){
     });
 });
 
-app.post('/process-reader', function (req, res){
+app.post('/task-reader', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
-    var processId = jdata.processId;
+    var taskId = jdata.taskId;
     var d = new Date()
 
     if(jdata.add){
@@ -346,41 +346,41 @@ app.post('/process-reader', function (req, res){
         reader.userName = jdata.userName;
         reader.department = jdata.department;
         reader.createDatetime = d.getTime().toString();
-        processdb.processes.findAndModify({
-            query: { _id: processId },
+        taskdb.tasks.findAndModify({
+            query: { _id: taskId },
             update: {
                 $addToSet: { readers:reader }
             },
             new: true
         }, function(err, doc, lastErrorObject) {
             if( err ){
-                var msg ="process reader not added";
+                var msg ="task reader not added";
                 console.log(msg);
                 res.writeHead(500, {'Content-Type': 'application/json'});
                 res.end(msg);
             }else{
-                var msg = "process reader added.";
+                var msg = "task reader added.";
                 console.log(msg);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(msg);
             }
         });
     }else{
-        processdb.processes.findAndModify({
-            query: { _id: processId },
+        taskdb.tasks.findAndModify({
+            query: { _id: taskId },
             update: {
                 $pull: { readers:{userId:jdata.userId}}
             },
             new: true
         }, function(err, doc, lastErrorObject) {
             if( err ){
-                var msg ="process reader " + jdata.userId + "," + jdata.createDatetime + " not deleted";
+                var msg ="task reader " + jdata.userId + "," + jdata.createDatetime + " not deleted";
                 console.log(msg);
                 res.writeHead(500, {'Content-Type': 'application/json'});
                 res.end(msg);
             }else{
                 //console.log(doc);
-                var msg = "process reader " + jdata.userId + "," + jdata.createDatetime  + " deleted.";
+                var msg = "task reader " + jdata.userId + "," + jdata.createDatetime  + " deleted.";
                 console.log(msg);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(msg);
@@ -390,11 +390,11 @@ app.post('/process-reader', function (req, res){
 });
 
 
-app.post('/process-adviser', function (req, res){
+app.post('/task-adviser', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
-    var processId = jdata.processId;
+    var taskId = jdata.taskId;
     var d = new Date()
 
     if(jdata.add){
@@ -404,41 +404,41 @@ app.post('/process-adviser', function (req, res){
         adviser.userName = jdata.userName;
         adviser.department = jdata.department;
         adviser.createDatetime = d.getTime().toString();
-        processdb.processes.findAndModify({
-            query: { _id: processId },
+        taskdb.tasks.findAndModify({
+            query: { _id: taskId },
             update: {
                 $addToSet: { advisers:adviser }
             },
             new: true
         }, function(err, doc, lastErrorObject) {
             if( err ){
-                var msg ="process adviser not added";
+                var msg ="task adviser not added";
                 console.log(msg);
                 res.writeHead(500, {'Content-Type': 'application/json'});
                 res.end(msg);
             }else{
-                var msg = "process adviser added.";
+                var msg = "task adviser added.";
                 console.log(msg);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(msg);
             }
         });
     }else{
-        processdb.processes.findAndModify({
-            query: { _id: processId },
+        taskdb.tasks.findAndModify({
+            query: { _id: taskId },
             update: {
                 $pull: { advisers:{id:jdata.id}}
             },
             new: true
         }, function(err, doc, lastErrorObject) {
             if( err ){
-                var msg ="process adviser " + jdata.id + "," + jdata.createDatetime + " not deleted";
+                var msg ="task adviser " + jdata.id + "," + jdata.createDatetime + " not deleted";
                 console.log(msg);
                 res.writeHead(500, {'Content-Type': 'application/json'});
                 res.end(msg);
             }else{
                 //console.log(doc);
-                var msg = "process adviser " + jdata.id + "," + jdata.createDatetime  + " deleted.";
+                var msg = "task adviser " + jdata.id + "," + jdata.createDatetime  + " deleted.";
                 console.log(msg);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(msg);
@@ -447,11 +447,11 @@ app.post('/process-adviser', function (req, res){
     }
 });
 
-app.post('/process-executer', function (req, res){
+app.post('/task-executer', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
-    var processId = jdata.processId;
+    var taskId = jdata.taskId;
     var d = new Date()
 
     if(jdata.add){
@@ -462,41 +462,41 @@ app.post('/process-executer', function (req, res){
         executer.department = jdata.department;
         executer.createDatetime = d.getTime().toString();
         executer.completeDatetime = '';
-        processdb.processes.findAndModify({
-            query: { _id: processId },
+        taskdb.tasks.findAndModify({
+            query: { _id: taskId },
             update: {
                 $addToSet: { executers:executer }
             },
             new: true
         }, function(err, doc, lastErrorObject) {
             if( err ){
-                var msg ="process executer not added";
+                var msg ="task executer not added";
                 console.log(msg);
                 res.writeHead(500, {'Content-Type': 'application/json'});
                 res.end(msg);
             }else{
-                var msg = "process executer added.";
+                var msg = "task executer added.";
                 console.log(msg);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(msg);
             }
         });
     }else{
-        processdb.processes.findAndModify({
-            query: { _id: processId },
+        taskdb.tasks.findAndModify({
+            query: { _id: taskId },
             update: {
                 $pull: { executers:{id:jdata.id}}
             },
             new: true
         }, function(err, doc, lastErrorObject) {
             if( err ){
-                var msg ="process executer " + jdata.id + "," + jdata.createDatetime + " not deleted";
+                var msg ="task executer " + jdata.id + "," + jdata.createDatetime + " not deleted";
                 console.log(msg);
                 res.writeHead(500, {'Content-Type': 'application/json'});
                 res.end(msg);
             }else{
                 //console.log(doc);
-                var msg = "process executer " + jdata.id + "," + jdata.createDatetime  + " deleted.";
+                var msg = "task executer " + jdata.id + "," + jdata.createDatetime  + " deleted.";
                 console.log(msg);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(msg);
@@ -505,11 +505,11 @@ app.post('/process-executer', function (req, res){
     }
 });
 
-app.post('/process-supplement', function (req, res){
+app.post('/task-supplement', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jdata = JSON.parse(req.body.mydata);
-    var processId = jdata.processId;
+    var taskId = jdata.taskId;
     var userId = jdata.userId;
     var datetime = (new Date()).getTime().toString();
 
@@ -523,8 +523,8 @@ app.post('/process-supplement', function (req, res){
     comment.userName = jdata.userName;
     comment.department = jdata.department;
 
-    processdb.processes.findAndModify({
-        query: { _id: processId },
+    taskdb.tasks.findAndModify({
+        query: { _id: taskId },
         update: {
             $set:{readers:jdata.readers},
             $addToSet: { comments:comment },
@@ -533,12 +533,12 @@ app.post('/process-supplement', function (req, res){
         new: true
     }, function(err, doc, lastErrorObject) {
         if( err ){
-            var msg ="process supplement not added";
+            var msg ="task supplement not added";
             console.log(msg);
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
-            var msg = "process supplement added.";
+            var msg = "task supplement added.";
             //console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
@@ -546,13 +546,13 @@ app.post('/process-supplement', function (req, res){
     });
 });
 
-app.post('/process', function (req, res){
+app.post('/task', function (req, res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
     var jsonData = JSON.parse(req.body.mydata);
     var d = new Date();
 
-    processdb.processes.save({
+    taskdb.tasks.save({
         _id:jsonData.id,
         type:jsonData.type,
         subject:jsonData.subject,
@@ -569,12 +569,12 @@ app.post('/process', function (req, res){
         executers:[]
         }, function(err, saved) {
         if( err || !saved ){
-            var msg ="process not saved";
+            var msg ="task not saved";
             console.log(msg);
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(msg);
         }else{
-            var msg = "process saved.";
+            var msg = "task saved.";
             //console.log(msg);
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(msg);
@@ -582,8 +582,8 @@ app.post('/process', function (req, res){
     });
 });
 
-app.get('/processes',function(req,res){
-    console.log("/processes");
+app.get('/tasks',function(req,res){
+    console.log("/tasks");
     //console.log(req.param('userName'));
     //console.log('type: ' + req.param('type'));
     var type = 1*req.param("type");
@@ -669,42 +669,42 @@ app.get('/processes',function(req,res){
             break;
     }
 
-    getProcesses(finder,offset,limit,res);
+    getTasks(finder,offset,limit,res);
 });
 
-var getProcesses = function(finder,offset,limit,res){
+var getTasks = function(finder,offset,limit,res){
     res.header("Access-Control-Allow-Origin", "http://localhost");
     res.header("Access-Control-Allow-Methods", "GET, POST");
-    processdb.processes.
+    taskdb.tasks.
         find(finder).
         skip(offset).
         limit(limit).
         sort({createDatetime:-1},
-        function(err, processes) {
-            if( err || !processes){
-                console.log("get processed error! could NOT find processes!");
+        function(err, tasks) {
+            if( err || !tasks){
+                console.log("get taskes error! could NOT find tasks!");
                 console.log(err);
                 res.writeHead(500, {'Content-Type': 'application/text'});
                 res.end("[]");
             } else {
-                console.log("there are "+ processes.length +" processes Found!");
+                console.log("there are "+ tasks.length +" tasks Found!");
                 var str='[';
-                if(processes.length>0){
-                    processes.forEach( function(process) {
+                if(tasks.length>0){
+                    tasks.forEach( function(task) {
                         str += '{';
-                        str += '"id":"' + process._id + '",';
-                        str += '"type":"' + process.type + '",';
-                        str += '"subject":"' + process.subject + '",';
-                        str += '"description":"' + process.description + '",';
-                        str += '"createDatetime":"' + process.createDatetime + '",';
-                        str += '"closeDatetime":"' + process.closeDatetime + '",';
-                        str += '"stopDatetime":"' + process.stopDatetime + '",';
-                        str += '"userId":"' + process.userId + '",';
-                        str += '"userName":"' + process.userName + '",';
-                        str += '"department":"' + process.department + '",';
+                        str += '"id":"' + task._id + '",';
+                        str += '"type":"' + task.type + '",';
+                        str += '"subject":"' + task.subject + '",';
+                        str += '"description":"' + task.description + '",';
+                        str += '"createDatetime":"' + task.createDatetime + '",';
+                        str += '"closeDatetime":"' + task.closeDatetime + '",';
+                        str += '"stopDatetime":"' + task.stopDatetime + '",';
+                        str += '"userId":"' + task.userId + '",';
+                        str += '"userName":"' + task.userName + '",';
+                        str += '"department":"' + task.department + '",';
                         str += '"comments":[';
-                            for(var i=process.comments.length-1; i>-1; i--){
-                                var comment = process.comments[i];
+                            for(var i=task.comments.length-1; i>-1; i--){
+                                var comment = task.comments[i];
                                 if(comment.type != '2'){
                                     str += '{';
                                     str += '"id":"' + comment.id + '",';
@@ -718,15 +718,15 @@ var getProcesses = function(finder,offset,limit,res){
                                     str += '},';
                                 }
                             }
-                            if(process.comments.length>0){
+                            if(task.comments.length>0){
                                 str = str.trim();
                                 str = str.substring(0,str.length-1);
                             }
                         str += '],';
 
                         str += '"readers":[';
-                            for(var i=process.readers.length-1; i>-1; i--){
-                                var reader = process.readers[i];
+                            for(var i=task.readers.length-1; i>-1; i--){
+                                var reader = task.readers[i];
                                 str += '{';
                                 str += '"userId":"' + reader.userId + '",';
                                 str += '"userName":"' + reader.userName + '",';
@@ -734,14 +734,14 @@ var getProcesses = function(finder,offset,limit,res){
                                 str += '"createDatetime":"' + reader.createDatetime + '"';
                                 str += '},';
                             }
-                            if(process.readers.length>0){
+                            if(task.readers.length>0){
                                 str = str.trim();
                                 str = str.substring(0,str.length-1);
                             }
                         str += '],';
                         str += '"advisers":[';
-                            for(var i=process.advisers.length-1; i>-1; i--){
-                                var adviser = process.advisers[i];
+                            for(var i=task.advisers.length-1; i>-1; i--){
+                                var adviser = task.advisers[i];
                                 str += '{';
                                 str += '"id":"' + adviser.id + '",';
                                 str += '"userId":"' + adviser.userId + '",';
@@ -750,14 +750,14 @@ var getProcesses = function(finder,offset,limit,res){
                                 str += '"createDatetime":"' + adviser.createDatetime + '"';
                                 str += '},';
                             }
-                            if(process.advisers.length>0){
+                            if(task.advisers.length>0){
                                 str = str.trim();
                                 str = str.substring(0,str.length-1);
                             }
                         str += '],';
                         str += '"executers":[';
-                            for(var i=process.executers.length-1; i>-1; i--){
-                                var executer = process.executers[i];
+                            for(var i=task.executers.length-1; i>-1; i--){
+                                var executer = task.executers[i];
                                 str += '{';
                                 str += '"id":"' + executer.id + '",';
                                 str += '"userId":"' + executer.userId + '",';
@@ -766,7 +766,7 @@ var getProcesses = function(finder,offset,limit,res){
                                 str += '"createDatetime":"' + executer.createDatetime + '"';
                                 str += '},';
                             }
-                            if(process.executers.length>0){
+                            if(task.executers.length>0){
                                 str = str.trim();
                                 str = str.substring(0,str.length-1);
                             }
@@ -786,7 +786,7 @@ var getProcesses = function(finder,offset,limit,res){
         });
 }
 
-//--- for process begin -------
+//--- for task begin -------
 
 //------ for log begin --------
 app.get('/logs/own', function (req, res) {

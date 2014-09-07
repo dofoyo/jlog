@@ -1,5 +1,5 @@
 <style type="text/css">
-    .processDiv {
+    .taskDiv {
         display:none;
     }
     .yesDiv {
@@ -32,20 +32,20 @@
 </div>
 
 <div ng-show="pageState.createDiv">
-    <input type="text" class="form-control" placeholder="类型" ng-model="processes.formData.type">
-    <input type="text" class="form-control" placeholder="主题" ng-model="processes.formData.subject">
-    <TEXTAREA ROWS="4" ng-model="processes.formData.description" class="form-control" placeholder="详细阐述"></TEXTAREA>
-    <button type="button" ng-click="processes.create()" class="btn btn-default">保存</button>
+    <input type="text" class="form-control" placeholder="类型" ng-model="tasks.formData.type">
+    <input type="text" class="form-control" placeholder="主题" ng-model="tasks.formData.subject">
+    <TEXTAREA ROWS="4" ng-model="tasks.formData.description" class="form-control" placeholder="详细阐述"></TEXTAREA>
+    <button type="button" ng-click="tasks.create()" class="btn btn-default">保存</button>
 </div>
 
 <div ng-show="pageState.todoDiv">
     <div class="input-group">
         <span class="input-group-addon">关键字：</span>
-        <input type="text" ng-model="processes.params.keyWord" class="form-control" />
+        <input type="text" ng-model="tasks.params.keyWord" class="form-control" />
         <span class="input-group-btn">
-            <button type="button" ng-click="processes.getProcesses(2);" class="btn btn-default">待处理</button>
-            <button type="button" ng-click="processes.getProcesses(3);" class="btn btn-default">待参与</button>
-            <button type="button" ng-click="processes.getProcesses(4);" class="btn btn-default">待阅</button>
+            <button type="button" ng-click="tasks.getTasks(2);" class="btn btn-default">待处理</button>
+            <button type="button" ng-click="tasks.getTasks(3);" class="btn btn-default">待参与</button>
+            <button type="button" ng-click="tasks.getTasks(4);" class="btn btn-default">待阅</button>
        </span>
     </div>
 </div>
@@ -53,32 +53,32 @@
 <div ng-show="pageState.doneDiv">
     <div class="input-group">
         <span class="input-group-addon">关键字：</span>
-        <input type="text" ng-model="processes.params.keyWord" class="form-control" />
+        <input type="text" ng-model="tasks.params.keyWord" class="form-control" />
         <span class="input-group-btn">
-            <button type="button" ng-click="processes.getProcesses(5);" class="btn btn-default">未结束</button>
-            <button type="button" ng-click="processes.getProcesses(6);" class="btn btn-default">已结束</button>
-            <button type="button" ng-click="processes.getProcesses(7);" class="btn btn-default">已终止</button>
+            <button type="button" ng-click="tasks.getTasks(5);" class="btn btn-default">未结束</button>
+            <button type="button" ng-click="tasks.getTasks(6);" class="btn btn-default">已结束</button>
+            <button type="button" ng-click="tasks.getTasks(7);" class="btn btn-default">已终止</button>
        </span>
     </div>
 </div>
 
 <div>
 <ul class="list-group">
-    <li ng-repeat="process in processes.list" class="list-group-item">
-        <div ng-click="processes.selectProcess($index)">
-            <span class="badge">{{$index+1}}.{{process.state}}</span><br>
-            <span class="text-info">{{process.userName}}</span>
-            <span class="text-muted">({{process.department}})</span><br>
-            <span class="text-primary">{{process.subject}}</span>
-            <span class="text-muted">({{process.createDatetime  | date:'yyyy-MM-dd hh:mm:ss'}})</span>
+    <li ng-repeat="task in tasks.list" class="list-group-item">
+        <div ng-click="tasks.selectTask($index)">
+            <span class="badge">{{$index+1}}.{{task.state}}</span><br>
+            <span class="text-info">{{task.userName}}</span>
+            <span class="text-muted">({{task.department}})</span><br>
+            <span class="text-primary">{{task.subject}}</span>
+            <span class="text-muted">({{task.createDatetime  | date:'yyyy-MM-dd hh:mm:ss'}})</span>
         </div>
-        <div  ng-class="{processDiv:$index!=processes.index || process.div.show}">
-            <span class="text-primary">{{process.description}}</span><br>
-            待{{process.caption.executer}}：<span  class="text-info" ng-repeat="executer in process.executers">{{executer.userName}}，</span><br>
-            待{{process.caption.adviser}}：<span  class="text-info" ng-repeat="adviser in process.advisers">{{adviser.userName}}，</span><br>
-            待阅：<span  class="text-info" ng-repeat="reader in process.readers">{{reader.userName}}，</span>
+        <div  ng-class="{taskDiv:$index!=tasks.index || task.div.show}">
+            <span class="text-primary">{{task.description}}</span><br>
+            待{{task.caption.executer}}：<span  class="text-info" ng-repeat="executer in task.executers">{{executer.userName}}，</span><br>
+            待{{task.caption.adviser}}：<span  class="text-info" ng-repeat="adviser in task.advisers">{{adviser.userName}}，</span><br>
+            待阅：<span  class="text-info" ng-repeat="reader in task.readers">{{reader.userName}}，</span>
             <table class="table">
-                <tr ng-repeat="comment in process.comments">
+                <tr ng-repeat="comment in task.comments">
                     <td align="right">
                         <span  ng-show="!{{comment.type}}" class="text-info">{{comment.userName}}</span>
                     </td>
@@ -94,53 +94,53 @@
             </table>
             <div class="btn-toolbar">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-default" ng-show="process.toolbar.yesBtn" ng-click="process.showDiv('yesDiv')">
-                        <abbr title="流程通过本节点，进入下一执行人。">{{process.caption.yesBtn}}</abbr>
+                    <button type="button" class="btn btn-default" ng-show="task.toolbar.yesBtn" ng-click="task.showDiv('yesDiv')">
+                        <abbr title="流程通过本节点，进入下一执行人。">{{task.caption.yesBtn}}</abbr>
                     </button>
-                    <button type="button" class="btn btn-default" ng-show="process.toolbar.noBtn" ng-click="process.showDiv('noDiv')">
-                        <abbr title="流程返回到上一节点">{{process.caption.noBtn}}</abbr>
+                    <button type="button" class="btn btn-default" ng-show="task.toolbar.noBtn" ng-click="task.showDiv('noDiv')">
+                        <abbr title="流程返回到上一节点">{{task.caption.noBtn}}</abbr>
                     </button>
                 </div>
                 <div class="btn-group">
-                    <button type="button" class="btn btn-default" ng-show="process.toolbar.userBtn" ng-click="process.showDiv('userDiv')">
+                    <button type="button" class="btn btn-default" ng-show="task.toolbar.userBtn" ng-click="task.showDiv('userDiv')">
                         <abbr title="未关闭、未终止的流程，发起人和当前人可随时新增其他人员。执行人会对流程的流向直接产生影响，知会人可发表意见，也可不发表意见，不会直接改变流程的流向">人员</abbr>
                     </button>
                 </div>
                 <div class="btn-group">
-                    <button type="button" class="btn btn-default" ng-show="process.toolbar.supplementBtn" ng-click="process.showDiv('supplementDiv')">
-                        <abbr title="未关闭、未终止的流程，参与者可随时发言，不会直接改变流程的流向">{{process.toolbar.supplementBtnTitle}}</abbr>
+                    <button type="button" class="btn btn-default" ng-show="task.toolbar.supplementBtn" ng-click="task.showDiv('supplementDiv')">
+                        <abbr title="未关闭、未终止的流程，参与者可随时发言，不会直接改变流程的流向">{{task.toolbar.supplementBtnTitle}}</abbr>
                     </button>
-                    <button type="button" class="btn btn-default" ng-show="process.toolbar.attachmentBtn" ng-click="process.showDiv('attachmentDiv')">
+                    <button type="button" class="btn btn-default" ng-show="task.toolbar.attachmentBtn" ng-click="task.showDiv('attachmentDiv')">
                         <abbr title="未关闭、未终止的流程，参与者可随时加附件，不会直接改变流程的流向">附件</abbr>
                     </button>
                 </div>
                 <div class="btn-group">
-                    <button type="button" class="btn btn-default" ng-show="process.toolbar.stopBtn" ng-click="process.showDiv('stopDiv')">
+                    <button type="button" class="btn btn-default" ng-show="task.toolbar.stopBtn" ng-click="task.showDiv('stopDiv')">
                         <abbr title="未完成的流程可被发起人和当前处理人强制终止，终止状态的流程除加入知会人外，其他操作都被禁止。">终止</abbr>
                     </button>
-                    <button type="button" class="btn btn-default" ng-show="process.toolbar.restartBtn" ng-click="process.showDiv('restartDiv')">
+                    <button type="button" class="btn btn-default" ng-show="task.toolbar.restartBtn" ng-click="task.showDiv('restartDiv')">
                         <abbr title="流程完成后自动关闭，关闭状态的流程除加入知会人外，其他操作都被禁止。流程发起人或处理人可重启已关闭或终止的流程，流程将按新增人员运行">重启</abbr>
                     </button>
                 </div>
             </div>
             <div>
-                <div  ng-class="{yesDiv: $index!=processes.index || process.div.yesDiv}">
-                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                    <button type="button" ng-click="process.yes();" class="btn btn-default">{{process.caption.yesBtn}}</button>
+                <div  ng-class="{yesDiv: $index!=tasks.index || task.div.yesDiv}">
+                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="task.formData"  class="form-control"></TEXTAREA>
+                    <button type="button" ng-click="task.yes();" class="btn btn-default">{{task.caption.yesBtn}}</button>
                 </div>
-                <div  ng-class="{noDiv: $index!=processes.index || process.div.noDiv}">
-                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                    <button type="button" ng-click="process.no();" class="btn btn-default">{{process.caption.noBtn}}</button>
+                <div  ng-class="{noDiv: $index!=tasks.index || task.div.noDiv}">
+                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="task.formData"  class="form-control"></TEXTAREA>
+                    <button type="button" ng-click="task.no();" class="btn btn-default">{{task.caption.noBtn}}</button>
                 </div>
-                <div  ng-class="{stopDiv: $index!=processes.index || process.div.stopDiv}">
-                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                    <button type="button" ng-click="process.stop();" class="btn btn-default">确定终止</button>
+                <div  ng-class="{stopDiv: $index!=tasks.index || task.div.stopDiv}">
+                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="task.formData"  class="form-control"></TEXTAREA>
+                    <button type="button" ng-click="task.stop();" class="btn btn-default">确定终止</button>
                 </div>
-                <div  ng-class="{restartDiv: $index!=processes.index || process.div.restartDiv}">
-                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                    <button type="button" ng-click="process.restart();" class="btn btn-default">确定重启</button>
+                <div  ng-class="{restartDiv: $index!=tasks.index || task.div.restartDiv}">
+                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="task.formData"  class="form-control"></TEXTAREA>
+                    <button type="button" ng-click="task.restart();" class="btn btn-default">确定重启</button>
                 </div>
-                <div  ng-class="{userDiv: $index!=processes.index || process.div.userDiv}">
+                <div  ng-class="{userDiv: $index!=tasks.index || task.div.userDiv}">
                     <div class="input-group">
                         <span class="input-group-addon">查找：</span>
                         <input type="text" ng-model="users.keyWord" class="form-control" placeholder="请输入姓名的关键字"/>
@@ -148,29 +148,29 @@
                         <button type="button" ng-click="users.refresh()" class="btn btn-default">GO</button>
                    </span>
                     </div>
-                    <div ng-repeat="executer in process.executers" class="panel panel-primary">
+                    <div ng-repeat="executer in task.executers" class="panel panel-primary">
                         <div class="panel-heading">
                             <span class="badge">{{$index+1}}</span>
-                            {{process.caption.executer}}：{{executer.userName}}
-                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delExecuter($index)">取消{{process.caption.executer}}</button></div>
+                            {{task.caption.executer}}：{{executer.userName}}
+                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="task.delExecuter($index)">取消{{task.caption.executer}}</button></div>
                             <br>
                             {{executer.department}}
                         </div>
                     </div>
-                    <div ng-repeat="adviser in process.advisers" class="panel panel-success">
+                    <div ng-repeat="adviser in task.advisers" class="panel panel-success">
                         <div class="panel-heading">
                             <span class="badge">{{$index+1}}</span>
-                            {{process.caption.adviser}}：{{adviser.userName}}
-                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delAdviser($index)">取消{{process.caption.adviser}}</button></div>
+                            {{task.caption.adviser}}：{{adviser.userName}}
+                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="task.delAdviser($index)">取消{{task.caption.adviser}}</button></div>
                             <br>
                             {{adviser.department}}
                         </div>
                     </div>
-                    <div ng-repeat="reader in process.readers" class="panel panel-info">
+                    <div ng-repeat="reader in task.readers" class="panel panel-info">
                         <div class="panel-heading">
                             <span class="badge">{{$index+1}}</span>
                             知会人：{{reader.userName}}
-                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="process.delReader($index)">取消知会人</button></div>
+                            <div class="pull-right"><button type="button" class="btn btn-default btn-xs" ng-click="task.delReader($index)">取消知会人</button></div>
                             <br>
                             {{reader.department}}
                         </div>
@@ -179,20 +179,20 @@
                         <div class="panel-body">
                             {{user.userName}}
                             <div class="pull-right">
-                                <button type="button" class="btn btn-default btn-xs" ng-click="process.addExecuter($index)">{{process.caption.executer}}</button>
-                                <button type="button" class="btn btn-default btn-xs" ng-click="process.addAdviser($index)">{{process.caption.adviser}}</button>
-                                <button type="button" class="btn btn-default btn-xs" ng-click="process.addReader($index)">知会人</button>
+                                <button type="button" class="btn btn-default btn-xs" ng-click="task.addExecuter($index)">{{task.caption.executer}}</button>
+                                <button type="button" class="btn btn-default btn-xs" ng-click="task.addAdviser($index)">{{task.caption.adviser}}</button>
+                                <button type="button" class="btn btn-default btn-xs" ng-click="task.addReader($index)">知会人</button>
                             </div>
                             <br>
                             {{user.department}}
                         </div>
                     </div>
                 </div>
-                <div  ng-class="{supplementDiv: $index!=processes.index || process.div.supplementDiv}">
-                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="process.formData"  class="form-control"></TEXTAREA>
-                    <button type="button" ng-click="process.supplement();" class="btn btn-default">提交</button>
+                <div  ng-class="{supplementDiv: $index!=tasks.index || task.div.supplementDiv}">
+                    <TEXTAREA NAME="" ROWS="2" COLS="20" ng-model="task.formData"  class="form-control"></TEXTAREA>
+                    <button type="button" ng-click="task.supplement();" class="btn btn-default">提交</button>
                 </div>
-                <div  ng-class="{attachmentDiv: $index!=processes.index || process.div.attachmentDiv}">
+                <div  ng-class="{attachmentDiv: $index!=tasks.index || task.div.attachmentDiv}">
                     <br>
                     <input ng-file-select type="file" multiple/>
                     <table class="table">
@@ -238,19 +238,19 @@
             </div>
         </div>
     </li>
-    <li class="list-group-item"><button type="button" ng-click="processes.refresh();" ng-show="processes.hasMore" class="btn btn-default">更多</button></li>
+    <li class="list-group-item"><button type="button" ng-click="tasks.refresh();" ng-show="tasks.hasMore" class="btn btn-default">更多</button></li>
 </ul>
 </div>
 
 <script>
-    $('#myTab a[href="#process"]').tab('show');
+    $('#myTab a[href="#task"]').tab('show');
 </script>
 
 <div ng-show="false">
     todo:
-    1、process.logs记载加入人员、取消人员的操作
+    1、task.logs记载加入人员、取消人员的操作
     2、某人登录后，显示有多少待办、多少待阅...
-    3、业务表单和流程分离，业务表单多种多样，但流程都一样。需要将process的显示和操作封装为directives
-    4、getProcesses返回的是process.subject，getProcess返回的是完整的process，即懒加载。
+    3、业务表单和流程分离，业务表单多种多样，但流程都一样。需要将task的显示和操作封装为directives
+    4、getTasks返回的是task.subject，getTask返回的是完整的task，即懒加载。
     5、已完成了http.get的service封装，需要将http.post也封装。
 </div>

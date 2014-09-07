@@ -4,8 +4,8 @@
 angular.module('myApp', [
   'ngRoute',
   'angularFileUpload',
-        'myApp.processControllers',
-        'myApp.processServices',
+  'myApp.taskControllers',
+  'myApp.taskServices',
   'myApp.logServices',
   'myApp.logFilters',
   'myApp.userServices',
@@ -22,7 +22,7 @@ config(function ($httpProvider) {
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
 }).
 config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/process', {templateUrl: 'process/views/process.html', controller: 'ProcessCtrl'});
+  $routeProvider.when('/task', {templateUrl: 'task/views/task.html', controller: 'TaskCtrl'});
   $routeProvider.when('/log', {templateUrl: 'log/views/log.html', controller: 'LogCtrl'});
   $routeProvider.when('/relationship', {templateUrl: 'user/views/relationship.html', controller: ''});
   $routeProvider.when('/login', {templateUrl: 'login/views/login.html', controller: 'LoginCtrl'});

@@ -1,7 +1,7 @@
 'use strict';
-var pc = angular.module('myApp.processControllers', []);
+var pc = angular.module('myApp.taskControllers', []);
 
-pc.controller('ProcessCtrl',[
+pc.controller('TaskCtrl',[
     '$scope',
     '$http',
     '$templateCache',
@@ -9,9 +9,9 @@ pc.controller('ProcessCtrl',[
     '$fileUploader',
     'CommentType',
     'uuid',
-    'Processes',
+    'Tasks',
     'User',
-    function($scope, $http, $templateCache, $window,$fileUploader,CommentType,uuid,Processes,User){
+    function($scope, $http, $templateCache, $window,$fileUploader,CommentType,uuid,Tasks,User){
         $scope.loginUser = $window.sessionStorage.token ?  {
             userId:$window.sessionStorage.loginUserId,
             userName:$window.sessionStorage.loginUserName,
@@ -32,7 +32,7 @@ pc.controller('ProcessCtrl',[
             }
         };
 
-        $scope.processes ={
+        $scope.tasks ={
             formData:{
                 type:'',
                 subject:'',
@@ -50,25 +50,25 @@ pc.controller('ProcessCtrl',[
             hasMore:false,
 
             refresh:function(){
-                Processes.query(this.params,function(data){
-                    $scope.processes.hasMore  = data.length==$scope.processes.params.limit ? true : false;
-                    $scope.processes.params.offset += data.length;
+                Tasks.query(this.params,function(data){
+                    $scope.tasks.hasMore  = data.length==$scope.tasks.params.limit ? true : false;
+                    $scope.tasks.params.offset += data.length;
                     console.log("data.length: " + data.length)
                     for(var i=0; i<data.length; i++){
-                        var process = new Process(data[i],$scope,$http,$templateCache);
-                        $scope.processes.list.push(process);
+                        var task = new Task(data[i],$scope,$http,$templateCache);
+                        $scope.tasks.list.push(task);
                     };
                 })
             },
 
-            selectProcess: function(index){
-                var process = this.list[index];
-                process.readed();
-                process.refreshToolbar();
+            selectTask: function(index){
+                var task = this.list[index];
+                task.readed();
+                task.refreshToolbar();
                 if(this.index == index){
-                    process.div.show = !process.div.show;
+                    task.div.show = !task.div.show;
                 }else{
-                    process.div.show = false;
+                    task.div.show = false;
                 }
                 this.index = index;
             },
@@ -80,7 +80,7 @@ pc.controller('ProcessCtrl',[
                 this.hasMore = false;
             },
 
-            getProcess:function(){
+            getTask:function(){
                 return this.list[this.index];
             },
 
@@ -91,7 +91,7 @@ pc.controller('ProcessCtrl',[
                     var subject = this.formData.subject.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
                     var description = this.formData.description.replace(/[\n\r]/g,'').replace(/[\\]/g,'');
 
-                    var process = {
+                    var task = {
                         id:id,
                         type:type,
                         subject:subject,
@@ -108,11 +108,11 @@ pc.controller('ProcessCtrl',[
                         executers:[]
                     };
 
-                    var jdata = 'mydata='+JSON.stringify(process);
+                    var jdata = 'mydata='+JSON.stringify(task);
                     //alert('save ' +jdata );
-                    saveData('/process',$http,$templateCache,jdata);
+                    saveData('/task',$http,$templateCache,jdata);
 
-                    this.list.splice(0,0,new Process(process,$scope,$http,$templateCache));
+                    this.list.splice(0,0,new Task(task,$scope,$http,$templateCache));
 
                     this.formData.type = '';
                     this.formData.subject = '';
@@ -122,7 +122,7 @@ pc.controller('ProcessCtrl',[
                 }
             },
 
-            getProcesses: function(type){
+            getTasks: function(type){
                 this.empty();
                 this.params.type = type;
                 this.refresh();
@@ -151,11 +151,11 @@ pc.controller('ProcessCtrl',[
                     //console.log('showDiv: ' + div);
 
                     if(this.createDiv){
-                        $scope.processes.getProcesses('1');
+                        $scope.tasks.getTasks('1');
                     }else if(this.todoDiv){
-                        $scope.processes.getProcesses('2');
+                        $scope.tasks.getTasks('2');
                     }else if(this.doneDiv){
-                        $scope.processes.getProcesses('5');
+                        $scope.tasks.getTasks('5');
                     }
                 }
             }
@@ -173,9 +173,9 @@ pc.controller('ProcessCtrl',[
 
         // REGISTER HANDLERS
         uploader.bind('success', function (event, xhr, item, response) {
-            var process = $scope.processes.getProcess();
-            process.formData = response.url;
-            process.supplement();
+            var task = $scope.tasks.getTask();
+            task.formData = response.url;
+            task.supplement();
         });
 
         uploader.bind('completeall', function (event, items) {
@@ -203,7 +203,7 @@ function saveData(url,$http,$templateCache,jdata){
         });
 }
 
-function Process(obj,$scope,$http,$templateCache){
+function Task(obj,$scope,$http,$templateCache){
     this.id = obj.id;
     this.type = obj.type;
     this.subject = obj.subject;
@@ -529,7 +529,7 @@ function Process(obj,$scope,$http,$templateCache){
 
         var comment = {
             readers:this.getReaders(),
-            processId:this.id,
+            taskId:this.id,
             closeDatetime: close_Date_time,
             id:datetime,
             type:'0',
@@ -542,7 +542,7 @@ function Process(obj,$scope,$http,$templateCache){
         };
 
         var jdata = 'mydata='+JSON.stringify(comment);
-        saveData('/process-no',$http,$templateCache,jdata);
+        saveData('/task-no',$http,$templateCache,jdata);
 
         this.comments.splice(0,0,comment);
         this.formData = "";
@@ -571,7 +571,7 @@ function Process(obj,$scope,$http,$templateCache){
 
         var comment = {
             readers:this.getReaders(),
-            processId:this.id,
+            taskId:this.id,
             closeDatetime: close_Date_time,
             executerId:executerId,
             id:datetime,
@@ -585,7 +585,7 @@ function Process(obj,$scope,$http,$templateCache){
         };
 
         var jdata = 'mydata='+JSON.stringify(comment);
-        saveData('/process-yes',$http,$templateCache,jdata);
+        saveData('/task-yes',$http,$templateCache,jdata);
 
         this.comments.splice(0,0,comment);
         this.formData = "";
@@ -602,7 +602,7 @@ function Process(obj,$scope,$http,$templateCache){
 
         var comment = {
             readers:this.getReaders(),
-            processId:this.id,
+            taskId:this.id,
             id:datetime,
             type:'1',
             message:msg,
@@ -615,7 +615,7 @@ function Process(obj,$scope,$http,$templateCache){
 
         var jdata = 'mydata='+JSON.stringify(comment);
         console.log(comment);
-        saveData('/process-supplement',$http,$templateCache,jdata);
+        saveData('/task-supplement',$http,$templateCache,jdata);
 
         this.comments.splice(0,0,comment);
         this.rebuildAdvisers();
@@ -638,21 +638,21 @@ function Process(obj,$scope,$http,$templateCache){
         this.executers.push(executer);
 
         executer.add = true;
-        executer.processId = this.id;
+        executer.taskId = this.id;
         var jdata = 'mydata='+JSON.stringify(executer);
-        saveData('/process-executer',$http,$templateCache,jdata);
+        saveData('/task-executer',$http,$templateCache,jdata);
 
     }
 
     this.readed = function(){
         if(this.isReader()){
             var reader = {
-                processId: this.id,
+                taskId: this.id,
                 userId:$scope.loginUser.userId,
                 userName:$scope.loginUser.userName
             };
             var jdata = 'mydata='+JSON.stringify(reader);
-            saveData('/process-readed',$http,$templateCache,jdata);
+            saveData('/task-readed',$http,$templateCache,jdata);
         }
     }
 
@@ -668,10 +668,10 @@ function Process(obj,$scope,$http,$templateCache){
         this.executers.splice(index,1);
 
         executer.add = false;
-        executer.processId = this.id;
+        executer.taskId = this.id;
         //alert(executer.id);
         var jdata = 'mydata='+JSON.stringify(executer);
-        saveData('/process-executer',$http,$templateCache,jdata);
+        saveData('/task-executer',$http,$templateCache,jdata);
     }
 
     this.addAdviser = function(index){
@@ -690,9 +690,9 @@ function Process(obj,$scope,$http,$templateCache){
         this.advisers.push(adviser);
 
         adviser.add = true;
-        adviser.processId = this.id;
+        adviser.taskId = this.id;
         var jdata = 'mydata='+JSON.stringify(adviser);
-        saveData('/process-adviser',$http,$templateCache,jdata);
+        saveData('/task-adviser',$http,$templateCache,jdata);
 
     }
 
@@ -708,9 +708,9 @@ function Process(obj,$scope,$http,$templateCache){
         $scope.users.list.push(adviser);
 
         adviser.add = false;
-        adviser.processId = this.id;
+        adviser.taskId = this.id;
         var jdata = 'mydata='+JSON.stringify(adviser);
-        saveData('/process-adviser',$http,$templateCache,jdata);
+        saveData('/task-adviser',$http,$templateCache,jdata);
     }
 
     this.addReader = function(index){
@@ -729,9 +729,9 @@ function Process(obj,$scope,$http,$templateCache){
         this.readers.push(reader);
 
         reader.add = true;
-        reader.processId = this.id;
+        reader.taskId = this.id;
         var jdata = 'mydata='+JSON.stringify(reader);
-        saveData('/process-reader',$http,$templateCache,jdata);
+        saveData('/task-reader',$http,$templateCache,jdata);
 
     }
 
@@ -747,9 +747,9 @@ function Process(obj,$scope,$http,$templateCache){
         $scope.users.list.push(reader);
 
         reader.add = false;
-        reader.processId = this.id;
+        reader.taskId = this.id;
         var jdata = 'mydata='+JSON.stringify(reader);
-        saveData('/process-reader',$http,$templateCache,jdata);
+        saveData('/task-reader',$http,$templateCache,jdata);
     }
 
 
@@ -759,7 +759,7 @@ function Process(obj,$scope,$http,$templateCache){
 
         var comment = {
             readers:this.getReaders(),
-            processId:this.id,
+            taskId:this.id,
             id:datetime,
             type:'0',
             message:'终止任务：' + msg,
@@ -770,7 +770,7 @@ function Process(obj,$scope,$http,$templateCache){
         };
 
         var jdata = 'mydata=' + JSON.stringify(comment);
-        saveData('/process-stop',$http,$templateCache,jdata);
+        saveData('/task-stop',$http,$templateCache,jdata);
 
         this.comments.splice(0,0,comment);
         this.formData = "";
@@ -785,7 +785,7 @@ function Process(obj,$scope,$http,$templateCache){
 
         var comment = {
             readers:this.getReaders(),
-            processId:this.id,
+            taskId:this.id,
             id:datetime,
             type:'0',
             message:'重启任务：' + msg,
@@ -796,7 +796,7 @@ function Process(obj,$scope,$http,$templateCache){
         };
 
         var jdata = 'mydata=' + JSON.stringify(comment);
-        saveData('/process-restart',$http,$templateCache,jdata);
+        saveData('/task-restart',$http,$templateCache,jdata);
 
         this.comments.splice(0,0,comment);
         this.formData = "";
