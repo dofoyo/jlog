@@ -185,6 +185,7 @@ pc.controller('TaskCtrl',[
         });
 
 
+
         var url = location.href;
         var divName = url.substr(url.lastIndexOf('/')+1);
         if(divName == 'create'){
