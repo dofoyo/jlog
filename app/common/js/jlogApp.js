@@ -28,6 +28,6 @@ config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/relationship', {templateUrl: 'user/views/relationship.html', controller: ''});
   $routeProvider.when('/login', {templateUrl: 'login/views/login.html', controller: 'LoginCtrl'});
   $routeProvider.when('/user', {templateUrl: 'user/views/user.html', controller: 'UserListCtrl'});
-  $routeProvider.otherwise({redirectTo: '/log'});
+  $routeProvider.otherwise({redirectTo: '/task'});
 }]);
 

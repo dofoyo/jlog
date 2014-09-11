@@ -48,6 +48,12 @@
             //e.preventDefault();
             $(this).tab('show');
         });
+
+        var url = location.href;
+        var module = "#" + url.substr(url.lastIndexOf('/')+1);
+        $('#myTab a[href="'+module+'"]').tab('show');
+
     </script>
+
 </body>
 </html>
