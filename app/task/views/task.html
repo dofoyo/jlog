@@ -25,7 +25,7 @@
     }
 </style>
 
-<div class="btn-group">
+<div class="btn-group" ng-show="pageState.showMenu">
     <button type="button" ng-click="pageState.showDiv('createDiv')" class="btn btn-success">发起</button>
     <button type="button" ng-click="pageState.showDiv('todoDiv')" class="btn btn-primary">待办</button>
     <button type="button" ng-click="pageState.showDiv('doneDiv')" class="btn btn-info">已办</button>

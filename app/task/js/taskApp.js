@@ -14,7 +14,7 @@ angular.module('taskApp', [
   'myApp.controllers'
 ]).
 config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/start', {templateUrl: 'views/task.html', controller: 'TaskCtrl'});
+  $routeProvider.when('/create', {templateUrl: 'views/task.html', controller: 'TaskCtrl'});
   $routeProvider.when('/todo', {templateUrl: 'views/task.html', controller: 'TaskCtrl'});
   $routeProvider.when('/done', {templateUrl: 'views/task.html', controller: 'TaskCtrl'});
   $routeProvider.otherwise({redirectTo: '/todo'});

@@ -135,6 +135,7 @@ pc.controller('TaskCtrl',[
         };
 
         $scope.pageState={
+            showMenu:true,
             createDiv: false,
             todoDiv: false,
             doneDiv: false,
@@ -182,6 +183,20 @@ pc.controller('TaskCtrl',[
             //alert('Complete all', items);
             uploader.clearQueue();
         });
+
+
+        var url = location.href;
+        var divName = url.substr(url.lastIndexOf('/')+1);
+        if(divName == 'create'){
+            $scope.pageState.showMenu = false;
+            $scope.pageState.showDiv('createDiv');
+        }else if(divName == 'todo'){
+            $scope.pageState.showMenu = false;
+            $scope.pageState.showDiv('todoDiv');
+        }else if(divName == 'done'){
+            $scope.pageState.showMenu = false;
+            $scope.pageState.showDiv('doneDiv');
+        }
 
 }]);
 
