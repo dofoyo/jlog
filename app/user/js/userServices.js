@@ -1,12 +1,12 @@
 'use strict';
 
-var um = angular.module('myApp.userServices', []);
+var um = angular.module('user.services', []);
 
 um.factory('User', function($resource){
     return $resource('/users');
 });
 
-angular.module('myApp.userFilterServices', []).
+angular.module('user.filterServices', []).
     factory('userFilterService', function() {
         return {
             activeFilters: {},

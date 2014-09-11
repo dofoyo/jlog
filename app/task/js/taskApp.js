@@ -4,14 +4,14 @@
 angular.module('taskApp', [
   'ngRoute',
   'angularFileUpload',
-  'myApp.taskControllers',
-  'myApp.taskServices',
-  'myApp.taskFilters',
-  'myApp.userServices',
-  'myApp.filters',
-  'myApp.services',
-  'myApp.directives',
-  'myApp.controllers'
+  'task.controllers',
+  'task.services',
+  'task.filters',
+  'user.services',
+  'common.filters',
+  'common.services',
+  'common.directives',
+  'common.controllers'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/create', {templateUrl: 'views/task.html', controller: 'TaskCtrl'});

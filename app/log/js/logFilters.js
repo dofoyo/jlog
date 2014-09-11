@@ -1,3 +1,3 @@
 'use strict';
 
-var logModule = angular.module('myApp.logFilters', []);
+var logModule = angular.module('log.filters', []);

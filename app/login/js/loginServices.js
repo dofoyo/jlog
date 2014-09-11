@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.loginServices', []).factory('authInterceptor', function ($rootScope, $q, $window) {
+angular.module('login.services', []).factory('authInterceptor', function ($rootScope, $q, $window) {
     return {
         request: function (config) {
             config.headers = config.headers || {};

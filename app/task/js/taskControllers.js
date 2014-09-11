@@ -1,5 +1,5 @@
 'use strict';
-var pc = angular.module('myApp.taskControllers', []);
+var pc = angular.module('task.controllers', []);
 
 pc.controller('TaskCtrl',[
     '$scope',

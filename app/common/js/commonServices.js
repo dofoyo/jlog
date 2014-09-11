@@ -1,6 +1,6 @@
 'use strict';
 
-var sm = angular.module('myApp.services', []);
+var sm = angular.module('common.services', []);
 
 sm.value('version', '0.1');
 

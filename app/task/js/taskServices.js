@@ -1,5 +1,5 @@
 'use strict';
-var pm = angular.module('myApp.taskServices', ['ngResource']);
+var pm = angular.module('task.services', ['ngResource']);
 
 pm.constant('CommentType',{
     EXECUTER:0,

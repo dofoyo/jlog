@@ -1,20 +1,21 @@
 'use strict';
 
 // Declare app level module which depends on filters, and services
-angular.module('myApp', [
+angular.module('jlogApp', [
   'ngRoute',
   'angularFileUpload',
-  'myApp.taskControllers',
-  'myApp.taskServices',
-  'myApp.logServices',
-  'myApp.logFilters',
-  'myApp.userServices',
-  'myApp.userFilterServices',
-  'myApp.loginServices',
-  'myApp.filters',
-  'myApp.services',
-  'myApp.directives',
-  'myApp.controllers'
+  'task.controllers',
+  'task.services',
+  'task.filters',
+  'log.services',
+  'log.filters',
+  'user.services',
+  'user.filterServices',
+  'login.services',
+  'common.filters',
+  'common.services',
+  'common.directives',
+  'common.controllers'
 ]).
 config(function ($httpProvider) {
     $httpProvider.interceptors.push('authInterceptor');

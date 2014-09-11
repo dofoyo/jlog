@@ -1,4 +1,4 @@
 'use strict';
 
-var logModule = angular.module('myApp.taskFilters', []);
+var logModule = angular.module('task.filters', []);
 
