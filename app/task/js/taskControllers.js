@@ -239,7 +239,8 @@ function Task(obj,$scope,$http,$templateCache){
         adviser: obj.type=='1' ? '会签人': '参与人',
         reader: '知会人',
         yesBtn: obj.type=='1' ? '同意': '完成',
-        noBtn: obj.type=='1' ? '驳回': '放弃'
+        noBtn: obj.type=='1' ? '驳回': '放弃',
+        supplementBtn: obj.type=='1' ? '会签': '汇报'
     };
     this.formData = '';
     this.toolbar = {
