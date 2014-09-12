@@ -154,9 +154,9 @@ pc.controller('TaskCtrl',[
                     if(this.createDiv){
                         $scope.tasks.getTasks('1');
                     }else if(this.todoDiv){
-                        $scope.tasks.getTasks('2');
+                        $scope.tasks.getTasks('23');
                     }else if(this.doneDiv){
-                        $scope.tasks.getTasks('5');
+                        $scope.tasks.getTasks('567');
                     }
                 }
             }

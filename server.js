@@ -627,6 +627,17 @@ app.get('/tasks',function(req,res){
                 ]
             };
             break;
+        case 23:     //2-toExecute:待处理
+            console.log("23-toExecute&Adviser:待处理+待签");
+            finder = {
+                $and:[
+                    {'subject':{$regex:keyWord}},
+                    {'closeDatetime':''},
+                    {'stopDatetime':''},
+                    {$or:[{'executers':{$elemMatch:{"userId":loginUserId}}},{'advisers':{$elemMatch:{"userId":loginUserId}}}]}
+                ]
+            };
+            break;
         case 4:     //4-toRead:待阅
             console.log("4-toRead:待阅");
             finder = {
@@ -663,6 +674,15 @@ app.get('/tasks',function(req,res){
                 $and:[
                     {'subject':{$regex:keyWord}},
                     {'stopDatetime':{$ne:''}},
+                    {'comments':{$elemMatch:{"userId":loginUserId}}}
+                ]
+            };
+            break;
+        case 567:     //7-stoped：已终止
+            console.log("7-stoped：已终止");
+            finder = {
+                $and:[
+                    {'subject':{$regex:keyWord}},
                     {'comments':{$elemMatch:{"userId":loginUserId}}}
                 ]
             };
