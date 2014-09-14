@@ -488,7 +488,7 @@ function Task(obj,$scope,$http,$templateCache){
 
         //未关闭、未终止的流程，参与人都可发言，即使是排在后面的处理人，也可先发言。发言并不影响流程的流向
         this.toolbar.supplementBtn = !hass && !hasc;
-        this.toolbar.supplementBtnTitle = isad ? this.caption.adviser : "发言";
+        this.toolbar.supplementBtnTitle = isad ? this.caption.supplementBtn : "补充";
         this.toolbar.attachmentBtn = !hass && !hasc;
 
         //未关闭、未终止的流程,发起人和当前处理人可拉会签人和处理人进来
