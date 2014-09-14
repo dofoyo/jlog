@@ -33,7 +33,12 @@
 </div>
 
 <div ng-show="pageState.createDiv">
-    <input type="text" class="form-control" placeholder="类型" ng-model="tasks.formData.type">
+    <label class="radio-inline">
+        <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="1"  ng-model="tasks.formData.type" ng-checked="true">申请/报告
+    </label>
+    <label class="radio-inline">
+        <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="2" ng-model="tasks.formData.type"> 工作安排
+    </label>
     <input type="text" class="form-control" placeholder="主题" ng-model="tasks.formData.subject">
     <TEXTAREA ROWS="4" ng-model="tasks.formData.description" class="form-control" placeholder="详细阐述"></TEXTAREA>
     <button type="button" ng-click="tasks.create()" class="btn btn-default">保存</button>
