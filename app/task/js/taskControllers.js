@@ -138,23 +138,25 @@ pc.controller('TaskCtrl',[
             showMenu:true,
             createDiv: false,
             todoDiv: false,
+            toreDiv: false,
             doneDiv: false,
             showDiv:function(div){
                 if(!$window.sessionStorage.token){
                     alert('请登录！');
                 } else{
-                    var currentDiv = this.createDiv ? 'createDiv': (this.todoDiv ? 'todoDiv' : 'doneDiv');
-
                     this.createDiv = div == 'createDiv' ? true : false;
                     this.todoDiv   = div == 'todoDiv' ? true : false;
+                    this.toreDiv   = div == 'toreDiv' ? true : false;
                     this.doneDiv   = div == 'doneDiv' ? true : false;
 
-                    //console.log('showDiv: ' + div);
+                    console.log('showDiv: ' + div);
 
                     if(this.createDiv){
                         $scope.tasks.getTasks('1');
                     }else if(this.todoDiv){
                         $scope.tasks.getTasks('23');
+                    }else if(this.toreDiv){
+                        $scope.tasks.getTasks('4');
                     }else if(this.doneDiv){
                         $scope.tasks.getTasks('567');
                     }

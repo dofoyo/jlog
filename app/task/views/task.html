@@ -28,6 +28,7 @@
 <div class="btn-group" ng-show="pageState.showMenu">
     <button type="button" ng-click="pageState.showDiv('createDiv')" class="btn btn-success">发起</button>
     <button type="button" ng-click="pageState.showDiv('todoDiv')" class="btn btn-primary">待办</button>
+    <button type="button" ng-click="pageState.showDiv('toreDiv')" class="btn btn-primary">待阅</button>
     <button type="button" ng-click="pageState.showDiv('doneDiv')" class="btn btn-info">已办</button>
 </div>
 
@@ -43,8 +44,17 @@
         <span class="input-group-addon">关键字：</span>
         <input type="text" ng-model="tasks.params.keyWord" class="form-control" />
         <span class="input-group-btn">
-            <button type="button" ng-click="tasks.getTasks(23);" class="btn btn-default">待办</button>
-            <button type="button" ng-click="tasks.getTasks(4);" class="btn btn-default">待阅</button>
+            <button type="button" ng-click="tasks.getTasks(23);" class="btn btn-default">GO</button>
+       </span>
+    </div>
+</div>
+
+<div ng-show="pageState.toreDiv">
+    <div class="input-group">
+        <span class="input-group-addon">关键字：</span>
+        <input type="text" ng-model="tasks.params.keyWord" class="form-control" />
+        <span class="input-group-btn">
+            <button type="button" ng-click="tasks.getTasks(4);" class="btn btn-default">GO</button>
        </span>
     </div>
 </div>
