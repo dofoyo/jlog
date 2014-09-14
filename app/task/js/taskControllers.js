@@ -196,6 +196,9 @@ pc.controller('TaskCtrl',[
         }else if(divName == 'todo'){
             $scope.pageState.showMenu = false;
             $scope.pageState.showDiv('todoDiv');
+        }else if(divName == 'tore'){
+            $scope.pageState.showMenu = false;
+            $scope.pageState.showDiv('toreDiv');
         }else if(divName == 'done'){
             $scope.pageState.showMenu = false;
             $scope.pageState.showDiv('doneDiv');
