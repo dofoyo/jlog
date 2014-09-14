@@ -75,6 +75,7 @@
                         <span  ng-show="!{{comment.type}}" class="text-info">{{comment.userName}}</span>
                     </td>
                     <td align="{{comment.type=='0' ? 'left' : 'right'}}">
+                        <span ng-show="{{comment.message | isPic}}"><img src="{{comment.message | attachmentUrl}}" name="image" border=0 width="50" height="50" id="img"/></span><br>
                         <span class="text-primary">{{comment.message | attachmentName}}</span>
                         <span ng-show="{{comment.message | hasAttachment}}"><a href="{{comment.message | attachmentUrl}}" target="_blank">下载</a></span><br>
                         <span class="text-muted">({{comment.completeDatetime  | date:'yyyy-MM-dd hh:mm:ss'}})</span>

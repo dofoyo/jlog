@@ -43,3 +43,17 @@ mf.filter('hasAttachment', function(){
     };
     return attachmentNameFilter;
 });
+
+mf.filter('isPic', function(){
+    var attachmentNameFilter = function(str){
+        var picReg = new RegExp('\.jpg$|\.jpeg$|\.gif$','i')
+        if(picReg.test(str)){
+            //console.log(str + ' is pic');
+            return true;
+        }else{
+            //console.log(str + ' is NOT pic');
+            return false;
+        }
+    };
+    return attachmentNameFilter;
+});
