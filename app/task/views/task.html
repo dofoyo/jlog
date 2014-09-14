@@ -39,32 +39,12 @@
     <button type="button" ng-click="tasks.create()" class="btn btn-default">保存</button>
 </div>
 
-<div ng-show="pageState.todoDiv">
+<div ng-show="!pageState.createDiv">
     <div class="input-group">
         <span class="input-group-addon">关键字：</span>
         <input type="text" ng-model="tasks.params.keyWord" class="form-control" />
         <span class="input-group-btn">
-            <button type="button" ng-click="tasks.getTasks(23);" class="btn btn-default">GO</button>
-       </span>
-    </div>
-</div>
-
-<div ng-show="pageState.toreDiv">
-    <div class="input-group">
-        <span class="input-group-addon">关键字：</span>
-        <input type="text" ng-model="tasks.params.keyWord" class="form-control" />
-        <span class="input-group-btn">
-            <button type="button" ng-click="tasks.getTasks(4);" class="btn btn-default">GO</button>
-       </span>
-    </div>
-</div>
-
-<div ng-show="pageState.doneDiv">
-    <div class="input-group">
-        <span class="input-group-addon">关键字：</span>
-        <input type="text" ng-model="tasks.params.keyWord" class="form-control" />
-        <span class="input-group-btn">
-            <button type="button" ng-click="tasks.getTasks(567);" class="btn btn-default">Go</button>
+            <button type="button" ng-click="pageState.getTasks();" class="btn btn-default">GO</button>
        </span>
     </div>
 </div>
